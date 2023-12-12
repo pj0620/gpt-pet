@@ -1,0 +1,22 @@
+description: "This API endpoint is used to move GPTPet in one direction by a fixed step size"
+parameters:
+  - description: "direction in which GptPet should move"
+    in: "query"
+    name: "direction"
+    schema:
+      type: string
+      enum: ['forward', 'left', 'back', 'right']
+    required: true
+responses:
+    "200":
+      description: Successful response
+      schema:
+        type: string
+    "400":
+      description: Bad request
+      schema:
+        type: string
+    "409":
+      description: Cannot move in the direction specified
+      schema:
+        type: string

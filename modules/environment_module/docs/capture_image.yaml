@@ -1,0 +1,9 @@
+description: "This API endpoint is used to receive an image of what GPTPet is currently seeing"
+produces:
+  - image/jpeg
+responses:
+    "200":
+      description: Successful response
+      schema:
+        type: file
+        format: binary
