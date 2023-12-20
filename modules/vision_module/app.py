@@ -29,7 +29,7 @@ swagger_config = {
 
 }
 swagger = Swagger(app, config=swagger_config)
-CORS(app, supports_credentials=True)  # This will disable CORS for all routes
+# CORS(app, supports_credentials=True)  # This will disable CORS for all routes
 
 # Create a logger object
 logger = logging.getLogger('vision_module')
@@ -51,7 +51,8 @@ logger.addHandler(stdout_handler)
 @swag_from("docs/capture_room_view.yaml")
 @app.route("/capture-room-view", methods=['PUT'])
 def capture_room_view():
-    pass
+    return 'hello world'
 
-if __name__ == '__main__':
-    app.run(debug=True, port=int(os.environ['VISION_MODULE_PORT']))
+
+if __name__ == "__main__":
+    app.run(debug=True)

@@ -11,10 +11,11 @@ class Ai2ThorService:
             gridSize=0.25,
             rotateStepDegrees=90,
             # camera properties
-            width=800,
-            height=800,
+            width=1200,
+            height=1200,
             fieldOfView=90
         )
+        controller.step(action="Crouch")
         self.last_event = None
 
     def move(self, direction: str):

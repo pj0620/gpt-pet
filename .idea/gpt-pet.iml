@@ -6,8 +6,11 @@
       <sourceFolder url="file://$MODULE_DIR$/modules/vision_module" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/vision_proxy_module" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/vision_module/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/vision_module/venv2" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/environment_module/venv" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.12 (gpt-pet) (2)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

@@ -1,11 +1,10 @@
 description: "This API endpoint is used to save the GPTPet's current view of the room"
-parameters:
 responses:
-    "200":
+    200:
       description: Successful response
       schema:
         type: string
-    "400":
+    400:
       description: Bad request
       schema:
         type: string
