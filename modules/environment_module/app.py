@@ -133,4 +133,5 @@ def capture_image():
     return send_file(img_io, mimetype='image/jpeg')
 
 
-app.run(debug=True)
+if __name__ == '__main__':
+    app.run(debug=True, port=int(os.environ['ENV_MODULE_PORT']))
