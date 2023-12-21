@@ -15,7 +15,7 @@ class Ai2ThorService:
             height=1200,
             fieldOfView=90
         )
-        controller.step(action="Crouch")
+        self.controller.step(action="Crouch")
         self.last_event = None
 
     def move(self, direction: str):
