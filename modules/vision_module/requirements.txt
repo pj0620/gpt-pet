@@ -18,3 +18,4 @@ referencing==0.32.0
 rpds-py==0.15.2
 werkzeug==3.0.1
 zipp==3.17.0
+requests==2.31.0
