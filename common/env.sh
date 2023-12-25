@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Motor-Sensory Modules
 export OBJECT_PERMANENCE_MODULE_PORT=3000
@@ -8,9 +8,6 @@ export LOCATION_MODULE_PORT=3001
 export HARDWARE_MODULE_PORT=4000
 export VECTOR_DB_MODULE_PORT=4001
 export SQL_MODULE_PORT=4003
-
-# Key Value DBs Configs
-export LOCATION_MODULE_KV__PORT
 
 # SQL Config
 #export SQL_DATABASE_NAME=gptpet-db

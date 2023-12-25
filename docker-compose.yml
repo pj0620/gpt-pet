@@ -55,7 +55,7 @@ services:
   location-module:
     build: modules/location_module
     environment:
-      - HARDWARE_MODULE_URL=http://host.docker.internal:${HARDWARE_MODULE_PORT}
+      - HARDWARE_MODULE_URL=http://${HARDWARE_MODULE_HOST:-host.docker.internal}:${HARDWARE_MODULE_PORT}
       - VECTOR_DB_MODULE_URL=http://host.docker.internal:${VECTOR_DB_MODULE_PORT}
       - PYTHONUNBUFFERED=1
       - RECREATE_VECTOR_DB=true

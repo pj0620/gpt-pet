@@ -1,11 +1,13 @@
-#!/bin/sh
+#!/bin/bash
+
+script_dir="$(dirname "$0")"
 
 # Function to run when SIGINT (Ctrl+C) is received
 cleanup() {
-  ~/Projects/GPTPet/code/gpt-pet/common/cleanup.sh
+  "$script_dir"/cleanup.sh
 }
 
-source ./env.sh
+source "$script_dir/env.sh"
 
 # Trap SIGINT
 trap cleanup INT
@@ -22,7 +24,7 @@ done
 if [ $headless_mode -eq 0 ]; then
   echo "Setting up ai2Thor + hardware module locally"
   pushd ../modules/hardware_module
-  ./venv/bin/flask run -p $HARDWARE_MODULE_PORT &
+  ./venv/bin/flask run -p "$HARDWARE_MODULE_PORT" &
   popd
 fi
 

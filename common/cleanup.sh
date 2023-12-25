@@ -1,6 +1,8 @@
 #!/bin/bash
 
-source ./env.sh
+script_dir="$(dirname "$0")"
+
+source $script_dir/env.sh
 
 echo "SIGINT received, stopping Flask and Docker Compose..."
 
