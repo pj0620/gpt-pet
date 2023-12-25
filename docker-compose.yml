@@ -11,15 +11,17 @@ services:
     - http
     image: semitechnologies/weaviate:1.22.7
     ports:
-    - ${VECTOR_DB_ENV_MODULE_PORT}:8080
+    - ${VECTOR_DB_MODULE_PORT}:8080
     - 50051:50051
+    volumes:
+    - vector_db_data:/var/lib/vector_db
     restart: on-failure:0
     environment:
       CONTEXTIONARY_URL: contextionary:9999
       IMAGE_INFERENCE_API: 'http://i2v-neural:8080'
       QUERY_DEFAULTS_LIMIT: 25
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
-      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      PERSISTENCE_DATA_PATH: '/var/lib/vector_db'
       DEFAULT_VECTORIZER_MODULE: 'text2vec-contextionary'
       ENABLE_MODULES: 'text2vec-contextionary,img2vec-neural'
       CLUSTER_HOSTNAME: 'node1'
@@ -37,15 +39,29 @@ services:
     image: semitechnologies/img2vec-pytorch:resnet50
     environment:
       ENABLE_CUDA: '0'
+#  sql-module:
+#    image: postgres:latest  # You can specify a specific version if needed
+#    environment:
+#      POSTGRES_DB: ${SQL_DATABASE_NAME}
+#      POSTGRES_USER: ${SQL_USER_NAME}
+#      POSTGRES_PASSWORD: ${SQL_PASSWORD}
+#      PGDATA: /var/lib/postgresql/data/pgdata
+#    volumes:
+#      - pgdata:/var/lib/postgresql/data
+#    ports:
+#      - ${SQL_MODULE_PORT}:5432
 
   # Motor-Sensory Modules
-  vision-module:
-    build: ./modules/vision_module
+  location-module:
+    build: modules/location_module
     environment:
-      - ENVIRONMENT_MODULE_URL=http://host.docker.internal:${ENV_MODULE_PORT}
+      - HARDWARE_MODULE_URL=http://host.docker.internal:${HARDWARE_MODULE_PORT}
+      - VECTOR_DB_MODULE_URL=http://host.docker.internal:${VECTOR_DB_MODULE_PORT}
       - PYTHONUNBUFFERED=1
+      - RECREATE_VECTOR_DB=true
     ports:
-      - "${VISION_MODULE_PORT}:8080"
+      - "${LOCATION_MODULE_PORT}:8080"
     volumes:
-      - ./modules/vision_module:/app
-
+      - ./modules/location_module:/app
+volumes:
+  vector_db_data:

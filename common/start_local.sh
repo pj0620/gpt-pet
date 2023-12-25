@@ -2,48 +2,31 @@
 
 # Function to run when SIGINT (Ctrl+C) is received
 cleanup() {
-    echo "SIGINT received, stopping Flask and Docker Compose..."
-
-    # Stop Flask server
-    ps aux | grep 'ai2' | awk '{print $2}' | xargs kill
-    for port in $ENV_MODULE_PORT; do
-      PID=$(lsof -t -i:"$port")
-      if [ -n "$PID" ]; then
-          echo "Killing process on port $port with PID: $PID"
-          kill $PID
-      else
-          echo "No process found on port $port"
-      fi
-  done
-
-    # Run docker-compose down
-    docker-compose down
-
-    exit 0
+  ~/Projects/GPTPet/code/gpt-pet/common/cleanup.sh
 }
-
-# Trap SIGINT
-trap cleanup INT
 
 source ./env.sh
 
-ps aux | grep 'ai2' | awk '{print $2}' | xargs kill
+# Trap SIGINT
+trap cleanup INT
+cleanup
 
-for port in $ENV_MODULE_PORT; do
-    PID=$(lsof -t -i:"$port")
-    if [ -n "$PID" ]; then
-        echo "Killing process on port $port with PID: $PID"
-        kill $PID
-    else
-        echo "No process found on port $port"
-    fi
+headless_mode=0
+for arg in "$@"
+do
+  if [ "$arg" = "--headless" ]; then
+    headless_mode=1
+    break
+  fi
 done
+if [ $headless_mode -eq 0 ]; then
+  echo "Setting up ai2Thor + hardware module locally"
+  pushd ../modules/hardware_module
+  ./venv/bin/flask run -p $HARDWARE_MODULE_PORT &
+  popd
+fi
 
-# start Environment Module
-pushd ../modules/environment_module
-./venv/bin/flask run -p $ENV_MODULE_PORT &
-popd
-
+echo starting other docker-based modules
 pushd ..
 docker-compose up
 popd

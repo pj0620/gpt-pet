@@ -2,15 +2,15 @@
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
     <content url="file://$MODULE_DIR$">
-      <sourceFolder url="file://$MODULE_DIR$/modules/environment_module" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/modules/vision_module" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/vision_proxy_module" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/modules/hardware_module" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/modules/location_module" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
-      <excludeFolder url="file://$MODULE_DIR$/modules/vision_module/venv" />
-      <excludeFolder url="file://$MODULE_DIR$/modules/vision_module/venv2" />
-      <excludeFolder url="file://$MODULE_DIR$/modules/environment_module/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/hardware_module/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/location_module/venv" />
+      <excludeFolder url="file://$MODULE_DIR$/modules/location_module/venv2" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.12 (gpt-pet) (2)" jdkType="Python SDK" />
+    <orderEntry type="jdk" jdkName="Python 3.10 (gpt-pet)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

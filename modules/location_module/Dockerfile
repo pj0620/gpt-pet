@@ -12,6 +12,7 @@ WORKDIR $APP_HOME
 COPY . ./
 
 # Install production dependencies.
+RUN apt-get update
 RUN pip install --no-cache-dir -r requirements.txt
 
 EXPOSE 8080
