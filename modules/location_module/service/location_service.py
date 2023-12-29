@@ -18,9 +18,17 @@ class LocationService:
   def capture_room_view(self):
     encoded_image = self.hardware_adapter_service.capture_image()
     
+    print('checking if current room is set')
     if self.current_room is None:
+      print('identifying current room')
       self.identify_current_room(encoded_image)
       
+    print("storing image from camera")
+    new_image_id = self.vectordb_adapter_service.create_image(encoded_image)
+    
+    print(f"associating current_room {self.current_room} with image {new_image_id}")
+    self.vectordb_adapter_service.associate_room_with_image(self.current_room, new_image_id)
+    
   def identify_current_room(self, encoded_image: str):
     # current room is set return current room
     # TODO: there is a chance current room is out of sync, add handling of this case
@@ -34,7 +42,7 @@ class LocationService:
       print(f'created new room: {self.current_room}')
       return self.current_room
     
-    # TODO: more logic
+    # TODO: more logic to try and identify room
     return 0
   
   def create_new_room(self, encoded_image: str):

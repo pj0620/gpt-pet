@@ -48,7 +48,6 @@ IMAGE_CLASS_SCHEMA = {
       'name': 'image',
       'dataType': ['blob']
     },
-    *NAMED_ENTITY_FIELDS,
     *AUDIT_FIELDS
   ]
 }
@@ -57,10 +56,6 @@ ROOM_CLASS_SCHEMA = {
   "class": ROOM_CLASS_NAME,
   "description": "A room in a building",
   "properties": [
-    {
-      'name': 'image',
-      'dataType': ['blob']
-    },
     {
       "name": "images",
       "dataType": ["Image"],

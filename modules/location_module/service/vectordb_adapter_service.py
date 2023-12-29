@@ -1,9 +1,11 @@
 import os
+from dataclasses import asdict
+from datetime import datetime
 
 import weaviate
 
-from model.location_models import Room
-from vectordb.constants import ROOM_CLASS_NAME
+from model.location_models import Room, Image
+from vectordb.constants import ROOM_CLASS_NAME, IMAGE_CLASS_NAME
 from vectordb.location_schema import LOCATION_VECTORDB_SCHEMA
 
 
@@ -32,7 +34,6 @@ class VectorDBAdapterService:
     if os.environ.get('RECREATE_VECTOR_DB').lower() == 'true':
       print('recreating vector db')
       for class_config in LOCATION_VECTORDB_SCHEMA["classes"]:
-        print(f"class_config = {class_config}")
         class_name = class_config["class"]
         print(f"checking if {class_name} exists")
         if self.vectordb_client.schema.exists(class_name):
@@ -61,7 +62,35 @@ class VectorDBAdapterService:
   def create_room(self, new_room: Room):
     new_room_id = self.vectordb_client.data_object.create(
       class_name=ROOM_CLASS_NAME,
-      data_object=new_room.build_dict()
+      data_object=asdict(new_room)
     )
     print(f'successfully created new room with id: {new_room_id}')
     return new_room_id
+  
+  def create_image(self, image_data: str | bytes):
+    converted_img = image_data
+    if isinstance(image_data, bytes):
+      converted_img = image_data.decode('utf-8')
+    
+    current_time = datetime.utcnow().isoformat() + 'Z'
+    new_image = Image(
+      image=converted_img,
+      createdAt=current_time,
+      modifiedAt=current_time,
+      lastAccessedAt=current_time
+    )
+    new_image_id = self.vectordb_client.data_object.create(
+      class_name=IMAGE_CLASS_NAME,
+      data_object=asdict(new_image)
+    )
+    print(f'successfully created new room with id: {new_image_id}')
+    return new_image_id
+  
+  def associate_room_with_image(self, room_id: str, image_id: str):
+    self.vectordb_client.data_object.reference.add(
+      from_class_name=ROOM_CLASS_NAME,
+      from_uuid=room_id,
+      from_property_name="images",
+      to_class_name=IMAGE_CLASS_NAME,
+      to_uuid=image_id,
+    )
