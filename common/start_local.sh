@@ -14,11 +14,13 @@ trap cleanup INT
 cleanup
 
 headless_mode=0
+bodyless_mode=0
 for arg in "$@"
 do
   if [ "$arg" = "--headless" ]; then
     headless_mode=1
-    break
+  elif [ "$arg" = "--bodyless" ]; then
+    bodyless_mode=1
   fi
 done
 if [ $headless_mode -eq 0 ]; then
@@ -28,7 +30,10 @@ if [ $headless_mode -eq 0 ]; then
   popd
 fi
 
-echo starting other docker-based modules
-pushd ..
-docker-compose up
-popd
+if [ $bodyless_mode -eq 0 ]; then
+  echo "Starting docker-based modules"
+  pushd ..
+  docker-compose up -d
+  docker-compose logs -f
+  popd
+fi

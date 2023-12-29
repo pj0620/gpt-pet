@@ -1,86 +1,52 @@
-import base64
-import os
-from urllib.parse import urlparse
+from datetime import datetime
 
-import requests
-import weaviate
-# import psycopg2
+from service.hardware_adapter_service import HardwareAdapterService
+from service.vectordb_adapter_service import VectorDBAdapterService
+from service.vision_adapter_service import VisionAdapterService
 
-from vectordb.constants import ROOM_CLASS_NAME, LOCATION_DB_SCHEMA_NAME
-from vectordb.location_schema import LOCATION_VECTORDB_SCHEMA
+from model.location_models import Room
 
-class VisionService:
+
+class LocationService:
   def __init__(self):
-    self.hardware_module_url = os.environ.get('HARDWARE_MODULE_URL')
-    print(f'found {self.hardware_module_url=}')
-    
-    vector_db_url = os.environ.get('VECTOR_DB_MODULE_URL')
-    print(f'found {vector_db_url=}')
-    for try_count in range(10):
-      print(f'trying to connect to weaviate attempt number: {try_count}')
-      try:
-        self.vectordb_client = weaviate.Client(
-          vector_db_url,
-          timeout_config=(100, 60)
-        )
-        break
-      except weaviate.exceptions.WeaviateStartUpError as e:
-        print('failed to connect to weaviate', e)
+    self.hardware_adapter_service = HardwareAdapterService()
+    self.vectordb_adapter_service = VectorDBAdapterService()
+    self.vision_adapter_service = VisionAdapterService()
     
     self.current_room = None
-    
-    self.setup_dbs(None)
-  
-  def setup_dbs(self, sql_module_url):
-    # result = urlparse(sql_module_url)
-    # username = result.username
-    # password = result.password
-    # database = result.path[1:]  # Remove leading slash
-    # hostname = result.hostname
-    # port = result.port
-    #
-    # # Connect to the database
-    # self.sql_conn = psycopg2.connect(
-    #   database=database,
-    #   user=username,
-    #   password=password,
-    #   host=hostname,
-    #   port=port
-    # )
-    
-    print('checking if we need to recreate vector db')
-    if os.environ.get('RECREATE_VECTOR_DB').lower() == 'true':
-      print('recreating vector db')
-      for class_config in LOCATION_VECTORDB_SCHEMA["classes"]:
-        print(f"class_config = {class_config}")
-        class_name = class_config["class"]
-        print(f"checking if {class_name} exists")
-        if self.vectordb_client.schema.exists(class_name):
-          print(f'found class exists, deleting {class_name}')
-          self.vectordb_client.schema.delete_class(class_name)
-      
-      print('creating db')
-      self.vectordb_client.schema.create(LOCATION_VECTORDB_SCHEMA)
   
   def capture_room_view(self):
-    print(f'getting capture of current view from {self.hardware_module_url}/capture-image')
-    # Make a GET request to fetch the image
-    response = requests.get(f'{self.hardware_module_url}/capture-image')
-    
-    # Check if the request was successful
-    if response.status_code != 200:
-      raise Exception(f"Cannot connect to self.environment_module_url at "
-                      f"{self.hardware_module_url}/capture-image, "
-                      f"recieved {response.status_code} response code")
-    
-    encoded_image = base64.b64encode(response.content).decode('utf-8')
-    print(f"{encoded_image=}")
+    encoded_image = self.hardware_adapter_service.capture_image()
     
     if self.current_room is None:
-      self.identify_current_room()
+      self.identify_current_room(encoded_image)
       
+  def identify_current_room(self, encoded_image: str):
+    # current room is set return current room
+    # TODO: there is a chance current room is out of sync, add handling of this case
+    if self.current_room is not None:
+      print(f'returning current room from location module state: id={self.current_room}')
+      return self.current_room
     
+    # if room db is empty, no rooms are created. This is the first room we have ever seen. Create new room
+    if self.vectordb_adapter_service.rooms_db_empty():
+      self.create_new_room(encoded_image)
+      print(f'created new room: {self.current_room}')
+      return self.current_room
     
-  def identify_current_room(self):
     # TODO: more logic
     return 0
+  
+  def create_new_room(self, encoded_image: str):
+    room_description = self.vision_adapter_service.describe_room(encoded_image)
+    print(room_description)
+    
+    current_time = datetime.utcnow().isoformat() + 'Z'
+    new_room = Room(
+      name=room_description.name,
+      description=room_description.description,
+      createdAt=current_time,
+      modifiedAt=current_time,
+      lastAccessedAt=current_time
+    )
+    self.current_room = self.vectordb_adapter_service.create_room(new_room)

@@ -1,3 +1,4 @@
+import base64
 import logging
 import os
 import sys
@@ -70,6 +71,10 @@ def log_request_info():
 
 @app.after_request
 def log_response_info(response):
+  if request.path == '/capture-image':
+    app.logger.info("Response for /capture-image, not logging data.")
+    return response
+  
   if not response.direct_passthrough:
     if response.mimetype != 'image/jpeg':  # Check if the response is not an image
       response_data = response.get_data(as_text=True)
@@ -129,8 +134,11 @@ def capture_image():
   img.save(img_io, 'JPEG')  # You can change 'JPEG' to 'PNG' if you prefer
   img_io.seek(0)
   
-  # Send the BytesIO object as a response
-  return send_file(img_io, mimetype='image/jpeg')
+  # Encode the image data in base64
+  img_base64 = base64.b64encode(img_io.getvalue()).decode('utf-8')
+  
+  # Return the base64 encoded string
+  return img_base64
 
 
 if __name__ == '__main__':

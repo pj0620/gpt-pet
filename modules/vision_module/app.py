@@ -1,12 +1,11 @@
-import os
 import sys
 
 from flasgger import Swagger, swag_from
-from flask import Flask
+from flask import Flask, request, jsonify
 import logging
 
-from service.location_service import LocationService
-from util.logging_utils import log_function_call
+from services.vision_service import VisionService
+from utils.logging_utils import log_function_call
 
 app = Flask(__name__)
 
@@ -17,7 +16,7 @@ swagger_config = {
   ],
   "specs": [
     {
-      "endpoint": 'Location_Module',
+      "endpoint": 'Vision_Module',
       "route": '/swagger.json',
       "rule_filter": lambda rule: True,
       "model_filter": lambda tag: True,
@@ -29,10 +28,9 @@ swagger_config = {
   
 }
 swagger = Swagger(app, config=swagger_config)
-# CORS(app, supports_credentials=True)  # This will disable CORS for all routes
 
 # Create a logger object
-logger = logging.getLogger('location_module')
+logger = logging.getLogger('vision_module')
 logger.setLevel(logging.INFO)  # Set the logging level
 
 # Create a handler that outputs log messages to stdout
@@ -46,15 +44,26 @@ stdout_handler.setFormatter(formatter)
 # Add the handler to the logger
 logger.addHandler(stdout_handler)
 
-location_service = LocationService()
+vision_service = VisionService()
 
 
 @log_function_call
-@swag_from("docs/capture_room_view.yaml")
-@app.route("/capture-room-view", methods=['PUT'])
-def capture_room_view():
-  location_service.capture_room_view()
-  return 'hello world'
+@swag_from("docs/describe_room.yaml")
+@app.route("/describe-room", methods=['POST'])
+def describe_room():
+  data = request.get_json()
+  if not data or 'image' not in data:
+    return jsonify({"error": "No image provided"}), 400
+  
+  img_b64 = data['image']
+  
+  try:
+    description = vision_service.describe_room(img_b64)
+    print(f"{description=}")
+    return jsonify(description), 200
+  except Exception as e:
+    print(e)
+    return jsonify({"error": "Invalid image format or internal error"}), 500
 
 
 if __name__ == "__main__":

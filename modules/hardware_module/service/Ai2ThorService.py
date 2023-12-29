@@ -11,8 +11,8 @@ class Ai2ThorService:
       gridSize=0.25,
       rotateStepDegrees=90,
       # camera properties
-      width=1200,
-      height=1200,
+      width=512,
+      height=512,
       fieldOfView=90
     )
     self.controller.step(action="Crouch")

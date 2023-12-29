@@ -1,9 +1,12 @@
-description: "This API endpoint is used to receive an image of what GPTPet is currently seeing"
+description: "This API endpoint is used to receive a base64 encoded image of what GPTPet is currently seeing"
 produces:
-  - image/jpeg
+  - application/json
 responses:
     "200":
       description: Successful response
       schema:
-        type: file
-        format: binary
+        type: object
+        properties:
+          image:
+            type: string
+            description: Base64 encoded image

@@ -1,0 +1,48 @@
+summary: Describe a room from an image
+description: This API endpoint is used to get a text description of the room from an image
+consumes:
+  - application/json
+produces:
+  - application/json
+parameters:
+  - in: body
+    name: image
+    required: true
+    description: JSON object containing a base64 encoded image of the room
+    schema:
+      type: object
+      properties:
+        image:
+          type: string
+          format: byte
+          description: Base64 encoded image of the room
+responses:
+  200:
+    description: Successful response
+    schema:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the room
+        description:
+          type: string
+          description: Text description of the room
+    examples:
+      application/json:
+        {
+          "name": "Modern Hearth Lounge",
+          "description": "This room features a contemporary style with a classic touch, showcasing a stately fireplace as its centerpiece. The muted color palette suggests a relaxed, sophisticated atmosphere. Comfortable seating is hinted at, inviting cozy gatherings around the warm hearth."
+        }
+  400:
+    description: Bad request
+    schema:
+      type: string
+    examples:
+      application/json: "Invalid image format. Please upload a base64 encoded image."
+  500:
+    description: Internal server error
+    schema:
+      type: string
+    examples:
+      application/json: "Internal server error. Please try again later."
