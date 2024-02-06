@@ -7,7 +7,7 @@ from constants.endpoint_constants import DIR_TO_AI2THOR_MOVEMENT
 class Ai2ThorService:
   def __init__(self):
     self.controller = Controller(
-      scene="FloorPlan209",
+      scene="FloorPlan_Val3_2",
       gridSize=0.25,
       rotateStepDegrees=90,
       # camera properties

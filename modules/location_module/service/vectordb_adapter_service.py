@@ -83,7 +83,7 @@ class VectorDBAdapterService:
       class_name=IMAGE_CLASS_NAME,
       data_object=asdict(new_image)
     )
-    print(f'successfully created new room with id: {new_image_id}')
+    print(f'successfully created new image with id: {new_image_id}')
     return new_image_id
   
   def associate_room_with_image(self, room_id: str, image_id: str):

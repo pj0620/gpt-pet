@@ -4,7 +4,7 @@ script_dir="$(dirname "$0")"
 
 # Function to run when SIGINT (Ctrl+C) is received
 cleanup() {
-  "$script_dir"/cleanup.sh
+  "$script_dir/cleanup.sh"
 }
 
 source "$script_dir/env.sh"

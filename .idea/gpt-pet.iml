@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/modules/hardware_module" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/location_module" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/modules/vision_module" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/modules/subconscious_module" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/venv" />
       <excludeFolder url="file://$MODULE_DIR$/modules/hardware_module/venv" />
       <excludeFolder url="file://$MODULE_DIR$/modules/location_module/venv" />
