@@ -1,0 +1,3 @@
+AI2THOR_NOOP = 'Done'
+AI2THOR_CROUCH = "Crouch"
+
