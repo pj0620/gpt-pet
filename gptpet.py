@@ -13,6 +13,16 @@ class GPTPet:
     self.subconscious_modules = subconscious_modules
   def exist(self):
     while True:
+      # get all sensor outputs from sensory modules
       for sensory_module in self.sensory_modules:
         sensory_module.build_subconscious_input()
+        
+      # build input to conscious module from subconscious modules
+      conscious_input = {}
+      for subconscious_module in self.subconscious_modules:
+        module_output = subconscious_module.build_conscious_input()
+        conscious_input = { **conscious_input, **module_output}
+      
+      print(conscious_input)
+      
       sleep(1)
