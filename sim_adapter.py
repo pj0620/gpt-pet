@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from ai2thor.controller import Controller
 
-from constants.ai2thor_constants import AI2THOR_CROUCH, AI2THOR_NOOP
+from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP
 from utils.math_utils import get_rotation_vector
 
 WINDOW_NAME = 'Pet View'
