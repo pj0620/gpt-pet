@@ -5,6 +5,7 @@ from module.sensory.base_sensory_module import BaseSensoryModule
 from module.subconcious.base_subconscious_module import BaseSubconsciousModule
 from module.subconcious.vision_module import VisionModule
 from service.vectordb_adapter_service import VectorDBAdapterService
+from service.visual_llm_adapter_service import VisualLLMAdapterService
 from sim_adapter import SimAdapter
 
 test_env = 'local'
@@ -12,7 +13,8 @@ test_env = 'local'
 env = GPTPetEnv()
 
 # setup vectordb
-env.vectordb_adapter_service = VectorDBAdapterService()
+env.vectordb_adapter = VectorDBAdapterService()
+env.visual_llm_adapter = VisualLLMAdapterService()
 
 sensory_modules: list[BaseSensoryModule] = []
 if test_env == 'local':

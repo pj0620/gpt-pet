@@ -22,6 +22,11 @@ PET_VIEW_CLASS_SCHEMA = {
       "name": "description",
       "dataType": ["string"],
       "description": "Description of this view"
+    },
+    {
+      "name": "turn_percent",
+      "dataType": ["int"],
+      "description": "an integer from -100 to 100 estimating how much the pet must turn if it wanted to move forward and not hit anything"
     }
   ]
 }

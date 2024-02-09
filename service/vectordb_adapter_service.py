@@ -60,7 +60,7 @@ class VectorDBAdapterService:
     
     raw_response = (self.vectordb_client.query.get(
       class_name=PET_VIEW_CLASS_NAME,
-      properties=["description"]
+      properties=["description", "turn_percent"]
       ).with_near_image(
         sourceImage, encode=False
       ).with_additional(["distance"])
