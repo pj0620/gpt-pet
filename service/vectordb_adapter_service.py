@@ -1,6 +1,5 @@
 import os
 from dataclasses import asdict
-from datetime import datetime
 
 import weaviate
 
@@ -55,6 +54,19 @@ class VectorDBAdapterService:
     )
     print(f'successfully created new room with id: {new_pet_view_id}')
     return new_pet_view_id
+  
+  def get_similar_pet_views(self, image: str):
+    sourceImage = {"image": image}
+    
+    raw_response = (self.vectordb_client.query.get(
+      class_name=PET_VIEW_CLASS_NAME,
+      properties=["description"]
+      ).with_near_image(
+        sourceImage, encode=False
+      ).with_additional(["distance"])
+      .with_limit(2).do())
+  
+    return raw_response['data']['Get']['RoomView']
   
   # def create_image(self, image_data: str | bytes):
   #   converted_img = image_data

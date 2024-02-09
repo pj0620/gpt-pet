@@ -27,7 +27,6 @@ class SimAdapter:
       position=dict(x=0, y=0, z=0)
     )
     self.noop()
-    # self.do_step('RotateLeft', degrees = -45)
     
     self.last_event = None
   

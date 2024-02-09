@@ -21,9 +21,8 @@ PET_VIEW_CLASS_SCHEMA = {
     {
       "name": "description",
       "dataType": ["string"],
-      "description": "The name of the room"
+      "description": "Description of this view"
     }
-    # *AUDIT_FIELDS
   ]
 }
 
