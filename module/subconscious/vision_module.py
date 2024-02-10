@@ -1,6 +1,6 @@
 from gptpet_env import GPTPetEnv
 from model.vision import PetView
-from module.subconcious.base_subconscious_module import BaseSubconsciousModule
+from module.subconscious.base_subconscious_module import BaseSubconsciousModule
 from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 

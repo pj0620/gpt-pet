@@ -1,6 +1,7 @@
 from gptpet_env import GPTPetEnv
+from module.conscious.base_conscious_module import BaseConsciousModule
 from module.sensory.base_sensory_module import BaseSensoryModule
-from module.subconcious.base_subconscious_module import BaseSubconsciousModule
+from module.subconscious.base_subconscious_module import BaseSubconsciousModule
 
 from time import sleep
 
@@ -8,10 +9,12 @@ from time import sleep
 class GPTPet:
   def __init__(self,
      sensory_modules: list[BaseSensoryModule],
-     subconscious_modules: list[BaseSubconsciousModule]
+     subconscious_modules: list[BaseSubconsciousModule],
+     conscious_modules: list[BaseConsciousModule]
   ):
     self.sensory_modules = sensory_modules
     self.subconscious_modules = subconscious_modules
+    self.conscious_modules = conscious_modules
   def exist(self, env: GPTPetEnv):
     while True:
       # get all sensor outputs from sensory modules
@@ -28,5 +31,11 @@ class GPTPet:
       
       print('env.subconscious_outputs.keys(): ', env.subconscious_outputs.keys())
       
-      sleep(10)
+      results_info = {}
+      for conscious_module in self.conscious_modules:
+        results_info |= conscious_module.execute(env)
+      
+      print('results_info: ', results_info)
+      
+      sleep(2)
       

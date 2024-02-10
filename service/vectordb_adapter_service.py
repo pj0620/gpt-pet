@@ -64,9 +64,16 @@ class VectorDBAdapterService:
       ).with_near_image(
         sourceImage, encode=False
       ).with_additional(["distance"])
-      .with_limit(2).do())
-  
-    return raw_response['data']['Get']['RoomView']
+      .with_limit(1).do())
+    
+    room_view_arr = raw_response['data']['Get']['RoomView']
+    if len(room_view_arr) == 0:
+      return []
+    
+    if room_view_arr[0]['_additional']['distance'] < 0.1:
+      return room_view_arr
+    else:
+      return []
   
   # def create_image(self, image_data: str | bytes):
   #   converted_img = image_data
