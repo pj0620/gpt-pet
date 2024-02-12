@@ -55,6 +55,14 @@ class VectorDBAdapterService:
     print(f'successfully created new room with id: {new_pet_view_id}')
     return new_pet_view_id
   
+  def delete_pet_view(self, pet_view_id: str):
+    deleted_pet_view_id = self.vectordb_client.data_object.delete(
+      class_name=PET_VIEW_CLASS_NAME,
+      uuid=pet_view_id
+    )
+    print(f'successfully deleted new room with id: {deleted_pet_view_id}')
+    return deleted_pet_view_id
+  
   def get_similar_pet_views(self, image: str):
     sourceImage = {"image": image}
     
@@ -63,7 +71,7 @@ class VectorDBAdapterService:
       properties=["description", "turn_percent"]
       ).with_near_image(
         sourceImage, encode=False
-      ).with_additional(["distance"])
+      ).with_additional(["distance", "id"])
       .with_limit(1).do())
     
     room_view_arr = raw_response['data']['Get']['RoomView']

@@ -7,28 +7,75 @@ from module.conscious.base_conscious_module import BaseConsciousModule
 FIELD_OF_VISION = 90
 
 class WalkForwardModule(BaseConsciousModule):
+  def __init__(self):
+    self.last_degrees = 0
+  
   def execute(self, env: GPTPetEnv) -> dict[str, Any]:
+    performed = []
     turn_percent = env.subconscious_outputs['turn_percent']
-    if -10 < turn_percent < 10:
-      env.motor_service.do_movement(
-        action=MOVE_AHEAD
-      )
-      return {
-        "performed": {
-          "movement": MOVE_AHEAD
-        }
-      }
-    else:
-      degrees = (turn_percent/100) * FIELD_OF_VISION / 2.0
-      env.motor_service.do_rotate(
+    fixed_loop = False
+    failed = False
+    if turn_percent < -9 or turn_percent > 9:
+      degrees = (turn_percent / 100) * FIELD_OF_VISION
+      result = env.motor_service.do_rotate(
         action=ROTATE_LEFT,
         degrees=degrees
       )
-      return {
-        "performed": {
-          "rotate": ROTATE_LEFT,
-          "degrees": degrees
-        }
-      }
+      performed = [{
+        "rotate": ROTATE_LEFT,
+        "degrees": degrees
+      }]
+      
+      if degrees * self.last_degrees < 0:
+        result = env.motor_service.do_movement(
+          action=MOVE_AHEAD,
+          move_magnitude=0.15
+        )
+        performed += [
+          {
+            "info": "found loop moving forward to break"
+          },
+          {
+            "action": MOVE_AHEAD
+          }
+        ]
+        fixed_loop = True
+      self.last_degrees = degrees
     
+    else:
+      result = env.motor_service.do_movement(
+        action=MOVE_AHEAD,
+        move_magnitude=0.15
+      )
+      performed += [{
+        "action": MOVE_AHEAD
+      }]
+      self.last_degrees = 0
+      
+    if not result.successful:
+      if fixed_loop:
+        performed += [
+          {
+            "info": "moving forward did not break loop, turning around"
+          },
+          {
+          "rotate": ROTATE_LEFT,
+          "degrees": 180
+        }]
+        env.motor_service.do_rotate(
+          action=ROTATE_LEFT,
+          degrees=180
+        )
+      else:
+        if 'vectordb_petview_id' not in env.subconscious_outputs:
+          raise Exception(f'movement failed, but env.subconscious_outputs is not set. Please think of something else for me to do')
+        pet_view_used_id = env.subconscious_outputs['vectordb_petview_id']
+        print('action failed, deleting pet_view with following id: ', pet_view_used_id)
+        env.vectordb_adapter.delete_pet_view(pet_view_used_id)
+        failed = True
+    
+    return {
+      "performed": performed,
+      "failed": failed
+    }
     

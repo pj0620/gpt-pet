@@ -18,6 +18,7 @@ class VisionModule(BaseSubconsciousModule):
       print('found existing description from vectordb: ', vectordb_resp)
       description = vectordb_resp[0]['description']
       turn_percent = vectordb_resp[0]['turn_percent']
+      vectordb_petview_id = vectordb_resp[0]['_additional']['id']
     else:
       # not found in vectordb, so use Visual LLM
       text_description = env.visual_llm_adapter.call_visual_llm(
@@ -32,7 +33,7 @@ class VisionModule(BaseSubconsciousModule):
       description = parsed_response['description']
       turn_percent = int(parsed_response['turn_percent'])
     
-      env.vectordb_adapter.create_pet_view(
+      vectordb_petview_id = env.vectordb_adapter.create_pet_view(
         PetView(
           description=description,
           turn_percent=turn_percent,
@@ -42,6 +43,7 @@ class VisionModule(BaseSubconsciousModule):
     
     return dict(
       current_view_description=description,
-      turn_percent=turn_percent
+      turn_percent=turn_percent,
+      vectordb_petview_id=vectordb_petview_id
     )
   

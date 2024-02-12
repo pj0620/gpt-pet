@@ -1,6 +1,7 @@
 from typing import Any
 
 from constants.ai2thor import MOVEMENT_TO_AI2THOR_MOVEMENT, ROTATE_TO_AI2THOR_ROTATE
+from model.motor import MovementResult
 from service.motor.base_motor_service import BaseMotorService
 from sim_adapter import SimAdapter
 
@@ -16,7 +17,7 @@ class Ai2ThorMotorService(BaseMotorService):
       self,
       action: str,
       move_magnitude: float = None
-  ) -> dict[str, Any]:
+  ) -> MovementResult:
     assert action in MOVEMENT_TO_AI2THOR_MOVEMENT.keys(), f'invalid movement action {action}'
     
     self.sim_adapter.do_step(
@@ -24,16 +25,23 @@ class Ai2ThorMotorService(BaseMotorService):
       moveMagnitude=move_magnitude
     )
     
-    return {
-      "move_completed": action,
-      "magnitude": move_magnitude
-    }
+    if self.sim_adapter.last_event_successful():
+      return MovementResult(
+        successful=True,
+        action=action,
+        move_magnitude=move_magnitude
+      )
+    else:
+      return MovementResult(
+        successful=False,
+        action=action,
+      )
   
   def do_rotate(
       self,
       action: str,
       degrees: float = None
-  ) -> dict[str, Any]:
+  ) -> MovementResult:
     assert action in ROTATE_TO_AI2THOR_ROTATE.keys(), f'invalid rotate action {action}'
     
     self.sim_adapter.do_step(
@@ -41,7 +49,14 @@ class Ai2ThorMotorService(BaseMotorService):
       degrees=degrees
     )
     
-    return {
-      "rotate_completed": action,
-      "degrees": degrees
-    }
+    if self.sim_adapter.last_event_successful():
+      return MovementResult(
+        successful=True,
+        action=action,
+        degrees=degrees
+      )
+    else:
+      return MovementResult(
+        successful=False,
+        action=action,
+      )

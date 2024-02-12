@@ -1,13 +1,15 @@
 from abc import ABC
 from typing import Any
 
+from model.motor import MovementResult
+
 
 class BaseMotorService(ABC):
   def do_movement(
       self,
       action: str,
       move_magnitude: float = None
-  ) -> dict[str, Any]:
+  ) -> MovementResult:
     """ move pet
     TODO: better description
     """
@@ -17,7 +19,7 @@ class BaseMotorService(ABC):
       self,
       action: str,
       degrees: float = None
-  ) -> dict[str, Any]:
+  ) -> MovementResult:
     """ rotate pet
     TODO: better description
     """

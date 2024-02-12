@@ -1,3 +1,5 @@
+import json
+
 from gptpet_env import GPTPetEnv
 from module.conscious.base_conscious_module import BaseConsciousModule
 from module.sensory.base_sensory_module import BaseSensoryModule
@@ -29,13 +31,23 @@ class GPTPet:
       for subconscious_module in self.subconscious_modules:
         env.subconscious_outputs |= subconscious_module.build_conscious_input(env)
       
-      print('env.subconscious_outputs.keys(): ', env.subconscious_outputs.keys())
+      print('env.subconscious_outputs: ', json.dumps(
+        env.subconscious_outputs,
+        sort_keys=True,
+        indent=4,
+        separators=(',', ': ')
+      ))
       
       results_info = {}
       for conscious_module in self.conscious_modules:
         results_info |= conscious_module.execute(env)
       
-      print('results_info: ', results_info)
+      print('results_info: ', json.dumps(
+        results_info,
+        sort_keys=True,
+        indent=4,
+        separators=(',', ': ')
+      ))
       
       sleep(2)
       

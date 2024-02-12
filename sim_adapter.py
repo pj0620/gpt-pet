@@ -16,9 +16,11 @@ class SimAdapter:
       gridSize=0.25,
       rotateStepDegrees=90,
       # camera properties
-      width=512,
-      height=512,
-      fieldOfView=90
+      # width=512,
+      # height=512,
+      width=1024,
+      height=1024,
+      fieldOfView=160
     )
     self.controller.step(AI2THOR_CROUCH)
     self.controller.step(
@@ -42,7 +44,7 @@ class SimAdapter:
     rot_arr = get_rotation_vector(**rot)
     
     # camera_offset = np.array([0, -0.75, 0])
-    camera_offset = np.array([0, -0.75, 0])
+    camera_offset = np.array([0, -0.7, 0])
     camera_pos_arr = pos_arr + 0.25 * rot_arr + camera_offset
     camera_pos = dict(
       x=camera_pos_arr[0],
@@ -72,7 +74,13 @@ class SimAdapter:
   def get_view(self):
     if self.last_event is None:
       self.noop()
-    last_frame = self.last_event.third_party_camera_frames[0]
+    # last_frame = self.last_event.third_party_camera_frames[0]
+    last_frame = self.last_event.frame
     cv2.imshow(WINDOW_NAME, last_frame)
     cv2.waitKey(33)
     return last_frame
+  
+  def last_event_successful(self):
+    if self.last_event is None:
+      return False
+    return self.last_event.metadata['lastActionSuccess']
