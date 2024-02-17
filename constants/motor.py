@@ -1,7 +1,16 @@
 MOVE_AHEAD = 'MoveAhead'
-MOVE_BACK  = 'MoveBack'
-MOVE_LEFT  = 'MoveLeft'
+MOVE_BACK = 'MoveBack'
+MOVE_LEFT = 'MoveLeft'
 MOVE_RIGHT = 'MoveRight'
 
 ROTATE_RIGHT = 'RotateRight'
-ROTATE_LEFT  = 'RotateLeft'
+ROTATE_LEFT = 'RotateLeft'
+
+ALL_MOTOR_ACTIONS = [
+  MOVE_AHEAD,
+  MOVE_BACK,
+  MOVE_LEFT,
+  MOVE_RIGHT,
+  ROTATE_RIGHT,
+  ROTATE_LEFT
+]

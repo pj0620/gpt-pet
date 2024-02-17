@@ -2,6 +2,7 @@ from typing import Any
 
 from constants.motor import ROTATE_LEFT, MOVE_AHEAD
 from gptpet_env import GPTPetEnv
+from model.task import TaskDefinition
 from module.conscious.base_conscious_module import BaseConsciousModule
 
 FIELD_OF_VISION = 90
@@ -10,7 +11,7 @@ class WalkForwardModule(BaseConsciousModule):
   def __init__(self):
     self.last_degrees = 0
   
-  def execute(self, env: GPTPetEnv) -> dict[str, Any]:
+  def generate_new_task(self, env: GPTPetEnv) -> TaskDefinition:
     performed = []
     turn_percent = env.subconscious_outputs['turn_percent']
     fixed_loop = False
@@ -29,7 +30,7 @@ class WalkForwardModule(BaseConsciousModule):
       if degrees * self.last_degrees < 0:
         result = env.motor_service.do_movement(
           action=MOVE_AHEAD,
-          move_magnitude=0.15
+          move_magnitude=0.2
         )
         performed += [
           {
@@ -74,8 +75,10 @@ class WalkForwardModule(BaseConsciousModule):
         env.vectordb_adapter.delete_pet_view(pet_view_used_id)
         failed = True
     
-    return {
+    print({
       "performed": performed,
       "failed": failed
-    }
+    })
+    
+    return TaskDefinition('null', 'null')
     

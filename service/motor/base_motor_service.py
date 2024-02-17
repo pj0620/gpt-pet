@@ -25,3 +25,6 @@ class BaseMotorService(ABC):
     """
     pass
   
+  def do_action(self, action: str):
+    pass
+  

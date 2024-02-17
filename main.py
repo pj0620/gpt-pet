@@ -1,10 +1,12 @@
 from gptpet import GPTPet
 from gptpet_env import GPTPetEnv
+from module.conscious.dummy_conscious_module import DummyConsciousModule
 from module.conscious.walk_forward_module import WalkForwardModule
-from module.conscious.base_conscious_module import BaseConsciousModule
 from module.sensory.ai2thor_camera_module import Ai2ThorCameraModule
-from module.subconscious.base_subconscious_module import BaseSubconsciousModule
-from module.subconscious.vision_module import VisionModule
+from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
+from module.subconscious.input.vision_module import VisionModule
+
+from module.subconscious.output.agent_executor_module import AgentExecutorModule
 from service.motor.ai2thor_motor_service import Ai2ThorMotorService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
@@ -28,18 +30,15 @@ if test_env == 'local':
 else:
   sensory_modules = []
 
-subconscious_modules: list[BaseSubconsciousModule] = [
+subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModule()
-]
-
-conscious_modules: list[BaseConsciousModule] = [
-  WalkForwardModule()
 ]
 
 gptpet = GPTPet(
   sensory_modules=sensory_modules,
-  subconscious_modules=subconscious_modules,
-  conscious_modules=conscious_modules
+  subconscious_input_modules=subconscious_input_modules,
+  conscious_module=DummyConsciousModule(),
+  executor_module=AgentExecutorModule(env)
 )
 
 gptpet.exist(env)

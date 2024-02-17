@@ -28,7 +28,8 @@ class VectorDBAdapterService:
   
   def setup_dbs(self):
     print('checking if we need to recreate vector db')
-    if os.environ.get('RECREATE_VECTOR_DB').lower() == 'true':
+    RECREATE_VECTOR_DB = os.environ.get('RECREATE_VECTOR_DB')
+    if RECREATE_VECTOR_DB is not None and RECREATE_VECTOR_DB.lower() == 'true':
       print('recreating vector db')
       for class_config in ROOM_VIEW_VECTORDB_SCHEMA["classes"]:
         class_name = class_config["class"]

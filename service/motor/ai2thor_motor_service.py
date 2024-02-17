@@ -60,3 +60,28 @@ class Ai2ThorMotorService(BaseMotorService):
         successful=False,
         action=action,
       )
+  
+  def do_action(
+      self,
+      action: str,
+      degrees: float = None
+  ) -> MovementResult:
+    assert (action in ROTATE_TO_AI2THOR_ROTATE.keys()) or (action in MOVEMENT_TO_AI2THOR_MOVEMENT.keys()),\
+      f'invalid rotate action {action}'
+    
+    self.sim_adapter.do_step(
+      action=ROTATE_TO_AI2THOR_ROTATE[action],
+      degrees=degrees
+    )
+    
+    if self.sim_adapter.last_event_successful():
+      return MovementResult(
+        successful=True,
+        action=action,
+        degrees=degrees
+      )
+    else:
+      return MovementResult(
+        successful=False,
+        action=action,
+      )

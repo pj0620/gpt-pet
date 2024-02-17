@@ -1,11 +1,11 @@
 from gptpet_env import GPTPetEnv
 from model.vision import PetView
-from module.subconscious.base_subconscious_module import BaseSubconsciousModule
+from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 
 
-class VisionModule(BaseSubconsciousModule):
+class VisionModule(BaseSubconsciousInputModule):
   def __init__(self):
     self.prompt = load_prompt('vision_module/describe_room.txt')
   
@@ -29,7 +29,6 @@ class VisionModule(BaseSubconsciousModule):
       
       json_parser = JsonOutputParser()
       parsed_response = json_parser.parse(text_description)
-      print("")
       description = parsed_response['description']
       turn_percent = int(parsed_response['turn_percent'])
     

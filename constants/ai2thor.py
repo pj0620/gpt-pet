@@ -1,6 +1,6 @@
 from constants.motor import MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_RIGHT, ROTATE_LEFT
 
-AI2THOR_NOOP = 'Done'
+AI2THOR_NOOP = 'Crouch'
 AI2THOR_CROUCH = "Crouch"
 
 AI2THOR_MOVE_AHEAD = 'MoveAhead'

@@ -7,5 +7,3 @@ class MovementResult:
   action: str
   move_magnitude: float = None
   degrees: float = None
-  
-  
