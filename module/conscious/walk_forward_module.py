@@ -16,7 +16,8 @@ class WalkForwardModule(BaseConsciousModule):
     turn_percent = env.subconscious_outputs['turn_percent']
     fixed_loop = False
     failed = False
-    if turn_percent < -9 or turn_percent > 9:
+    # if turn_percent < -9 or turn_percent > 9:
+    if False:
       degrees = (turn_percent / 100) * FIELD_OF_VISION
       result = env.motor_service.do_rotate(
         action=ROTATE_LEFT,
@@ -53,27 +54,27 @@ class WalkForwardModule(BaseConsciousModule):
       }]
       self.last_degrees = 0
       
-    if not result.successful:
-      if fixed_loop:
-        performed += [
-          {
-            "info": "moving forward did not break loop, turning around"
-          },
-          {
-          "rotate": ROTATE_LEFT,
-          "degrees": 180
-        }]
-        env.motor_service.do_rotate(
-          action=ROTATE_LEFT,
-          degrees=180
-        )
-      else:
-        if 'vectordb_petview_id' not in env.subconscious_outputs:
-          raise Exception(f'movement failed, but env.subconscious_outputs is not set. Please think of something else for me to do')
-        pet_view_used_id = env.subconscious_outputs['vectordb_petview_id']
-        print('action failed, deleting pet_view with following id: ', pet_view_used_id)
-        env.vectordb_adapter.delete_pet_view(pet_view_used_id)
-        failed = True
+    # if not result.successful:
+    #   if fixed_loop:
+    #     performed += [
+    #       {
+    #         "info": "moving forward did not break loop, turning around"
+    #       },
+    #       {
+    #       "rotate": ROTATE_LEFT,
+    #       "degrees": 180
+    #     }]
+    #     env.motor_service.do_rotate(
+    #       action=ROTATE_LEFT,
+    #       degrees=180
+    #     )
+    #   else:
+    #     if 'vectordb_petview_id' not in env.subconscious_outputs:
+    #       raise Exception(f'movement failed, but env.subconscious_outputs is not set. Please think of something else for me to do')
+    #     pet_view_used_id = env.subconscious_outputs['vectordb_petview_id']
+    #     print('action failed, deleting pet_view with following id: ', pet_view_used_id)
+    #     env.vectordb_adapter.delete_pet_view(pet_view_used_id)
+    #     failed = True
     
     print({
       "performed": performed,

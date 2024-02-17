@@ -12,7 +12,7 @@ cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 class SimAdapter:
   def __init__(self):
     self.controller = Controller(
-      scene="FloorPlan2",
+      scene="FloorPlan1",
       gridSize=0.25,
       rotateStepDegrees=90,
       # camera properties
@@ -20,7 +20,9 @@ class SimAdapter:
       # height=512,
       width=1024,
       height=1024,
-      # fieldOfView=90
+      # fieldOfView=90,
+      
+      renderDepthImage=True
     )
     self.controller.step(AI2THOR_CROUCH)
     self.controller.step(
@@ -62,12 +64,14 @@ class SimAdapter:
   
   def do_step(self, *args, **kwargs):
     self.last_event = self.controller.step(*args, **kwargs)
+    print()
     self.update_camera()
     self.update_proximity_sensors()
   
   def get_view(self):
     self.noop()
     third_party_last_frame = self.last_event.third_party_camera_frames[0]
+    # third_party_last_frame = self.last_event.depth_frame
     last_frame = self.last_event.frame
     cv2.imshow(WINDOW_NAME, third_party_last_frame)
     cv2.waitKey(33)
@@ -79,41 +83,78 @@ class SimAdapter:
     return self.last_event.metadata['lastActionSuccess']
   
   def update_proximity_sensors(self):
-    direction = 'x'
+    direction = 'z'
     dir_idx = {
       'x': 0,
       'y': 1,
       'z': 2,
     }[direction]
     pos = dict_to_array(self.last_event.metadata["agent"]["position"])
-    rot = dict_to_array(self.last_event.metadata["agent"]["rotation"])
+    # pos[1] = 0.25
+    # rot = dict_to_array(self.last_event.metadata["agent"]["rotation"])
+    rot = np.array([0., 0., 1.])
     
     min_ortho = float('inf')
-    rect_bl = np.array([float('-inf'), float('-inf'), float('-inf')])
-    rect_tr = np.array([float('inf'), float('inf'), float('inf')])
+    max_ortho = float('-inf')
     for object_info in self.last_event.metadata["objects"]:
+      if not object_info["visible"]:
+        continue
+      
+      print('#' * 40)
+      print(f'{object_info['name']=}')
+      
+      print(f'pos: {pos}')
+      print(f'rot: {rot}')
+      
       axis_aligned_bounding_box = object_info["axisAlignedBoundingBox"]
       
-      min_ortho_corner = float('inf')
-      rect_bl_c = np.array([float('-inf'), float('-inf'), float('-inf')])
-      rect_tr_c = np.array([float('inf'), float('inf'), float('inf')])
+      # find bottom right, and top left corners of this bounding rect
+      bottom_left_corner = np.array([float('inf'), float('inf'), float('inf')])
+      top_right_corner = np.array([float('-inf'), float('-inf'), float('-inf')])
       for corner in axis_aligned_bounding_box["cornerPoints"]:
-        min_ortho_corner = min(
-          min_ortho_corner,
-          corner[dir_idx]
-        )
-        rect_bl_c = np.minimum(
-          rect_bl_c,
+        print(f'corner: {np.array(corner)}')
+        bottom_left_corner = np.minimum(
+          bottom_left_corner,
           np.array(corner)
         )
-        rect_tr_c = np.maximum(
-          rect_tr_c,
+        top_right_corner = np.maximum(
+          top_right_corner,
           np.array(corner)
         )
       
-      if min_ortho_corner > pos[dir_idx]:
-        min_ortho = min(min_ortho, min_ortho_corner)
+      print(f"bottom_left_corner: {bottom_left_corner}, top_right_corner: {top_right_corner}")
+      
+      # find distance from sensor to surface of box aligned
+      aligned_diff_bl = bottom_left_corner[dir_idx] - pos[dir_idx]
+      aligned_diff_tr = top_right_corner[dir_idx] - pos[dir_idx]
+      aligned_diff = aligned_diff_bl
+      if abs(aligned_diff_tr) < abs(aligned_diff_bl):
+        aligned_diff = aligned_diff_tr
+        
+      print(f'{aligned_diff=}')
+      
+      # find point from sensor that may lie inside surface
+      print(f"{rot=}, {pos=}")
+      point_toward_plane = (aligned_diff / rot[dir_idx]) * rot + pos
+      print(f"{point_toward_plane=}")
+      
+      # project to plane normal to sensor
+      proj_idxes = [i for i in range(3) if i != dir_idx]
+      bl_proj = bottom_left_corner[proj_idxes]
+      tr_proj = top_right_corner[proj_idxes]
+      pos_proj = point_toward_plane[proj_idxes]
+      print(f"{bl_proj=}, {tr_proj=}, {pos_proj=}")
+      
+      in_surface = True
+      for idx in range(2):
+        in_surface = in_surface and (bl_proj[idx] <= pos_proj[idx] <= tr_proj[idx])
+      print(f"{in_surface=}")
+      
+      if in_surface:
+        min_ortho = min(min_ortho, aligned_diff)
+        max_ortho = max(max_ortho, aligned_diff)
+        print(f'updated: {min_ortho=}, {max_ortho=}')
     
-    print('min_ortho: ', min_ortho, ', pos[dir_idx]:', pos[dir_idx])
+    print(f'{min_ortho=}, {max_ortho=}')
       
       

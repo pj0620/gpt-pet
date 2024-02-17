@@ -4,7 +4,6 @@ from typing import Type, Optional, Any
 from langchain.pydantic_v1 import BaseModel, Field
 from langchain.tools import BaseTool, StructuredTool, tool
 from langchain_core.callbacks import CallbackManagerForToolRun
-from langchain_core.tools import ToolException
 
 from constants.motor import ALL_MOTOR_ACTIONS
 from service.motor.base_motor_service import BaseMotorService
@@ -27,4 +26,4 @@ class MotorTool(BaseTool):
   ) -> str:
     if query not in ALL_MOTOR_ACTIONS:
       return  f"invalid action, must be in the following list: {ALL_MOTOR_ACTIONS}"
-    self.motor_service.do_movement(query)
+    self.motor_service.do_action(query)

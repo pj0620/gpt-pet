@@ -7,10 +7,15 @@ from module.subconscious.input.base_subconscious_input_module import BaseSubcons
 from module.subconscious.input.vision_module import VisionModule
 
 from module.subconscious.output.agent_executor_module import AgentExecutorModule
+from module.subconscious.output.noop_executor_module import DummyExecutorModule
 from service.motor.ai2thor_motor_service import Ai2ThorMotorService
+from service.sim_adapter import SimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
-from sim_adapter import SimAdapter
+
+import numpy as np
+
+np.set_printoptions(precision=3, suppress=True)
 
 # TODO: request param
 test_env = 'local'
@@ -37,8 +42,8 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
 gptpet = GPTPet(
   sensory_modules=sensory_modules,
   subconscious_input_modules=subconscious_input_modules,
-  conscious_module=DummyConsciousModule(),
-  executor_module=AgentExecutorModule(env)
+  conscious_module=WalkForwardModule(),
+  executor_module=DummyExecutorModule()
 )
 
 gptpet.exist(env)

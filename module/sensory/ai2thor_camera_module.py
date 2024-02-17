@@ -4,7 +4,8 @@ from PIL import Image
 
 from gptpet_env import GPTPetEnv
 from module.sensory.base_sensory_module import BaseSensoryModule
-from sim_adapter import SimAdapter
+from service.sim_adapter import SimAdapter
+
 
 class Ai2ThorCameraModule(BaseSensoryModule):
   def __init__(

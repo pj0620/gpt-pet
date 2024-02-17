@@ -3,7 +3,7 @@ from typing import Any
 from constants.ai2thor import MOVEMENT_TO_AI2THOR_MOVEMENT, ROTATE_TO_AI2THOR_ROTATE
 from model.motor import MovementResult
 from service.motor.base_motor_service import BaseMotorService
-from sim_adapter import SimAdapter
+from service.sim_adapter import SimAdapter
 
 
 class Ai2ThorMotorService(BaseMotorService):
