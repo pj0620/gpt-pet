@@ -52,3 +52,5 @@ class GPTPet:
       
       sleep(2)
       
+      break
+      

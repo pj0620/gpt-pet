@@ -3,17 +3,20 @@ import numpy as np
 from ai2thor.controller import Controller
 
 from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP
+from constants.motor import MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, MOVE_AHEAD
 from utils.math_utils import get_rotation_vector, dict_to_array
 
 WINDOW_NAME = 'Pet View'
+PROXIMITY_SENSOR_MAX_STEPS = 10
+PROXIMITY_SENSOR_RESOLUTION = 0.05
 
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 
 class SimAdapter:
   def __init__(self):
     self.controller = Controller(
-      scene="FloorPlan1",
-      gridSize=0.25,
+      scene="FloorPlan2",
+      gridSize=0.01,
       rotateStepDegrees=90,
       # camera properties
       # width=512,
@@ -62,11 +65,17 @@ class SimAdapter:
       rotation=camera_rot
     )
   
-  def do_step(self, *args, **kwargs):
-    self.last_event = self.controller.step(*args, **kwargs)
-    print()
+  def do_step(self,
+              action,
+              update_proximity_sensors=True,
+              **kwargs
+  ):
+    print(f'calling do_step with {action=}, {update_proximity_sensors=}, {kwargs=}')
+    self.last_event = self.controller.step(action=action, **kwargs)
+    print(f'{self.last_event=}')
     self.update_camera()
-    self.update_proximity_sensors()
+    if update_proximity_sensors:
+      self.update_proximity_sensors()
   
   def get_view(self):
     self.noop()
@@ -83,78 +92,32 @@ class SimAdapter:
     return self.last_event.metadata['lastActionSuccess']
   
   def update_proximity_sensors(self):
-    direction = 'z'
-    dir_idx = {
-      'x': 0,
-      'y': 1,
-      'z': 2,
-    }[direction]
-    pos = dict_to_array(self.last_event.metadata["agent"]["position"])
-    # pos[1] = 0.25
-    # rot = dict_to_array(self.last_event.metadata["agent"]["rotation"])
-    rot = np.array([0., 0., 1.])
+    actions = [MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK]
+    directions = ['right', 'ahead', 'left', 'back']
     
-    min_ortho = float('inf')
-    max_ortho = float('-inf')
-    for object_info in self.last_event.metadata["objects"]:
-      if not object_info["visible"]:
-        continue
-      
-      print('#' * 40)
-      print(f'{object_info['name']=}')
-      
-      print(f'pos: {pos}')
-      print(f'rot: {rot}')
-      
-      axis_aligned_bounding_box = object_info["axisAlignedBoundingBox"]
-      
-      # find bottom right, and top left corners of this bounding rect
-      bottom_left_corner = np.array([float('inf'), float('inf'), float('inf')])
-      top_right_corner = np.array([float('-inf'), float('-inf'), float('-inf')])
-      for corner in axis_aligned_bounding_box["cornerPoints"]:
-        print(f'corner: {np.array(corner)}')
-        bottom_left_corner = np.minimum(
-          bottom_left_corner,
-          np.array(corner)
+    start_position = dict(self.last_event.metadata["agent"]["position"])
+    distances = {}
+    for action, direction in zip(actions, directions):
+      self.noop()
+      final_steps = -1
+      for step in range(PROXIMITY_SENSOR_MAX_STEPS):
+        self.do_step(
+          action=action,
+          moveMagnitude=PROXIMITY_SENSOR_RESOLUTION,
+          update_proximity_sensors=False
         )
-        top_right_corner = np.maximum(
-          top_right_corner,
-          np.array(corner)
-        )
-      
-      print(f"bottom_left_corner: {bottom_left_corner}, top_right_corner: {top_right_corner}")
-      
-      # find distance from sensor to surface of box aligned
-      aligned_diff_bl = bottom_left_corner[dir_idx] - pos[dir_idx]
-      aligned_diff_tr = top_right_corner[dir_idx] - pos[dir_idx]
-      aligned_diff = aligned_diff_bl
-      if abs(aligned_diff_tr) < abs(aligned_diff_bl):
-        aligned_diff = aligned_diff_tr
+        if not self.last_event_successful():
+          final_steps = step
+          break
+      if final_steps == -1:
+        final_steps = 10
+      distances[direction] = final_steps * PROXIMITY_SENSOR_RESOLUTION
+      self.do_step(
+        action="Teleport",
+        position=start_position,
+        update_proximity_sensors=False
+      )
+          
+    print(f'{distances=}')
         
-      print(f'{aligned_diff=}')
-      
-      # find point from sensor that may lie inside surface
-      print(f"{rot=}, {pos=}")
-      point_toward_plane = (aligned_diff / rot[dir_idx]) * rot + pos
-      print(f"{point_toward_plane=}")
-      
-      # project to plane normal to sensor
-      proj_idxes = [i for i in range(3) if i != dir_idx]
-      bl_proj = bottom_left_corner[proj_idxes]
-      tr_proj = top_right_corner[proj_idxes]
-      pos_proj = point_toward_plane[proj_idxes]
-      print(f"{bl_proj=}, {tr_proj=}, {pos_proj=}")
-      
-      in_surface = True
-      for idx in range(2):
-        in_surface = in_surface and (bl_proj[idx] <= pos_proj[idx] <= tr_proj[idx])
-      print(f"{in_surface=}")
-      
-      if in_surface:
-        min_ortho = min(min_ortho, aligned_diff)
-        max_ortho = max(max_ortho, aligned_diff)
-        print(f'updated: {min_ortho=}, {max_ortho=}')
-    
-    print(f'{min_ortho=}, {max_ortho=}')
-      
       
