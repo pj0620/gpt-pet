@@ -8,7 +8,7 @@ from utils.math_utils import get_rotation_vector, dict_to_array
 
 WINDOW_NAME = 'Pet View'
 PROXIMITY_SENSOR_MAX_STEPS = 10
-PROXIMITY_SENSOR_RESOLUTION = 0.05
+PROXIMITY_SENSOR_RESOLUTION = 0.1
 
 cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 
@@ -99,18 +99,18 @@ class SimAdapter:
     distances = {}
     for action, direction in zip(actions, directions):
       self.noop()
-      final_steps = -1
-      for step in range(PROXIMITY_SENSOR_MAX_STEPS):
+      final_steps = 0
+      
+      jump_size = PROXIMITY_SENSOR_MAX_STEPS
+      while jump_size > 0:
         self.do_step(
           action=action,
-          moveMagnitude=PROXIMITY_SENSOR_RESOLUTION,
+          moveMagnitude=PROXIMITY_SENSOR_RESOLUTION * jump_size,
           update_proximity_sensors=False
         )
-        if not self.last_event_successful():
-          final_steps = step
-          break
-      if final_steps == -1:
-        final_steps = 10
+        if self.last_event_successful():
+          final_steps = jump_size
+        jump_size //= 2
       distances[direction] = final_steps * PROXIMITY_SENSOR_RESOLUTION
       self.do_step(
         action="Teleport",
