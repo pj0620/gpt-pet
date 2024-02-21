@@ -1,5 +1,5 @@
 from gptpet import GPTPet
-from gptpet_env import GPTPetEnv
+from gptpet_context import GPTPetContext
 from module.conscious.agent_conscious_module import AgentConsciousModule
 from module.conscious.dummy_conscious_module import DummyConsciousModule
 from module.conscious.walk_forward_module import WalkForwardModule
@@ -21,18 +21,18 @@ np.set_printoptions(precision=3, suppress=True)
 # TODO: request param
 test_env = 'local'
 
-env = GPTPetEnv()
+context = GPTPetContext()
 
 # setup vectordb
-env.vectordb_adapter = VectorDBAdapterService()
-env.visual_llm_adapter = VisualLLMAdapterService()
+context.vectordb_adapter = VectorDBAdapterService()
+context.visual_llm_adapter = VisualLLMAdapterService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
   sensory_modules = [
     Ai2ThorCameraModule(sim_adapter)
   ]
-  env.motor_service = Ai2ThorMotorService(sim_adapter)
+  context.motor_service = Ai2ThorMotorService(sim_adapter)
 else:
   sensory_modules = []
 
@@ -47,4 +47,4 @@ gptpet = GPTPet(
   executor_module=DummyExecutorModule()
 )
 
-gptpet.exist(env)
+gptpet.exist(context)

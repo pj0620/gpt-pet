@@ -3,7 +3,7 @@ from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTempla
   HumanMessagePromptTemplate, PromptTemplate
 from langchain_openai import ChatOpenAI
 
-from gptpet_env import GPTPetEnv
+from gptpet_context import GPTPetContext
 from model.task import TaskDefinition
 from module.conscious.base_conscious_module import BaseConsciousModule
 from utils.prompt_utils import load_prompt
@@ -23,8 +23,8 @@ class AgentConsciousModule(BaseConsciousModule):
     agent = create_json_chat_agent(llm, [], template)
     self.agent_executor = AgentExecutor(agent=agent, tools=[], verbose=True)
   
-  def generate_new_task(self, env: GPTPetEnv) -> TaskDefinition:
-    conscious_inputs = env.conscious_inputs
+  def generate_new_task(self, context: GPTPetContext) -> TaskDefinition:
+    conscious_inputs = context.conscious_inputs
     
     
     return TaskDefinition(

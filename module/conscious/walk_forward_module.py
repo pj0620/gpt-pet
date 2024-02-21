@@ -1,7 +1,7 @@
 from typing import Any
 
 from constants.motor import ROTATE_LEFT, MOVE_AHEAD
-from gptpet_env import GPTPetEnv
+from gptpet_context import GPTPetContext
 from model.task import TaskDefinition
 from module.conscious.base_conscious_module import BaseConsciousModule
 
@@ -11,15 +11,15 @@ class WalkForwardModule(BaseConsciousModule):
   def __init__(self):
     self.last_degrees = 0
   
-  def generate_new_task(self, env: GPTPetEnv) -> TaskDefinition:
+  def generate_new_task(self, context: GPTPetContext) -> TaskDefinition:
     performed = []
-    turn_percent = env.subconscious_outputs['turn_percent']
+    turn_percent = context.subconscious_outputs['turn_percent']
     fixed_loop = False
     failed = False
     # if turn_percent < -9 or turn_percent > 9:
     if False:
       degrees = (turn_percent / 100) * FIELD_OF_VISION
-      result = env.motor_service.do_rotate(
+      result = context.motor_service.do_rotate(
         action=ROTATE_LEFT,
         degrees=degrees
       )
@@ -29,7 +29,7 @@ class WalkForwardModule(BaseConsciousModule):
       }]
       
       if degrees * self.last_degrees < 0:
-        result = env.motor_service.do_movement(
+        result = context.motor_service.do_movement(
           action=MOVE_AHEAD,
           move_magnitude=0.2
         )
@@ -45,7 +45,7 @@ class WalkForwardModule(BaseConsciousModule):
       self.last_degrees = degrees
     
     else:
-      result = env.motor_service.do_movement(
+      result = context.motor_service.do_movement(
         action=MOVE_AHEAD,
         move_magnitude=0.15
       )
@@ -64,16 +64,16 @@ class WalkForwardModule(BaseConsciousModule):
     #       "rotate": ROTATE_LEFT,
     #       "degrees": 180
     #     }]
-    #     env.motor_service.do_rotate(
+    #     context.motor_service.do_rotate(
     #       action=ROTATE_LEFT,
     #       degrees=180
     #     )
     #   else:
-    #     if 'vectordb_petview_id' not in env.subconscious_outputs:
-    #       raise Exception(f'movement failed, but env.subconscious_outputs is not set. Please think of something else for me to do')
-    #     pet_view_used_id = env.subconscious_outputs['vectordb_petview_id']
+    #     if 'vectordb_petview_id' not in context.subconscious_outputs:
+    #       raise Exception(f'movement failed, but context.subconscious_outputs is not set. Please think of something else for me to do')
+    #     pet_view_used_id = context.subconscious_outputs['vectordb_petview_id']
     #     print('action failed, deleting pet_view with following id: ', pet_view_used_id)
-    #     env.vectordb_adapter.delete_pet_view(pet_view_used_id)
+    #     context.vectordb_adapter.delete_pet_view(pet_view_used_id)
     #     failed = True
     
     print({

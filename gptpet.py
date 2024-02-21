@@ -1,6 +1,6 @@
 import json
 
-from gptpet_env import GPTPetEnv
+from gptpet_context import GPTPetContext
 from module.conscious.base_conscious_module import BaseConsciousModule
 from module.sensory.base_sensory_module import BaseSensoryModule
 
@@ -21,27 +21,27 @@ class GPTPet:
     self.subconscious_input_modules = subconscious_input_modules
     self.conscious_module = conscious_module
     self.executor_module = executor_module
-  def exist(self, env: GPTPetEnv):
+  def exist(self, context: GPTPetContext):
     while True:
       # get all sensor outputs from sensory modules
-      env.sensory_outputs = {}
+      context.sensory_outputs = {}
       for sensory_module in self.sensory_modules:
-        env.sensory_outputs |= sensory_module.build_subconscious_input(env)
+        context.sensory_outputs |= sensory_module.build_subconscious_input(context)
       
-      print('env.sensory_outputs.keys(): ', env.sensory_outputs.keys())
+      print('context.sensory_outputs.keys(): ', context.sensory_outputs.keys())
         
       # build input to conscious module from subconscious modules
-      env.conscious_inputs = []
+      context.conscious_inputs = []
       for subconscious_input_modules in self.subconscious_input_modules:
-        env.conscious_inputs.append(subconscious_input_modules.build_conscious_input(env))
+        context.conscious_inputs.append(subconscious_input_modules.build_conscious_input(context))
       
-      print('env.subconscious_outputs: ', env.conscious_inputs)
+      print('context.subconscious_outputs: ', context.conscious_inputs)
       
-      new_task = self.conscious_module.generate_new_task(env)
+      new_task = self.conscious_module.generate_new_task(context)
       
       print('new task: ', new_task)
       
-      task_result = self.executor_module.execute(env, new_task)
+      task_result = self.executor_module.execute(context, new_task)
       
       print('task_result: ', task_result)
       

@@ -7,7 +7,7 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import create_openai_functions_agent, AgentExecutor, initialize_agent, AgentType, \
   create_json_chat_agent
 
-from gptpet_env import GPTPetEnv
+from gptpet_context import GPTPetContext
 from model.task import TaskDefinition, TaskResult
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from tools.MotorTool import MotorTool
@@ -16,11 +16,11 @@ from utils.prompt_utils import load_prompt
 
 class AgentExecutorModule(BaseExecutorModule):
   
-  def __init__(self, env: GPTPetEnv):
+  def __init__(self, context: GPTPetContext):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
-    print('env.motor_service: ', env.motor_service)
+    print('context.motor_service: ', context.motor_service)
     tools = [
-      MotorTool(env.motor_service)
+      MotorTool(context.motor_service)
     ]
     prompt_system = load_prompt('executor/system.txt')
     prompt_human = load_prompt('executor/human.txt')
@@ -33,7 +33,7 @@ class AgentExecutorModule(BaseExecutorModule):
     agent = create_json_chat_agent(llm, tools, template)
     self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
     
-  def execute(self, env: GPTPetEnv, new_task: TaskDefinition) -> TaskResult:
+  def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     result = self.agent_executor.invoke(dict(
       input=new_task
     ))

@@ -6,7 +6,7 @@ from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 
 
-class GPTPetEnv:
+class GPTPetContext:
     vectordb_adapter: VectorDBAdapterService
     visual_llm_adapter: VisualLLMAdapterService
     motor_service: BaseMotorService
