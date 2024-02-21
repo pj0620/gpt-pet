@@ -31,16 +31,11 @@ class GPTPet:
       print('env.sensory_outputs.keys(): ', env.sensory_outputs.keys())
         
       # build input to conscious module from subconscious modules
-      env.subconscious_outputs = {}
+      env.conscious_inputs = []
       for subconscious_input_modules in self.subconscious_input_modules:
-        env.subconscious_outputs |= subconscious_input_modules.build_conscious_input(env)
+        env.conscious_inputs.append(subconscious_input_modules.build_conscious_input(env))
       
-      print('env.subconscious_outputs: ', json.dumps(
-        env.subconscious_outputs,
-        sort_keys=True,
-        indent=4,
-        separators=(',', ': ')
-      ))
+      print('env.subconscious_outputs: ', env.conscious_inputs)
       
       new_task = self.conscious_module.generate_new_task(env)
       

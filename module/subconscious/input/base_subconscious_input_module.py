@@ -2,6 +2,7 @@ from abc import ABC
 from typing import Any
 
 from gptpet_env import GPTPetEnv
+from module.base_module import BaseModule
 
 
 class BaseSubconsciousInputModule(ABC):

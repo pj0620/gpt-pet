@@ -22,7 +22,6 @@ class AgentExecutorModule(BaseExecutorModule):
     tools = [
       MotorTool(env.motor_service)
     ]
-    # prompt = hub.pull("hwchase17/react-chat-json")
     prompt_system = load_prompt('executor/system.txt')
     prompt_human = load_prompt('executor/human.txt')
     template = ChatPromptTemplate.from_messages([
@@ -32,9 +31,6 @@ class AgentExecutorModule(BaseExecutorModule):
       MessagesPlaceholder(variable_name='agent_scratchpad')
     ])
     agent = create_json_chat_agent(llm, tools, template)
-    
-    # self.agent = initialize_agent(
-    #   tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
     self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
     
   def execute(self, env: GPTPetEnv, new_task: TaskDefinition) -> TaskResult:

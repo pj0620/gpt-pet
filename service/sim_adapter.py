@@ -35,6 +35,9 @@ class SimAdapter:
       fieldOfView=90
     )
     self.noop()
+    
+    self.proximity_measurements = None
+    self.update_proximity_sensors()
   
   def noop(self):
     self.last_event = self.controller.step(AI2THOR_NOOP)
@@ -110,6 +113,7 @@ class SimAdapter:
         )
         if self.last_event_successful():
           final_steps = jump_size
+          break
         jump_size //= 2
       distances[direction] = final_steps * PROXIMITY_SENSOR_RESOLUTION
       self.do_step(
@@ -117,7 +121,6 @@ class SimAdapter:
         position=start_position,
         update_proximity_sensors=False
       )
-          
-    print(f'{distances=}')
-        
+      
+    self.proximity_measurements = distances
       
