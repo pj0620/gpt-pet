@@ -19,7 +19,7 @@ class WalkForwardModule(BaseConsciousModule):
     # if turn_percent < -9 or turn_percent > 9:
     if False:
       degrees = (turn_percent / 100) * FIELD_OF_VISION
-      result = context.motor_service.do_rotate(
+      result = context.motor_adapter.do_rotate(
         action=ROTATE_LEFT,
         degrees=degrees
       )
@@ -29,7 +29,7 @@ class WalkForwardModule(BaseConsciousModule):
       }]
       
       if degrees * self.last_degrees < 0:
-        result = context.motor_service.do_movement(
+        result = context.motor_adapter.do_movement(
           action=MOVE_AHEAD,
           move_magnitude=0.2
         )
@@ -45,7 +45,7 @@ class WalkForwardModule(BaseConsciousModule):
       self.last_degrees = degrees
     
     else:
-      result = context.motor_service.do_movement(
+      result = context.motor_adapter.do_movement(
         action=MOVE_AHEAD,
         move_magnitude=0.15
       )

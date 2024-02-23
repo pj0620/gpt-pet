@@ -4,7 +4,7 @@ from typing import Any
 from model.motor import MovementResult
 
 
-class BaseMotorService(ABC):
+class BaseMotorAdapter(ABC):
   def do_movement(
       self,
       action: str,
