@@ -1,4 +1,4 @@
-from service.sensor.base_sensor_adapter import BaseProximitySensorAdapter
+from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 
 

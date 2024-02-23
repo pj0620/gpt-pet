@@ -11,7 +11,9 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
 from gptpet_context import GPTPetContext
 from model.task import TaskDefinition, TaskResult
 from module.subconscious.output.base_executor_module import BaseExecutorModule
-from tools.MotorTool import MotorTool
+from tools.environment.mock_environment_tool import MockEnvironmentTool
+from tools.environment.prod_environment_tool import ProdEnvironmentTool
+from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 
 
@@ -21,10 +23,19 @@ class AgentExecutorModule(BaseExecutorModule):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
     print('context.motor_service: ', context.motor_adapter)
     tools = [
-      MotorTool(context.motor_adapter)
+      MockEnvironmentTool(),
+      ProdEnvironmentTool(
+        motor_adapter=context.motor_adapter,
+        proximity_sensor_adapter=context.proximity_sensor_adapter
+      )
     ]
     prompt_system = load_prompt('executor/system.txt')
+    response_format = load_prompt("executor/response_format.txt")
     prompt_system = prompt_system.replace("{programs}", self.get_programs())
+    prompt_system = prompt_system.replace("{response_format}", response_format)
+    
+    print(f"{prompt_system=}")
+    
     prompt_human = load_prompt('executor/human.txt')
     template = ChatPromptTemplate.from_messages([
       SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=['programs'], template=prompt_system)),

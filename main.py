@@ -10,7 +10,7 @@ from module.subconscious.input.vision_module import VisionModule
 from module.subconscious.output.agent_executor_module import AgentExecutorModule
 from module.subconscious.output.noop_executor_module import DummyExecutorModule
 from service.motor.ai2thor_motor_adapter import Ai2ThorMotorService
-from service.sensor.ai2thor_sensor_adapter import Ai2thorProximitySensorAdapter
+from service.sensor.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService

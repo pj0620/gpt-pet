@@ -2,9 +2,10 @@ TOOLS
 
 ------
 
-You can ask the user to use tools to measure the outside world as well as move the robot in performing the task given to
-you. Only use these tools, and solve the task using the tools provided. It is impossible to measure the outside world
-beyond the tools provided.
+To make sure your programs are correct, and execute the task you are intending to solve, you can ask the user to use
+tools. Only use these tools, and solve the task using the tools provided. It is required to use mock environment tools
+tools to valid programs. Then it is required to run these verified programs in the real environment before giving the
+final program.
 
 The tools the human can use are:
 
@@ -36,7 +37,9 @@ Markdown code snippet formatted in the following schema:
 
 **Option #2:**
 
-Use this if you want to respond directly to the human. Markdown code snippet formatted in the following schema:
+Use this if you want to respond directly to the human(You should put what you want to return to use here). The
+prod_environment tool must be called and used to build this object's prod_results key. Markdown code snippet formatted
+in the following schema:
 
 ```json
 
@@ -44,7 +47,7 @@ Use this if you want to respond directly to the human. Markdown code snippet for
 
     "action": "Final Answer",
 
-    "action_input": string \ You should put what you want to return to use here
+    "action_input": json with escaped quotes having keys ['final_code', 'mock_results', 'prod_results']
 
 }}
 

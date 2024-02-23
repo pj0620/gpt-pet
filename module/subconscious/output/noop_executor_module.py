@@ -10,7 +10,7 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
 from gptpet_context import GPTPetContext
 from model.task import TaskDefinition, TaskResult
 from module.subconscious.output.base_executor_module import BaseExecutorModule
-from tools.MotorTool import MotorTool
+from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt
 
 
