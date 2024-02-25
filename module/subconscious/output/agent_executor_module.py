@@ -11,8 +11,7 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
 from gptpet_context import GPTPetContext
 from model.task import TaskDefinition, TaskResult
 from module.subconscious.output.base_executor_module import BaseExecutorModule
-from tools.environment.mock_environment_tool import MockEnvironmentTool
-from tools.environment.prod_environment_tool import ProdEnvironmentTool
+from tools.environment.environement_tool import EnvironmentTool
 from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 
@@ -23,8 +22,7 @@ class AgentExecutorModule(BaseExecutorModule):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
     print('context.motor_service: ', context.motor_adapter)
     tools = [
-      MockEnvironmentTool(),
-      ProdEnvironmentTool(
+      EnvironmentTool(
         motor_adapter=context.motor_adapter,
         proximity_sensor_adapter=context.proximity_sensor_adapter
       )

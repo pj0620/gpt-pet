@@ -2,10 +2,8 @@ TOOLS
 
 ------
 
-To make sure your programs are correct, and execute the task you are intending to solve, you can ask the user to use
-tools. Only use these tools, and solve the task using the tools provided. It is required to use mock environment tools
-tools to valid programs. Then it is required to run these verified programs in the real environment before giving the
-final program.
+To execute the task you are intending to solve, you can ask the user to use tools. It is required to use
+prod_environment tool run your program and collect feedback.
 
 The tools the human can use are:
 
@@ -38,7 +36,7 @@ Markdown code snippet formatted in the following schema:
 **Option #2:**
 
 Use this if you want to respond directly to the human(You should put what you want to return to use here). The
-prod_environment tool must be called and used to build this object's prod_results key. Markdown code snippet formatted
+environment_tool must be called and used to build this object's environment_feedback key. Markdown code snippet formatted
 in the following schema:
 
 ```json
@@ -47,7 +45,7 @@ in the following schema:
 
     "action": "Final Answer",
 
-    "action_input": json with escaped quotes having keys ['final_code', 'mock_results', 'prod_results']
+    "action_input": json with escaped quotes having keys ['final_code', 'environment_feedback']
 
 }}
 

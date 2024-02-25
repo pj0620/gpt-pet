@@ -7,7 +7,7 @@ from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdap
 from tools.environment.api.base_control_api import BaseControlAPI
 
 
-class ProdControlAPI(BaseControlAPI):
+class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorAdapter
   proximity_sensor_adapter: BaseProximitySensorAdapter
   
