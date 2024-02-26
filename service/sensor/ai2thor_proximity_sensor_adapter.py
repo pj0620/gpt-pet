@@ -11,4 +11,4 @@ class Ai2thorProximitySensorAdapter(BaseProximitySensorAdapter):
     self.last_event = None
     
   def get_measurements(self):
-    return {'proximity_measurements': self.sim_adapter.proximity_measurements()}
+    return self.sim_adapter.proximity_measurements

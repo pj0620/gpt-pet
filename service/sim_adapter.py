@@ -6,6 +6,7 @@ from ai2thor.controller import Controller
 
 from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP
 from constants.motor import MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, MOVE_AHEAD
+from model.collision import CollisionError
 from utils.math_utils import get_rotation_vector, dict_to_array
 
 WINDOW_NAME = 'Pet View'
@@ -52,6 +53,28 @@ class SimAdapter:
     # self.update_camera()
     if update_proximity_sensors:
       self.update_proximity_sensors()
+      
+    if not self.last_event.metadata['lastActionSuccess']:
+      collision_direction = self.get_collision_direction()
+      raise CollisionError("hit something")
+    
+  def get_collision_direction(self):
+    print('here1')
+    if self.last_event.metadata["lastActionSuccess"]:
+      return None
+    
+    print('here2')
+    blocking_object_name = self.last_event.metadata["errorMessage"].split(' is blocking Agent 0 from moving by ')[0].strip()
+    
+    blocking_objects = [
+      obj
+      for obj in self.last_event.metadata["objects"]
+      if obj["name"] == blocking_object_name
+    ]
+    
+    print(blocking_objects)
+    
+    return 'ahead'
   
   def get_view(self):
     self.noop()

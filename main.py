@@ -5,6 +5,7 @@ from module.conscious.dummy_conscious_module import DummyConsciousModule
 from module.conscious.walk_forward_module import WalkForwardModule
 from module.sensory.ai2thor_camera_module import Ai2ThorCameraModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
+from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.vision_module import VisionModule
 
 from module.subconscious.output.agent_executor_module import AgentExecutorModule
@@ -39,7 +40,8 @@ else:
   sensory_modules = []
 
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule()
+  VisionModule(),
+  ProximitySensorModule()
 ]
 
 gptpet = GPTPet(

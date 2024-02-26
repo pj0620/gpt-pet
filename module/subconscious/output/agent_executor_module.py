@@ -11,7 +11,7 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
 from gptpet_context import GPTPetContext
 from model.conscious import TaskResult, TaskDefinition
 from module.subconscious.output.base_executor_module import BaseExecutorModule
-from tools.environment.environement_tool import EnvironmentTool
+from tools.environment.environment_tool import EnvironmentTool
 from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 

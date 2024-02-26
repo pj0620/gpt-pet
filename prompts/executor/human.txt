@@ -36,7 +36,8 @@ Markdown code snippet formatted in the following schema:
 **Option #2:**
 
 Use this if you want to respond directly to the human(You should put what you want to return to use here). The
-environment_tool must be called and used to build this object's environment_feedback key. Markdown code snippet formatted
+environment_tool must be called and used to build this object's environment_feedback key. The environmental_tool
+must return that the program is valid for it to be used as the final answer. Markdown code snippet formatted
 in the following schema:
 
 ```json

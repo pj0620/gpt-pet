@@ -11,7 +11,7 @@ VISION_MODULE_SCHEMA = {
                   "and not hit anything."
 }
 
-VISION_MODULE_DESCRIPTION = "This conscious input represents all data from GPTPet's vision."
+VISION_MODULE_DESCRIPTION = "Summary of GPTPet's vision."
 
 class VisionModule(BaseSubconsciousInputModule):
   def __init__(self):

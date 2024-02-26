@@ -11,6 +11,7 @@ from module.conscious.base_conscious_module import BaseConsciousModule
 from utils.conscious import task_response_mapper
 from utils.prompt_utils import load_prompt
 from datetime import datetime
+import pprint
 
 
 class AgentConsciousModule(BaseConsciousModule):
@@ -33,6 +34,9 @@ class AgentConsciousModule(BaseConsciousModule):
       inp.__dict__
       for inp in context.conscious_inputs
     ])
+    
+    print('conscious_inputs_str: ')
+    pprint.pprint({"data": conscious_inputs_str})
     
     response = self.chain.invoke(dict(
       subconscious_info=conscious_inputs_str,
