@@ -35,17 +35,17 @@ class GPTPet:
       for subconscious_input_modules in self.subconscious_input_modules:
         context.conscious_inputs.append(subconscious_input_modules.build_conscious_input(context))
       
-      print('context.subconscious_outputs: ', context.conscious_inputs)
+      print('context.conscious_inputs: ', context.conscious_inputs)
       
       new_task = self.conscious_module.generate_new_task(context)
       
       print('new task: ', new_task)
       
       task_result = self.executor_module.execute(context, new_task)
-      
+
       print('task_result: ', task_result)
-      
+
       sleep(2)
-      
-      break
+      #
+      # break
       

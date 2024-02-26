@@ -9,7 +9,7 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
   create_json_chat_agent
 
 from gptpet_context import GPTPetContext
-from model.task import TaskDefinition, TaskResult
+from model.conscious import TaskResult, TaskDefinition
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from tools.environment.environement_tool import EnvironmentTool
 from tools.motor_tool import MotorTool
@@ -42,7 +42,7 @@ class AgentExecutorModule(BaseExecutorModule):
       MessagesPlaceholder(variable_name='agent_scratchpad')
     ])
     agent = create_json_chat_agent(llm, tools, template)
-    self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+    self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
   
   def get_programs(self, skills=None):
     if skills is None:

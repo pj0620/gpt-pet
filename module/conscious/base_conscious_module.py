@@ -2,7 +2,7 @@ from abc import ABC
 from typing import Any
 
 from gptpet_context import GPTPetContext
-from model.task import TaskDefinition
+from model.conscious import TaskDefinition
 
 
 class BaseConsciousModule(ABC):

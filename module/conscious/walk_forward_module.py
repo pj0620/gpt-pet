@@ -2,7 +2,7 @@ from typing import Any
 
 from constants.motor import ROTATE_LEFT, MOVE_AHEAD
 from gptpet_context import GPTPetContext
-from model.task import TaskDefinition
+from model.conscious import TaskDefinition
 from module.conscious.base_conscious_module import BaseConsciousModule
 
 FIELD_OF_VISION = 90

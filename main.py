@@ -45,7 +45,7 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
 gptpet = GPTPet(
   sensory_modules=sensory_modules,
   subconscious_input_modules=subconscious_input_modules,
-  conscious_module=DummyConsciousModule(),
+  conscious_module=AgentConsciousModule(),
   executor_module=AgentExecutorModule(context)
 )
 

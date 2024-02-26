@@ -8,7 +8,7 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
   create_json_chat_agent
 
 from gptpet_context import GPTPetContext
-from model.task import TaskDefinition, TaskResult
+from model.conscious import TaskResult, TaskDefinition
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt

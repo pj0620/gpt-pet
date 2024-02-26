@@ -16,7 +16,7 @@ class Ai2ThorMotorService(BaseMotorAdapter):
   def do_movement(
       self,
       action: str,
-      move_magnitude: float = None
+      move_magnitude: float = 1
   ) -> MovementResult:
     assert action in MOVEMENT_TO_AI2THOR_MOVEMENT.keys(), f'invalid movement action {action}'
 
