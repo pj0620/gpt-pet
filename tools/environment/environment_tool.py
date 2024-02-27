@@ -1,3 +1,4 @@
+import random
 from enum import Enum
 from typing import Type, Optional, Any
 
@@ -14,11 +15,13 @@ from tools.environment.api.real_control_api import RealControlAPI
 from tools.environment.model import EnvironmentInput
 
 
+secret_passphrases = ["apple", "orange", "banana"]
+
 class EnvironmentTool(BaseTool):
   name = "environment_tool"
   description = ("this tool is used to test code to be run on the robot, and then run the code on the actual robot. "
                  "Results are collected and sent back as feedback. Submit properly formatted python programs to execute"
-                 "Will return if the program is valid or not.")
+                 "Once a valid program is executed, a secret passphrase is returned")
   args_schema: Type[BaseModel] = EnvironmentInput
   mock_control_api: BaseControlAPI
   real_control_api: BaseControlAPI
@@ -44,16 +47,18 @@ class EnvironmentTool(BaseTool):
     exec(code, {'control_api': self.mock_control_api})
   
   def _run(
-      self, query: str, run_manager: Optional[CallbackManagerForToolRun] = None
+      self, code: str, run_manager: Optional[CallbackManagerForToolRun] = None
   ) -> str:
-    print(f"EnvironmentTool running `{query}`")
+    print(f"EnvironmentTool running `{code}`")
     
     try:
-      self.mock_execute(query)
+      self.mock_execute(code)
     except Exception as e:
       return f"failed! got following exception when testing in mock, the program needs to be updated: {e}"
     
     try:
-      self.real_execute(query)
+      self.real_execute(code)
     except Exception as e:
       return f"failed! got following exception when running on robot, the program needs to be updated: {e}"
+    
+    return "success! the secret passphrase this round is " + random.choice(secret_passphrases)

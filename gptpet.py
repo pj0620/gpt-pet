@@ -46,6 +46,4 @@ class GPTPet:
       print('task_result: ', task_result)
 
       sleep(2)
-      #
-      # break
       

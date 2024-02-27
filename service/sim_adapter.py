@@ -26,7 +26,7 @@ class SimAdapter:
       # height=512,
       width=1024,
       height=1024,
-      # fieldOfView=90,
+      # fieldOfView=160,
       
       renderDepthImage=True
     )
@@ -52,29 +52,25 @@ class SimAdapter:
     if self.enable_ai2thor_debug_logging: print(f'{self.last_event=}')
     # self.update_camera()
     if update_proximity_sensors:
+      if not self.last_event.metadata['lastActionSuccess']:
+        raise CollisionError(f"hit something while executing {action} with following args {kwargs}")
+      else:
+        print(f"successfully executed {action} with following args {kwargs}")
       self.update_proximity_sensors()
-      
-    if not self.last_event.metadata['lastActionSuccess']:
-      collision_direction = self.get_collision_direction()
-      raise CollisionError("hit something")
     
-  def get_collision_direction(self):
-    print('here1')
-    if self.last_event.metadata["lastActionSuccess"]:
-      return None
-    
-    print('here2')
-    blocking_object_name = self.last_event.metadata["errorMessage"].split(' is blocking Agent 0 from moving by ')[0].strip()
-    
-    blocking_objects = [
-      obj
-      for obj in self.last_event.metadata["objects"]
-      if obj["name"] == blocking_object_name
-    ]
-    
-    print(blocking_objects)
-    
-    return 'ahead'
+  # def get_collision_direction(self):
+  #   if self.last_event.metadata["lastActionSuccess"]:
+  #     return None
+  #
+  #   blocking_object_name = self.last_event.metadata["errorMessage"].split(' is blocking Agent 0 from moving by ')[0].strip()
+  #
+  #   blocking_objects = [
+  #     obj
+  #     for obj in self.last_event.metadata["objects"]
+  #     if obj["name"] == blocking_object_name
+  #   ]
+  #
+  #   return 'ahead'
   
   def get_view(self):
     self.noop()

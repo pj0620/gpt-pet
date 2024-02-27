@@ -42,7 +42,14 @@ class AgentExecutorModule(BaseExecutorModule):
       MessagesPlaceholder(variable_name='agent_scratchpad')
     ])
     agent = create_json_chat_agent(llm, tools, template)
-    self.agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True, handle_parsing_errors=True)
+    self.agent_executor = AgentExecutor(
+      agent=agent,
+      tools=tools,
+      verbose=True,
+      handle_parsing_errors=True,
+      max_iterations=5,
+      return_intermediate_steps=True
+    )
   
   def get_programs(self, skills=None):
     if skills is None:
