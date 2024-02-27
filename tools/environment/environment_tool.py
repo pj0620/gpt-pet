@@ -47,9 +47,9 @@ class EnvironmentTool(BaseTool):
     exec(code, {'control_api': self.mock_control_api})
   
   def _run(
-      self, code: str, run_manager: Optional[CallbackManagerForToolRun] = None
+      self, code: str, reasoning: str, run_manager: Optional[CallbackManagerForToolRun] = None
   ) -> str:
-    print(f"EnvironmentTool running `{code}`")
+    print(f"EnvironmentTool running `{code}` with following reasoning: {reasoning}")
     
     try:
       self.mock_execute(code)

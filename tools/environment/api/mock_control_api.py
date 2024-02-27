@@ -60,3 +60,23 @@ class MockControlAPI(BaseControlAPI):
       action=ROTATE_RIGHT,
       degrees=degress
     )
+  
+  def read_right_sensor(
+      self
+  ) -> float:
+    return 100.0
+  
+  def read_ahead_sensor(
+      self
+  ) -> float:
+    return 100.0
+  
+  def read_left_sensor(
+      self
+  ) -> float:
+    return 100.0
+  
+  def read_back_sensor(
+      self
+  ) -> float:
+    return 100.0

@@ -1,6 +1,4 @@
-from abc import ABC
-
-from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT
+from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT, ROTATE_LEFT
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
@@ -52,4 +50,28 @@ class RealControlAPI(BaseControlAPI):
       degress: float = None
   ) -> MovementResult:
     print(f"ProdControlAPI: executing rotate, {degress=}")
-    return self.motor_adapter.do_rotate(ROTATE_RIGHT, degrees=degress)
+    return self.motor_adapter.do_rotate(ROTATE_LEFT, degrees=degress)
+  
+  def read_back_sensor(
+      self
+  ) -> str:
+    print(f"ProdControlAPI: executing read_back_sensor")
+    return self.proximity_sensor_adapter.get_measurements()['back']
+  
+  def read_ahead_sensor(
+      self
+  ) -> str:
+    print(f"ProdControlAPI: executing read_ahead_sensor")
+    return self.proximity_sensor_adapter.get_measurements()['ahead']
+  
+  def read_left_sensor(
+      self
+  ) -> str:
+    print(f"ProdControlAPI: executing read_left_sensor")
+    return self.proximity_sensor_adapter.get_measurements()['left']
+  
+  def read_right_sensor(
+      self
+  ) -> str:
+    print(f"ProdControlAPI: executing read_right_sensor")
+    return self.proximity_sensor_adapter.get_measurements()['right']

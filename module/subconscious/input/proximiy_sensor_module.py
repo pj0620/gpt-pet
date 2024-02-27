@@ -6,13 +6,14 @@ from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 
 PROXIMITY_SENSOR_MODULE_SCHEMA = {
-  "right": "Approximate distance in meters from the robot to the nearest obstacle right of GPTPet.",
-  "ahead": "Approximate distance in meters from the robot to the nearest obstacle ahead of GPTPet.",
-  "left": "Approximate distance in meters from the robot to the nearest obstacle left of GPTPet.",
-  "back": "Approximate distance in meters from the robot to the nearest obstacle to back of GPTPet."
+  "right": "distance to the right",
+  "ahead": "distance to the ahead",
+  "left": "distance to the left",
+  "back": "distance to the back"
 }
 
-PROXIMITY_SENSOR_MODULE_DESCRIPTION = "Summary of Proximity Sensors on GPTPet"
+PROXIMITY_SENSOR_MODULE_DESCRIPTION = ("Summary of Proximity Sensors on GPTPet which reports approximate distance in "
+                                       "meters to the nearest obstacle in each direction")
 
 
 class ProximitySensorModule(BaseSubconsciousInputModule):
