@@ -16,7 +16,7 @@ from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 
 
-class AgentExecutorModule(BaseExecutorModule):
+class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
@@ -27,16 +27,15 @@ class AgentExecutorModule(BaseExecutorModule):
         proximity_sensor_adapter=context.proximity_sensor_adapter
       )
     ]
-    prompt_system = load_prompt('executor/system.txt')
-    
-    prompt_human = load_prompt('executor/human.txt')
+    prompt_system = load_prompt('executor_single_input/system.txt')
+    prompt_human = load_prompt('executor_single_input/human.txt')
     prompt_human = prompt_human.replace("{programs}", self.get_programs())
     template = ChatPromptTemplate.from_messages([
       SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=['programs'], template=prompt_system)),
       MessagesPlaceholder(variable_name='chat_history', optional=True),
       HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['input'], template=prompt_human))
     ])
-    agent = create_structured_chat_agent(llm, tools, template)
+    agent = create_json_chat_agent(llm, tools, template)
     self.agent_executor = AgentExecutor(
       agent=agent,
       tools=tools,

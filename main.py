@@ -10,6 +10,7 @@ from module.subconscious.input.vision_module import VisionModule
 
 from module.subconscious.output.agent_executor_module import AgentExecutorModule
 from module.subconscious.output.noop_executor_module import DummyExecutorModule
+from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.motor.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sensor.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
@@ -48,7 +49,7 @@ gptpet = GPTPet(
   sensory_modules=sensory_modules,
   subconscious_input_modules=subconscious_input_modules,
   conscious_module=AgentConsciousModule(),
-  executor_module=AgentExecutorModule(context)
+  executor_module=SingleInputAgentExecutorModule(context)
 )
 
 gptpet.exist(context)

@@ -1,4 +1,7 @@
+import ast
+import multiprocessing
 import random
+import threading
 from enum import Enum
 from typing import Type, Optional, Any
 
@@ -16,40 +19,50 @@ from tools.environment.model import EnvironmentInput
 
 
 secret_passphrases = ["apple", "orange", "banana"]
+TIMEOUT_MESSAGE = "Execution terminated due to timeout."
+SUCCESS_MESSAGE = "Executed successfully."
 
 class EnvironmentTool(BaseTool):
   name = "environment_tool"
-  description = ("this tool is used to test code to be run on the robot, and then run the code on the actual robot. "
-                 "Results are collected and sent back as feedback. Submit properly formatted python programs to execute"
-                 "Once a valid program is executed, a secret passphrase is returned")
+  description = ("this tool is used to test code to be run on the robot to make sure it works as well as get the special"
+                 " passphrase for this code if it runs successfully. input must only be properly formatted python program.")
   args_schema: Type[BaseModel] = EnvironmentInput
   mock_control_api: BaseControlAPI
   real_control_api: BaseControlAPI
   
-  def __init__(
-      self,
-      proximity_sensor_adapter: BaseProximitySensorAdapter,
-      motor_adapter: BaseMotorAdapter
-  ):
-    real_control_api = RealControlAPI(
-      proximity_sensor_adapter=proximity_sensor_adapter,
-      motor_adapter=motor_adapter
-    )
+  def __init__(self,
+               proximity_sensor_adapter: BaseProximitySensorAdapter,
+               motor_adapter: BaseMotorAdapter):
+    real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter)
     super(EnvironmentTool, self).__init__(
       mock_control_api=MockControlAPI(),
       real_control_api=real_control_api
     )
   
   def real_execute(self, code: str):
-    exec(code, {'control_api': self.real_control_api})
-    
+    return exec(code, {"control_api": self.real_control_api})
+  
   def mock_execute(self, code: str):
-    exec(code, {'control_api': self.mock_control_api})
+    return exec(code, {"control_api": self.mock_control_api})
+  
+  def contains_while_loop(self, code):
+    try:
+      tree = ast.parse(code)
+      for node in ast.walk(tree):
+        if isinstance(node, ast.While):
+          return True
+      return False
+    except SyntaxError:
+      # Handle code with syntax errors if necessary
+      return False
   
   def _run(
-      self, code: str, reasoning: str, run_manager: Optional[CallbackManagerForToolRun] = None
+      self, code: str, run_manager: Optional[CallbackManagerForToolRun] = None
   ) -> str:
-    print(f"EnvironmentTool running `{code}` with following reasoning: {reasoning}")
+    print(f"EnvironmentTool running `{code}`")
+    
+    if self.contains_while_loop(code):
+      return "failed! code contains a while loop which is not allowed!"
     
     try:
       self.mock_execute(code)

@@ -15,6 +15,7 @@ You must follow the following criteria:
 5) The next task should be novel and interesting. I should not be doing the same thing over and over again.
 6) I may sometimes need to repeat some tasks if I need to collect more resources to complete more difficult tasks. Only repeat tasks if necessary.
 7) I don't want to stay in one place.
+8) Your next task should be very quick to execute. For example: "Move Forward"
 
 You should only respond with yaml in the form beloew
 RESPONSE FORMAT:
