@@ -2,7 +2,7 @@
 LLM-based Pet
 
 # Installation Instructions
-1. clone the git repo git clone git@github.com:pj0620/gpt-pet.git
+1. clone this git repo `git clone git@github.com:pj0620/gpt-pet.git`
 2. start Docker deamon
 3. Once Docker is started, run `docker-compose up` in the gpt-pet directory. This should install for a long time.
 4. install requirements from requirements.txt
