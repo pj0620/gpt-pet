@@ -8,7 +8,7 @@ matplotlib==3.8.0
 numpy==1.26.3
 numpydoc==1.5.0
 openai==1.12.0
-pydantic==1.10.12
+pydantic
 opencv-python==4.9.0.80
 ai2thor==5.0.0
 weaviate-client==4.4b2
