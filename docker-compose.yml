@@ -39,5 +39,20 @@ services:
     image: semitechnologies/img2vec-pytorch:resnet50
     environment:
       ENABLE_CUDA: '0'
+
+  ai2thor:
+    image: ai2thor-docker:latest
+    volumes:
+      - .:/app  # Mount the current directory to /app in the container
+    working_dir: /app  # Set the working directory to /app
+    environment:
+      - ROBOTHOR_BASE_DIR=/app  # Set the ROBOTHOR_BASE_DIR environment variable
+    command: python3 main.py
+    stdin_open: true  # Equivalent to '-i' flag in docker run
+    tty: true  # Equivalent to '-t' flag in docker run
+    depends_on:
+      - vector-db-module
+      - contextionary
+      - i2v-neural
 volumes:
   vector_db_data:
