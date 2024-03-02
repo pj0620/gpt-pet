@@ -19,6 +19,7 @@ from service.vectordb_adapter_service import VectorDBAdapterService
 import numpy as np
 
 from service.vision_llm.blip_visual_llm_adapter_service import BlipVisualLLMAdapterService
+from service.vision_llm.llava_visual_llm_adapter_service import LlavaVisualLLMAdapterService
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -29,7 +30,7 @@ context = GPTPetContext()
 
 # setup vectordb
 context.vectordb_adapter = VectorDBAdapterService()
-context.visual_llm_adapter = BlipVisualLLMAdapterService()
+context.visual_llm_adapter = LlavaVisualLLMAdapterService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
