@@ -46,9 +46,16 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
 ]
 
 gptpet = GPTPet(
+  # collects raw sensor data
   sensory_modules=sensory_modules,
+  
+  # builds text input from sensor data
   subconscious_input_modules=subconscious_input_modules,
+  
+  # use text input to create task
   conscious_module=AgentConsciousModule(),
+  
+  # executes task
   executor_module=SingleInputAgentExecutorModule(context)
 )
 

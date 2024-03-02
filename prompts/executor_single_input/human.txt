@@ -11,7 +11,7 @@ RESPONSE FORMAT INSTRUCTIONS
 
 ----------------------------
 
-When responding to me, please output a response in one of two formats:
+When responding to me, output responses in only one of the following two formats:
 
 **Option 1:**
 

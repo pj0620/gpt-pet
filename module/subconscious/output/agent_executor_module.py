@@ -28,7 +28,6 @@ class AgentExecutorModule(BaseExecutorModule):
       )
     ]
     prompt_system = load_prompt('executor/system.txt')
-    
     prompt_human = load_prompt('executor/human.txt')
     prompt_human = prompt_human.replace("{programs}", self.get_programs())
     template = ChatPromptTemplate.from_messages([
