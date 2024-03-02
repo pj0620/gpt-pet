@@ -11,4 +11,4 @@ openai==1.12.0
 pydantic
 opencv-python==4.9.0.80
 ai2thor==5.0.0
-weaviate-client==4.4b2
+weaviate-client

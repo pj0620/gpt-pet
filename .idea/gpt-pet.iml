@@ -13,7 +13,7 @@
       <excludeFolder url="file://$MODULE_DIR$/modules/location_module/venv2" />
       <excludeFolder url="file://$MODULE_DIR$/modules/vision_module/venv" />
     </content>
-    <orderEntry type="inheritedJdk" />
+    <orderEntry type="jdk" jdkName="Python 3.11 (gpt-pet)" jdkType="Python SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>

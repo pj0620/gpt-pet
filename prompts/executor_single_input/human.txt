@@ -67,6 +67,6 @@ accomplishing your task
 4. Code should never contain a while loop
 
 REMINDER: You must ask the human to validate a program works using the environment_tool before sending program to the human using
-"action": "Final Answer".
+"action": "Final Answer"
 
 {agent_scratchpad}
