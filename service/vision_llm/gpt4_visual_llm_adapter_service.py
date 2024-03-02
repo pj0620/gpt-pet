@@ -1,7 +1,9 @@
 from openai import OpenAI
 
+from service.vision_llm.base_visual_llm_adapter_service import BaseVisualLLMAdapterService
 
-class VisualLLMAdapterService:
+
+class GPT4VisualLLMAdapterService(BaseVisualLLMAdapterService):
   def __init__(self):
     self.client = OpenAI()
     

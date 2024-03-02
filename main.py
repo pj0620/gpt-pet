@@ -15,9 +15,10 @@ from service.motor.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sensor.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
-from service.visual_llm_adapter_service import VisualLLMAdapterService
 
 import numpy as np
+
+from service.vision_llm.blip_visual_llm_adapter_service import BlipVisualLLMAdapterService
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -28,7 +29,7 @@ context = GPTPetContext()
 
 # setup vectordb
 context.vectordb_adapter = VectorDBAdapterService()
-context.visual_llm_adapter = VisualLLMAdapterService()
+context.visual_llm_adapter = BlipVisualLLMAdapterService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
