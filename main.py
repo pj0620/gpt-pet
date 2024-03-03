@@ -18,7 +18,9 @@ from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 
 import numpy as np
+import warnings
 
+warnings.filterwarnings("ignore", category=ResourceWarning)
 np.set_printoptions(precision=3, suppress=True)
 
 # TODO: request param
