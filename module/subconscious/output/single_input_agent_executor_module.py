@@ -20,7 +20,7 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
+    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
     print('context.motor_service: ', context.motor_adapter)
     tools = [
       EnvironmentTool(
@@ -40,7 +40,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       programs=self.get_programs(),
       response_format=response_format
     )
-    agent = create_executor_chat_agent(llm, tools, prompt)
+    agent = create_json_chat_agent(llm, tools, prompt)
     self.agent_executor = AgentExecutor(
       agent=agent,
       tools=tools,

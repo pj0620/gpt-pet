@@ -24,8 +24,7 @@ SUCCESS_MESSAGE = "Executed successfully."
 
 class EnvironmentTool(BaseTool):
   name = "environment_tool"
-  description = ("this tool is used to test code to be run on the robot to make sure it works as well as get the special"
-                 " passphrase for this code if it runs successfully. input must only be properly formatted python program.")
+  description = ("An expertly crafted environement to verify programs to be run on robots. Used for when you want to write a program that controls a robot to complete a task. The input should be a valid python program")
   args_schema: Type[BaseModel] = EnvironmentInput
   mock_control_api: BaseControlAPI
   real_control_api: BaseControlAPI

@@ -1,14 +1,8 @@
-USER'S INPUT
-
---------------------
-
-
-Please create a python program that can be run on a robot that will execute the task given to you below, and secret
-passphrase for the code from environment_tool.
+Leveraging environment_tool, create a python program that can be run on a robot that will execute the following task.
 
 task: {input}
 
-Here are some useful programs showing that you can use as a model when creating your code.
+Here are some useful programs you can use as a model when creating your code.
 
 {programs}
 
@@ -21,7 +15,6 @@ accomplishing your task
 4. Code should never contain a while loop
 5. Code should not contain a main method or if __name__ == "__main__" block
 
-REMINDER: DO NOT CREATE YOUR OWN SECRET PASSPHRASE. You must return the  value for the secret passphrase you recieve
-from calling environment_tool
+Reminder to use environment_tool before giving final answer
 
 {agent_scratchpad}
