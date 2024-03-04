@@ -1,56 +1,10 @@
-TOOLS
-
-------
-
-Assistant can ask the user to use tools to look up information that may be helpful in answering the users original
-question. The tools the human can use are:
-
-{tools}
-
-RESPONSE FORMAT INSTRUCTIONS
-
-----------------------------
-
-When responding to me, output responses in only one of the following two formats:
-
-**Option 1:**
-
-Use this if you want the human to use a tool.
-
-Markdown code snippet formatted in the following schema:
-
-```json
-
-{{
-    "action": string, \ The action to take. Must be one of {tool_names}
-    "action_input": string \ The input to the action
-}}
-
-```
-
-**Option #2:**
-
-Use this if you want to respond directly to the human.
-Markdown code snippet formatted in the following schema:
-
-```json
-
-{{
-    "action": "Final Answer",
-    "action_input": string \ You should put what you want to return to use here
-}}
-
-```
-
 USER'S INPUT
 
 --------------------
 
 
-Please create a python program that can be run on a robot that will execute the task given to you below.
-You must ask the human to validate a program works using the environment_tool before sending program to the human using
-"action": "Final Answer". Please also include as a comment the passphrase you receive from environment_tool that constantly
-changes. Do not make up this passcode. It must come directly from environment_tool
+Please create a python program that can be run on a robot that will execute the task given to you below, and secret
+passphrase for the code from environment_tool.
 
 task: {input}
 
@@ -65,8 +19,9 @@ There are no other ways besides the method calls presented above to interact wit
 3. Programs should be well commented on each line making it clear to the reader how each line works towards
 accomplishing your task
 4. Code should never contain a while loop
+5. Code should not contain a main method or if __name__ == "__main__" block
 
-REMINDER: You must ask the human to validate a program works using the environment_tool before sending program to the human using
-"action": "Final Answer"
+REMINDER: DO NOT CREATE YOUR OWN SECRET PASSPHRASE. You must return the  value for the secret passphrase you recieve
+from calling environment_tool
 
 {agent_scratchpad}

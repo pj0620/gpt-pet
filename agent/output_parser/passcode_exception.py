@@ -1,0 +1,2 @@
+class PasscodeException(Exception):
+  pass

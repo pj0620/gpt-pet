@@ -8,6 +8,7 @@ from langchain_openai import ChatOpenAI
 from langchain.agents import create_openai_functions_agent, AgentExecutor, initialize_agent, AgentType, \
   create_json_chat_agent, create_structured_chat_agent
 
+from agent.executor_agent import create_executor_chat_agent
 from gptpet_context import GPTPetContext
 from model.conscious import TaskResult, TaskDefinition
 from module.subconscious.output.base_executor_module import BaseExecutorModule
@@ -27,15 +28,19 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
         proximity_sensor_adapter=context.proximity_sensor_adapter
       )
     ]
+    response_format = load_prompt('executor_single_input/response_format.txt')
     prompt_system = load_prompt('executor_single_input/system.txt')
     prompt_human = load_prompt('executor_single_input/human.txt')
-    prompt_human = prompt_human.replace("{programs}", self.get_programs())
-    template = ChatPromptTemplate.from_messages([
+    prompt = ChatPromptTemplate.from_messages([
       SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=['programs'], template=prompt_system)),
       MessagesPlaceholder(variable_name='chat_history', optional=True),
       HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['input'], template=prompt_human))
     ])
-    agent = create_json_chat_agent(llm, tools, template)
+    prompt = prompt.partial(
+      programs=self.get_programs(),
+      response_format=response_format
+    )
+    agent = create_executor_chat_agent(llm, tools, prompt)
     self.agent_executor = AgentExecutor(
       agent=agent,
       tools=tools,
@@ -57,7 +62,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     result = self.agent_executor.invoke(dict(
-      input=new_task,
+      input=new_task.task,
       chat_history=[],
     ))
     print(result)

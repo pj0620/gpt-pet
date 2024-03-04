@@ -18,7 +18,7 @@ from tools.environment.api.real_control_api import RealControlAPI
 from tools.environment.model import EnvironmentInput
 
 
-secret_passphrases = ["apple", "orange", "banana"]
+secret_passphrases = ["apple"]
 TIMEOUT_MESSAGE = "Execution terminated due to timeout."
 SUCCESS_MESSAGE = "Executed successfully."
 
