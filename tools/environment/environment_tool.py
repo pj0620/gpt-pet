@@ -68,9 +68,11 @@ class EnvironmentTool(BaseTool):
     except Exception as e:
       return f"failed! got following exception when testing in mock, the program needs to be updated: {e}"
     
+    self.real_control_api.clear_last_actions()
     try:
       self.real_execute(code)
     except Exception as e:
+      self.real_control_api.rollback_last_successful()
       return f"failed! got following exception when running on robot, the program needs to be updated: {e}"
     
     return "success! the secret passphrase this round is " + random.choice(secret_passphrases)

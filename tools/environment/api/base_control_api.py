@@ -1,59 +1,96 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 
-from model.motor import MovementResult
+from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 
 
 class BaseControlAPI(ABC):
+  last_steps: list[tuple[str, dict[str, float]]]
+  
+  def __init__(self):
+    self.last_steps = []
+  
+  def push_new_action(self, action: str, params: dict[str, float]):
+    print(f"push_new_action: {action} with {params}")
+    self.last_steps.append((action, params))
+  
+  def clear_last_actions(self):
+    self.last_steps = []
+    
+  def rollback_last_successful(self):
+    print("failed, rolling back last actions")
+    for action, params in self.last_steps[::-1]:
+      for key in params:
+        if params[key] is not None:
+          params[key] = -1 * params[key]
+      print(f"[ROLLBACK] executing {action} with {params}")
+      if action == MOVE_RIGHT:
+        self.move_right(**params)
+      elif action == MOVE_AHEAD:
+        self.move_ahead(**params)
+      elif action == MOVE_LEFT:
+        self.move_left(**params)
+      elif action == MOVE_BACK:
+        self.move_back(**params)
+      elif action == ROTATE_LEFT:
+        self.rotate(**params)
+    
+  
+  @abstractmethod
   def move_right(
       self,
       move_magnitude: float = None
-  ) -> MovementResult:
+  ) -> str:
     """
     :param move_magnitude: distance for robot to move
     :return: results of moving
     """
     pass
   
+  @abstractmethod
   def move_ahead(
       self,
       move_magnitude: float = None
-  ) -> MovementResult:
+  ) -> str:
     """
     :param move_magnitude: distance for robot to move
     :return: results of moving
     """
     pass
   
+  @abstractmethod
   def move_left(
       self,
       move_magnitude: float = None
-  ) -> MovementResult:
+  ) -> str:
     """
     :param move_magnitude: distance for robot to move
     :return: results of moving
     """
     pass
   
+  @abstractmethod
   def move_back(
       self,
       move_magnitude: float = None
-  ) -> MovementResult:
+  ) -> str:
     """
     :param move_magnitude: distance for robot to move
     :return: results of moving
     """
     pass
   
+  @abstractmethod
   def rotate(
       self,
-      degress: float = None
-  ) -> MovementResult:
+      degrees: float = None
+  ) -> str:
     """
-    :param degress: rough number of degrees for robot to turn
+    :param degrees: rough number of degrees for robot to turn
     :return: results of turning
     """
     pass
   
+  @abstractmethod
   def read_right_sensor(
       self
   ) -> str:
@@ -62,6 +99,7 @@ class BaseControlAPI(ABC):
     """
     pass
   
+  @abstractmethod
   def read_ahead_sensor(
       self
   ) -> str:
@@ -70,6 +108,7 @@ class BaseControlAPI(ABC):
     """
     pass
   
+  @abstractmethod
   def read_left_sensor(
       self
   ) -> str:
@@ -78,6 +117,7 @@ class BaseControlAPI(ABC):
     """
     pass
   
+  @abstractmethod
   def read_back_sensor(
       self
   ) -> str:

@@ -10,7 +10,7 @@ TOOLS
 
 ------
 
-Assistant can ask the user to use tools to look up information that may be helpful in answering the users original question. The tools the human can use are:
+Assistant must use the following tools to validate its code before responding with "Final Answer". The tools the human can use are:
 
 {tools}
 
@@ -22,7 +22,7 @@ When responding to me, output responses in only one of the following two formats
 
 **Option 1:**
 
-Use this if you want the human to use a tool you must use json that is correct and is valid. Must have following schema.
+Use this if you want the human to use a tool you must use json that is correct and is valid. This must be used before Final Answer in Option 2 below. Must have following schema.
 
 Markdown code snippet formatted in the following schema:
 

@@ -52,13 +52,13 @@ class MockControlAPI(BaseControlAPI):
   
   def rotate(
       self,
-      degress: float = None
+      degrees: float = None
   ) -> MovementResult:
     print("MockControlAPI: executing rotate")
     return MovementResult(
       successful=True,
       action=ROTATE_RIGHT,
-      degrees=degress
+      degrees=degrees
     )
   
   def read_right_sensor(

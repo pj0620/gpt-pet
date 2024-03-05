@@ -15,6 +15,10 @@ accomplishing your task
 4. Code should never contain a while loop
 5. Code should not contain a main method or if __name__ == "__main__" block
 
-Reminder to use environment_tool before giving final answer
+Reminder to use environment_tool before giving final answer.
+
+Follow these steps in answering this question
+
+write code -> test using environment_tool -> ... continue testing until code passes ... -> return using final answer
 
 {agent_scratchpad}
