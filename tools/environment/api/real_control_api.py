@@ -46,7 +46,7 @@ class RealControlAPI(BaseControlAPI):
       degrees: float = None
   ) -> str:
     print(f"ProdControlAPI: executing rotate, {degrees=}")
-    return self.handle_action(ROTATE_LEFT, degrees)
+    return self.handle_action(ROTATE_RIGHT, degrees)
   
   # No need to track proximity sensor actions for rollback procedure
   
@@ -75,9 +75,8 @@ class RealControlAPI(BaseControlAPI):
     return self.proximity_sensor_adapter.get_measurements()['right']
 
   def handle_action(self, action: str, param: float):
-    kwargs = {}
-    if action == ROTATE_LEFT:
-      kwargs = dict(degress=param)
+    if 'Rotate' in action:
+      kwargs = dict(degrees=param)
       resp = self.motor_adapter.do_rotate(action, **kwargs)
     else:
       kwargs = dict(move_magnitude=param)

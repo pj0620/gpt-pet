@@ -35,8 +35,10 @@ class AgentConsciousModule(BaseConsciousModule):
       for inp in context.conscious_inputs
     ])
     
-    print('conscious_inputs_str: ')
-    pprint.pprint({"data": conscious_inputs_str})
+    pprint.pprint({"conscious_inputs":  [
+      inp.__dict__
+      for inp in context.conscious_inputs
+    ]})
     
     response = self.chain.invoke(dict(
       subconscious_info=conscious_inputs_str,
