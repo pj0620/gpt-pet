@@ -9,25 +9,21 @@ from gptpet_context import GPTPetContext
 from model.conscious import NewTaskResponse, TaskDefinition
 from module.conscious.base_conscious_module import BaseConsciousModule
 from utils.conscious import task_response_mapper
-from utils.prompt_utils import load_prompt
+from utils.prompt_utils import load_prompt, encode_image_array
 from datetime import datetime
 import pprint
 
 
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
-    prompt_system = load_prompt('conscious/system.txt')
-    prompt_human = load_prompt('conscious/human.txt')
-    template = ChatPromptTemplate.from_messages([
-      SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=[], template=prompt_system)),
-      HumanMessagePromptTemplate(prompt=PromptTemplate(
-        input_variables=['subconscious_info', 'time', 'completed_tasks_so_far', 'failed_tasks'],
-        template=prompt_human
-      ))
-    ])
-    output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
-    self.chain = template | llm | output_parser
+    self.prompt_system = load_prompt('conscious/system.txt')
+    prompt_human_raw = load_prompt('conscious/human.txt')
+    self.prompt_human = PromptTemplate(
+      input_variables=['subconscious_info', 'time', 'completed_tasks_so_far', 'failed_tasks'],
+      template=prompt_human_raw
+    )
+    self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
+    # self.chain = template | llm | output_parser
   
   def generate_new_task(self, context: GPTPetContext) -> TaskDefinition:
     conscious_inputs_str = str([
@@ -40,11 +36,26 @@ class AgentConsciousModule(BaseConsciousModule):
       for inp in context.conscious_inputs
     ]})
     
-    response = self.chain.invoke(dict(
+    human_prompt_inst = self.prompt_human.invoke(dict(
       subconscious_info=conscious_inputs_str,
       time=str(datetime.now()),
       completed_tasks_so_far="[]",
       failed_tasks="[]"
-    ))
+    )).to_string()
     
+    base64_image = encode_image_array(context.sensory_outputs['last_frame']).decode('utf-8')
+    context.visual_llm_adapter.call_visual_llm(
+      system_prompt=self.prompt_system,
+      human_prompt=human_prompt_inst,
+      encoded_image_prompt=base64_image
+    )
+    
+    # TODO:
+    # response = self.chain.invoke(dict(
+    #   subconscious_info=conscious_inputs_str,
+    #   time=str(datetime.now()),
+    #   completed_tasks_so_far="[]",
+    #   failed_tasks="[]"
+    # ))
+    #
     return task_response_mapper(response)

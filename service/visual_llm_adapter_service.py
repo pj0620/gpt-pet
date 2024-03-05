@@ -7,16 +7,21 @@ class VisualLLMAdapterService:
     
   def call_visual_llm(
       self,
-      text_prompt: str,
+      system_prompt: str,
+      human_prompt: str,
       encoded_image_prompt: str
   ):
     response = self.client.chat.completions.create(
       model="gpt-4-vision-preview",
       messages=[
         {
+          "role": "system",
+          "content": system_prompt,
+        },
+        {
           "role": "user",
           "content": [
-            {"type": "text", "text": text_prompt},
+            {"type": "text", "text": human_prompt},
             {
               "type": "image_url",
               "image_url": {

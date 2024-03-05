@@ -30,7 +30,8 @@ class VisionModule(BaseSubconsciousInputModule):
     else:
       # not found in vectordb, so use Visual LLM
       text_description = context.visual_llm_adapter.call_visual_llm(
-        text_prompt=self.prompt,
+        system_prompt="You are a helpful assistant",
+        human_prompt=self.prompt,
         encoded_image_prompt=base64_image
       )
       print("called LLM and found text_description = ", text_description)
