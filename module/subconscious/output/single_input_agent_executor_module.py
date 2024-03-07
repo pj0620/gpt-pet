@@ -1,6 +1,7 @@
 from json import tool
 
 from langchain import hub
+from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
   HumanMessagePromptTemplate
@@ -21,7 +22,10 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
-    print('context.motor_service: ', context.motor_adapter)
+    # llm = ChatAnthropic(
+    #   temperature=0,
+    #   model_name="claude-3-opus-20240229"
+    # )
     tools = [
       EnvironmentTool(
         motor_adapter=context.motor_adapter,

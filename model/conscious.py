@@ -10,6 +10,7 @@ class NewTaskResponse(BaseModel):
 
 @dataclass
 class TaskDefinition:
+  input: str
   reasoning: str
   task: str
 

@@ -45,6 +45,8 @@ class GPTPet:
         print('new task: ', new_task)
         
         task_result = self.executor_module.execute(context, new_task)
+        
+        self.conscious_module.report_task_result(new_task, task_result)
   
         print('task_result: ', task_result)
   

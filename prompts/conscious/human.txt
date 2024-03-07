@@ -1,4 +1,2 @@
 Subconscious Info: {subconscious_info}
 Time: {time}
-Completed tasks so far: {completed_tasks_so_far}
-Failed tasks that are too hard: {failed_tasks}
