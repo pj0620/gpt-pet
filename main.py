@@ -1,6 +1,6 @@
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
-from module.conscious.no_memory_agent_conscious_module import AgentConsciousModule
+from module.conscious.agent_conscious_module import AgentConsciousModule
 from module.conscious.dummy_conscious_module import DummyConsciousModule
 from module.conscious.walk_forward_module import WalkForwardModule
 from module.sensory.ai2thor_camera_module import Ai2ThorCameraModule
