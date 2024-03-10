@@ -17,9 +17,6 @@ PROXIMITY_SENSOR_MODULE_DESCRIPTION = ("Summary of Proximity Sensors on GPTPet w
 
 
 class ProximitySensorModule(BaseSubconsciousInputModule):
-  def __init__(self):
-    self.prompt = load_prompt('vision_module/describe_room.txt')
-  
   def build_conscious_input(self, context: GPTPetContext) -> ConsciousInput:
     return ConsciousInput(
       value=context.proximity_sensor_adapter.get_measurements(),

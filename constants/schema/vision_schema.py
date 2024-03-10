@@ -24,9 +24,9 @@ PET_VIEW_CLASS_SCHEMA = {
       "description": "Description of this view"
     },
     {
-      "name": "turn_percent",
-      "dataType": ["int"],
-      "description": "an integer from -100 to 100 estimating how much the pet must turn if it wanted to move forward and not hit anything"
+      "name": "passageway_descriptions",
+      "dataType": ["string"],
+      "description": "list of descriptions for all passageways in gptpet's view"
     }
   ]
 }

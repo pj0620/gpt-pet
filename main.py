@@ -2,9 +2,13 @@ from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from module.conscious.agent_conscious_module import AgentConsciousModule
 from module.conscious.dummy_conscious_module import DummyConsciousModule
+from module.conscious.no_memory_agent_conscious_module import NoMemoryAgentConsciousModule
 from module.conscious.walk_forward_module import WalkForwardModule
 from module.sensory.ai2thor_camera_module import Ai2ThorCameraModule
+from module.sensory.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
+from module.sensory.ai2thor_proximity_module import Ai2ThorProximityModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
+from module.subconscious.input.no_depth_vision_module import NoDepthVisionModule
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.vision_module import VisionModule
 
@@ -36,7 +40,9 @@ if test_env == 'local':
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
   context.proximity_sensor_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
   sensory_modules = [
-    Ai2ThorCameraModule(sim_adapter)
+    Ai2ThorCameraModule(sim_adapter),
+    Ai2ThorDepthCameraModule(sim_adapter),
+    Ai2ThorProximityModule(sim_adapter)
   ]
 else:
   sensory_modules = []
@@ -54,7 +60,7 @@ gptpet = GPTPet(
   subconscious_input_modules=subconscious_input_modules,
   
   # use text input to create task
-  conscious_module=AgentConsciousModule(),
+  conscious_module=NoMemoryAgentConsciousModule(),
   
   # executes task
   executor_module=SingleInputAgentExecutorModule(context)

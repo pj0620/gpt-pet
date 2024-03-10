@@ -47,4 +47,4 @@ class NoMemoryAgentConsciousModule(BaseConsciousModule):
       failed_tasks="[]"
     ))
     
-    return task_response_mapper(response)
+    return task_response_mapper(conscious_inputs_str, response)

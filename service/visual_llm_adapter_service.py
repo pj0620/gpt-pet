@@ -31,4 +31,43 @@ class VisualLLMAdapterService:
     )
     return response.choices[0].message.content
   
+  def call_visual_llm_with_system_prompt(
+      self,
+      system_prompt: str,
+      encoded_image_prompt: str,
+      human_prompt: str = None
+  ):
+    messages = [{
+      "role": "system",
+      "content": [
+        {"type": "text", "text": system_prompt}
+      ],
+    }]
+    human_content = [{
+      "type": "image_url",
+      "image_url": {
+        "url": f"data:image/jpeg;base64,{encoded_image_prompt}",
+        "detail": "low"
+      }
+    }]
+    if human_prompt is None:
+      human_content.append({ "type": "text", "text": human_prompt })
+    response = self.client.chat.completions.create(
+      model="gpt-4-vision-preview",
+      messages=[
+        {
+          "role": "system",
+          "content": [
+            {"type": "text", "text": system_prompt}
+          ],
+        },
+        {
+          "role": "user",
+          "content": human_content,
+        }
+      ],
+      max_tokens=300,
+    )
+    return response.choices[0].message.content
+  
   

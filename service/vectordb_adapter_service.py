@@ -69,12 +69,13 @@ class VectorDBAdapterService:
     
     raw_response = (self.vectordb_client.query.get(
       class_name=PET_VIEW_CLASS_NAME,
-      properties=["description", "turn_percent"]
+      properties=["description", "passageway_descriptions"]
       ).with_near_image(
         sourceImage, encode=False
       ).with_additional(["distance", "id"])
       .with_limit(1).do())
     
+    print(f'{raw_response=}')
     room_view_arr = raw_response['data']['Get']['RoomView']
     if len(room_view_arr) == 0:
       return []

@@ -16,4 +16,4 @@ class Ai2ThorProximityModule(BaseSensoryModule):
     self.last_event = None
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
-    return {'proximity_measurements': self.sim_adapter.proximity_measurements()}
+    return {'proximity_measurements': self.sim_adapter.proximity_measurements}

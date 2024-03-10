@@ -26,10 +26,11 @@ class SimAdapter:
       # height=512,
       width=1024,
       height=1024,
-      # fieldOfView=160,
+      fieldOfView=70,
       
       renderDepthImage=True
     )
+    self.last_event = None
     self.controller.step(AI2THOR_CROUCH)
     self.noop()
     
@@ -75,6 +76,11 @@ class SimAdapter:
   def get_view(self):
     self.noop()
     last_frame = self.last_event.frame
+    return last_frame
+  
+  def get_depth_view(self):
+    self.noop()
+    last_frame = self.last_event.depth_frame
     return last_frame
   
   def last_event_successful(self):
