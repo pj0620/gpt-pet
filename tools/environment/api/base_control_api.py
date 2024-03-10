@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
+from utils.vision_utils import PassagewayInfo
 
 
 class BaseControlAPI(ABC):
@@ -8,6 +9,10 @@ class BaseControlAPI(ABC):
   
   def __init__(self):
     self.last_steps = []
+    self.passageways: list[PassagewayInfo] = []
+    
+  def update_passageways(self, new_passageways: list[PassagewayInfo]):
+    self.passageways = new_passageways
   
   def push_new_action(self, action: str, params: dict[str, float]):
     print(f"push_new_action: {action} with {params}")
@@ -93,7 +98,7 @@ class BaseControlAPI(ABC):
   @abstractmethod
   def read_right_sensor(
       self
-  ) -> str:
+  ) -> float:
     """
     :return: Approximate distance in meters from the robot to the nearest obstacle right of GPTPet.
     """
@@ -102,7 +107,7 @@ class BaseControlAPI(ABC):
   @abstractmethod
   def read_ahead_sensor(
       self
-  ) -> str:
+  ) -> float:
     """
     :return: Approximate distance in meters from the robot to the nearest obstacle ahead of GPTPet.
     """
@@ -111,7 +116,7 @@ class BaseControlAPI(ABC):
   @abstractmethod
   def read_left_sensor(
       self
-  ) -> str:
+  ) -> float:
     """
     :return: Approximate distance in meters from the robot to the nearest obstacle left of GPTPet.
     """
@@ -120,8 +125,14 @@ class BaseControlAPI(ABC):
   @abstractmethod
   def read_back_sensor(
       self
-  ) -> str:
+  ) -> float:
     """
     :return: Approximate distance in meters from the robot to the nearest obstacle to back of GPTPet.
     """
     pass
+  
+  @abstractmethod
+  def goto_passageway(self, passageway_color: str) -> None:
+    """
+    :param passageway_color: color of passageway to move into
+    """

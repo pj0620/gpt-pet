@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from constants.vision import FIELD_OF_VIEW
 
 import numpy as np
 
@@ -61,9 +62,9 @@ class LabelPassagewaysConfig:
   x_height_percent: float = 0.65
   
 @dataclass
-class XInfo:
+class PassagewayInfo:
   color: str
-  horz_location: int
+  turn_degrees: float
 
 @dataclass
 class LabelPassagewaysResponse:
@@ -71,12 +72,12 @@ class LabelPassagewaysResponse:
   final_image: np.array
   
   # color of each x
-  xs_info: list[XInfo]
+  xs_info: list[PassagewayInfo]
   
   
 def label_passageways(
     camera_view_arr: np.array, depth_camera_view_arr: np.array, config: LabelPassagewaysConfig = None
-  ) -> np.array:
+  ) -> tuple[np.array, list[PassagewayInfo]]:
   if config is None:
     config = LabelPassagewaysConfig()
   
@@ -86,6 +87,7 @@ def label_passageways(
   
   # clip depth averaging to only scan bottom of the image
   image_height = camera_view_arr.shape[0]
+  image_width = camera_view_arr.shape[1]
   top_percent = config.top_clip_percent
   bottom_percent = config.bottom_clip_percent
   depth_image_arr_clipped = depth_camera_view_arr[int(image_height * top_percent):int(image_height * bottom_percent), :]
@@ -147,8 +149,12 @@ def label_passageways(
   xs_info = []
   for i, center in enumerate(centers):
     draw_x(labeled_img, center, size=100, thickness=10, color=colors[i][1])
-    xs_info.append(XInfo(
-      horz_location=center[0],
+    
+    # compute degrees to turn to face this
+    degrees = (FIELD_OF_VIEW / 2) * (center[0] / image_width - 0.5)
+    
+    xs_info.append(PassagewayInfo(
+      turn_degrees=degrees,
       color=colors[i][0]
     ))
     

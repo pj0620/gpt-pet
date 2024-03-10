@@ -1,0 +1,1 @@
+FIELD_OF_VIEW = 70

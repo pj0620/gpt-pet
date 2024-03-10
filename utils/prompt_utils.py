@@ -63,13 +63,7 @@ def load_text(*fpaths, by_lines=False):
       return fp.read()
   
   
-def load_control_primitives_context(primitive_names=None):
-  if primitive_names is None:
-    primitive_names = [
-      primitive[:-3]
-      for primitive in os.listdir(f"control_primitives_context")
-      if primitive.endswith(".py")
-    ]
+def load_control_primitives_context(primitive_names):
   primitives = [
     load_text(f"control_primitives_context/{primitive_name}.py")
     for primitive_name in primitive_names

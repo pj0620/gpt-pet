@@ -2,7 +2,7 @@ from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
-
+import warnings
 
 class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorAdapter
@@ -52,27 +52,43 @@ class RealControlAPI(BaseControlAPI):
   
   def read_back_sensor(
       self
-  ) -> str:
+  ) -> float:
     print(f"ProdControlAPI: executing read_back_sensor")
-    return self.proximity_sensor_adapter.get_measurements()['back']
+    return float(self.proximity_sensor_adapter.get_measurements()['back'])
   
   def read_ahead_sensor(
       self
-  ) -> str:
+  ) -> float:
     print(f"ProdControlAPI: executing read_ahead_sensor")
-    return self.proximity_sensor_adapter.get_measurements()['ahead']
+    return float(self.proximity_sensor_adapter.get_measurements()['ahead'])
   
   def read_left_sensor(
       self
-  ) -> str:
+  ) -> float:
     print(f"ProdControlAPI: executing read_left_sensor")
-    return self.proximity_sensor_adapter.get_measurements()['left']
+    return float(self.proximity_sensor_adapter.get_measurements()['left'])
   
   def read_right_sensor(
       self
-  ) -> str:
+  ) -> float:
     print(f"ProdControlAPI: executing read_right_sensor")
-    return self.proximity_sensor_adapter.get_measurements()['right']
+    return float(self.proximity_sensor_adapter.get_measurements()['right'])
+  
+  def goto_passageway(
+      self, passageway_color: str
+  ) -> str:
+    print(f"RealControlAPI: going down '{passageway_color}' passageway")
+    matching_passageways = [p for p in self.passageways if p.color == passageway_color]
+    if len(matching_passageways) == 0:
+      raise Exception(f"failed to move down {passageway_color} passageway. Does not exist. The only valid passageways "
+                      f"are {self.passageways}")
+    elif len(matching_passageways) > 1:
+      warnings.warn(f"found multiple passageways with the same color {passageway_color} choosing first")
+    passageway = matching_passageways[0]
+    degrees_to_turn = passageway.turn_degrees
+    self.rotate(degrees_to_turn)
+    dist = self.read_ahead_sensor() * 0.9
+    return self.move_ahead(dist)
 
   def handle_action(self, action: str, param: float):
     if 'Rotate' in action:

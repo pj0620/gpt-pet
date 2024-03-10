@@ -8,6 +8,7 @@ class PetView:
   image: str
   description: str
   passageway_descriptions: str
+  passageways: str
 
 
 class PassagewayDescription(BaseModel):

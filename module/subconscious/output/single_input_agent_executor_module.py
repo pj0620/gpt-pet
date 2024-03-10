@@ -26,12 +26,11 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     #   temperature=0,
     #   model_name="claude-3-opus-20240229"
     # )
-    tools = [
-      EnvironmentTool(
-        motor_adapter=context.motor_adapter,
-        proximity_sensor_adapter=context.proximity_sensor_adapter
-      )
-    ]
+    self.environment_tool = EnvironmentTool(
+      motor_adapter=context.motor_adapter,
+      proximity_sensor_adapter=context.proximity_sensor_adapter
+    )
+    tools = [self.environment_tool]
     response_format = load_prompt('executor_single_input/response_format.txt')
     prompt_system = load_prompt('executor_single_input/system.txt')
     prompt_human = load_prompt('executor_single_input/human.txt')
@@ -59,12 +58,14 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       skills = []
     base_skills = [
       "motor_control",
-      "proximity_sensor"
+      "proximity_sensor",
+      "passageways"
     ]
     programs = "\n\n".join(load_control_primitives_context(base_skills) + skills)
     return programs
     
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
+    self.environment_tool.update_passageways(context.passageways)
     result = self.agent_executor.invoke(dict(
       input=new_task.task,
       chat_history=[],

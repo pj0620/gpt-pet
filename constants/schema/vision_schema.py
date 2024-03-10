@@ -27,6 +27,11 @@ PET_VIEW_CLASS_SCHEMA = {
       "name": "passageway_descriptions",
       "dataType": ["string"],
       "description": "list of descriptions for all passageways in gptpet's view"
+    },
+    {
+      "name": "passageways",
+      "dataType": ["string"],
+      "description": "list of all passageways in gptpet's view"
     }
   ]
 }

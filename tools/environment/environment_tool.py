@@ -16,7 +16,7 @@ from tools.environment.api.base_control_api import BaseControlAPI
 from tools.environment.api.mock_control_api import MockControlAPI
 from tools.environment.api.real_control_api import RealControlAPI
 from tools.environment.model import EnvironmentInput
-
+from utils.vision_utils import PassagewayInfo
 
 secret_passphrases = ["apple"]
 TIMEOUT_MESSAGE = "Execution terminated due to timeout."
@@ -37,6 +37,10 @@ class EnvironmentTool(BaseTool):
       mock_control_api=MockControlAPI(),
       real_control_api=real_control_api
     )
+    
+  def update_passageways(self, passageways: list[PassagewayInfo]):
+    self.mock_control_api.update_passageways(passageways)
+    self.real_control_api.update_passageways(passageways)
   
   def real_execute(self, code: str):
     return exec(code, {"control_api": self.real_control_api})

@@ -1,3 +1,4 @@
+import warnings
 from abc import ABC
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT
@@ -64,19 +65,36 @@ class MockControlAPI(BaseControlAPI):
   def read_right_sensor(
       self
   ) -> float:
+    print("MockControlAPI: reading right sensor")
     return 100.0
   
   def read_ahead_sensor(
       self
   ) -> float:
+    print("MockControlAPI: reading ahead sensor")
     return 100.0
   
   def read_left_sensor(
       self
   ) -> float:
+    print("MockControlAPI: reading left sensor")
     return 100.0
   
   def read_back_sensor(
       self
   ) -> float:
+    print("MockControlAPI: reading back sensor")
     return 100.0
+  
+  def goto_passageway(
+      self, passageway_color: str
+  ) -> str:
+    print(f"MockControlAPI: going down '{passageway_color}' passageway")
+    matching_passageways = [p for p in self.passageways if p.color == passageway_color]
+    if len(matching_passageways) == 0:
+      raise Exception(f"failed to move down {passageway_color} passageway. Does not exist. The only valid passageways "
+                      f"are {self.passageways}")
+    elif len(matching_passageways) > 1:
+      warnings.warn(f"found multiple passageways with the same color {passageway_color} choosing first")
+      
+    return "success!"

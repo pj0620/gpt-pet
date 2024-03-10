@@ -5,6 +5,7 @@ from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
+from utils.vision_utils import PassagewayInfo
 
 
 class GPTPetContext:
@@ -14,4 +15,5 @@ class GPTPetContext:
     proximity_sensor_adapter: BaseProximitySensorAdapter
     sensory_outputs: dict[str, Any]
     conscious_inputs: list[ConsciousInput]
+    passageways: list[PassagewayInfo]
     
