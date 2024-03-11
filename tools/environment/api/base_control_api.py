@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
-from utils.vision_utils import PassagewayInfo
+from model.vision import PhysicalPassagewayInfo
 
 
 class BaseControlAPI(ABC):
@@ -9,9 +9,9 @@ class BaseControlAPI(ABC):
   
   def __init__(self):
     self.last_steps = []
-    self.passageways: list[PassagewayInfo] = []
+    self.passageways: list[PhysicalPassagewayInfo] = []
     
-  def update_passageways(self, new_passageways: list[PassagewayInfo]):
+  def update_passageways(self, new_passageways: list[PhysicalPassagewayInfo]):
     self.passageways = new_passageways
   
   def push_new_action(self, action: str, params: dict[str, float]):
@@ -23,21 +23,24 @@ class BaseControlAPI(ABC):
     
   def rollback_last_successful(self):
     print("failed, rolling back last actions")
-    for action, params in self.last_steps[::-1]:
-      for key in params:
-        if params[key] is not None:
-          params[key] = -1 * params[key]
-      print(f"[ROLLBACK] executing {action} with {params}")
-      if action == MOVE_RIGHT:
-        self.move_right(**params)
-      elif action == MOVE_AHEAD:
-        self.move_ahead(**params)
-      elif action == MOVE_LEFT:
-        self.move_left(**params)
-      elif action == MOVE_BACK:
-        self.move_back(**params)
-      elif action == ROTATE_LEFT:
-        self.rotate(**params)
+    try:
+      for action, params in self.last_steps[::-1]:
+        for key in params:
+          if params[key] is not None:
+            params[key] = -1 * params[key]
+        print(f"[ROLLBACK] executing {action} with {params}")
+        if action == MOVE_RIGHT:
+          self.move_right(**params)
+        elif action == MOVE_AHEAD:
+          self.move_ahead(**params)
+        elif action == MOVE_LEFT:
+          self.move_left(**params)
+        elif action == MOVE_BACK:
+          self.move_back(**params)
+        elif action == ROTATE_LEFT:
+          self.rotate(**params)
+    except Exception as e:
+      print("[ROLLBACK] got exception during rollback action, ", e)
     
   
   @abstractmethod

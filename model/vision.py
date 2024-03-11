@@ -1,10 +1,25 @@
 from dataclasses import dataclass
 
+import numpy as np
 from pydantic.v1 import BaseModel, Field
 
 
+@dataclass
+class PhysicalPassagewayInfo:
+  color: str
+  turn_degrees: float
+
+
+@dataclass
+class LabelPassagewaysResponse:
+  # final image including Xs in passageways
+  final_image: np.array
+  
+  # color of each x
+  xs_info: list[PhysicalPassagewayInfo]
+
 @dataclass(frozen=True)
-class PetView:
+class CreatePetViewModel:
   image: str
   description: str
   passageway_descriptions: str

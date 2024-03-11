@@ -10,13 +10,13 @@ from langchain.tools import BaseTool, StructuredTool, tool
 from langchain_core.callbacks import CallbackManagerForToolRun
 
 from constants.motor import ALL_MOTOR_ACTIONS
+from model.vision import PhysicalPassagewayInfo
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
 from tools.environment.api.mock_control_api import MockControlAPI
 from tools.environment.api.real_control_api import RealControlAPI
 from tools.environment.model import EnvironmentInput
-from utils.vision_utils import PassagewayInfo
 
 secret_passphrases = ["apple"]
 TIMEOUT_MESSAGE = "Execution terminated due to timeout."
@@ -38,7 +38,7 @@ class EnvironmentTool(BaseTool):
       real_control_api=real_control_api
     )
     
-  def update_passageways(self, passageways: list[PassagewayInfo]):
+  def update_passageways(self, passageways: list[PhysicalPassagewayInfo]):
     self.mock_control_api.update_passageways(passageways)
     self.real_control_api.update_passageways(passageways)
   

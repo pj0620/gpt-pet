@@ -5,7 +5,7 @@ import weaviate
 
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
 from constants.vectordb import VECTOR_DB_URL
-from model.vision import PetView
+from model.vision import CreatePetViewModel
 
 
 class VectorDBAdapterService:
@@ -48,7 +48,7 @@ class VectorDBAdapterService:
       .do()
     return rooms['data']['Get']['description']
   
-  def create_pet_view(self, new_pet_view: PetView):
+  def create_pet_view(self, new_pet_view: CreatePetViewModel):
     new_pet_view_id = self.vectordb_client.data_object.create(
       class_name=PET_VIEW_CLASS_NAME,
       data_object=asdict(new_pet_view)
@@ -69,7 +69,7 @@ class VectorDBAdapterService:
     
     raw_response = (self.vectordb_client.query.get(
       class_name=PET_VIEW_CLASS_NAME,
-      properties=["description", "passageway_descriptions"]
+      properties=["description", "passageway_descriptions", "passageways"]
       ).with_near_image(
         sourceImage, encode=False
       ).with_additional(["distance", "id"])

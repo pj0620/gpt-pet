@@ -1,3 +1,5 @@
+import os
+
 import numpy as np
 
 from gptpet import GPTPet
@@ -40,9 +42,11 @@ else:
   sensory_modules = []
 
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule(),
-  ProximitySensorModule()
+  VisionModule()
 ]
+
+if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true':
+  subconscious_input_modules.append(ProximitySensorModule())
 
 gptpet = GPTPet(
   # collects raw sensor data

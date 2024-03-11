@@ -87,7 +87,7 @@ class RealControlAPI(BaseControlAPI):
     passageway = matching_passageways[0]
     degrees_to_turn = passageway.turn_degrees
     self.rotate(degrees_to_turn)
-    dist = self.read_ahead_sensor() * 0.9
+    dist = min(self.read_ahead_sensor() * 0.9, 1)
     return self.move_ahead(dist)
 
   def handle_action(self, action: str, param: float):

@@ -3,6 +3,8 @@ from constants.vision import FIELD_OF_VIEW
 
 import numpy as np
 
+from model.vision import PhysicalPassagewayInfo
+
 
 def draw_line(img, start, end, color, thickness):
   """Draw a line on an image using Bresenham's algorithm."""
@@ -53,31 +55,18 @@ class LabelPassagewaysConfig:
   bottom_clip_percent: float = 1
   
   # average distance to be considered a path forward
-  passage_distance_threshold: float = 0.9
+  passage_distance_threshold: float = 0.5
   
   # minimum width of a passage for robot to consider passing through it
-  min_passage_width: int = 100
+  min_passage_width: int = 20
   
   # control where X labeling passages is placed vertically on the final image
   x_height_percent: float = 0.65
   
-@dataclass
-class PassagewayInfo:
-  color: str
-  turn_degrees: float
-
-@dataclass
-class LabelPassagewaysResponse:
-  # final image including Xs in passageways
-  final_image: np.array
-  
-  # color of each x
-  xs_info: list[PassagewayInfo]
-  
   
 def label_passageways(
     camera_view_arr: np.array, depth_camera_view_arr: np.array, config: LabelPassagewaysConfig = None
-  ) -> tuple[np.array, list[PassagewayInfo]]:
+  ) -> tuple[np.array, list[PhysicalPassagewayInfo]]:
   if config is None:
     config = LabelPassagewaysConfig()
   
@@ -111,13 +100,15 @@ def label_passageways(
     else:
       in_section = False
   
+  # If final section includes end of the image, close the section
+  if len(sections) > 0 and sections[-1][1] == -1:
+    sections[-1][1] = row_avgs.shape[0] - 1
+  
   # filter out passages to small to passthrough
   min_passage_width = config.min_passage_width
   def passage_valid(section: list[int]) -> bool:
     if section[1] - section[0] < min_passage_width:
-      return False
-    
-    if section[0] == -1 or section[1] == -1:
+      print(f'Filtering out passageway for being to narrow width={section[1] - section[0]}, {min_passage_width=}')
       return False
     
     return True
@@ -153,7 +144,7 @@ def label_passageways(
     # compute degrees to turn to face this
     degrees = (FIELD_OF_VIEW / 2) * (center[0] / image_width - 0.5)
     
-    xs_info.append(PassagewayInfo(
+    xs_info.append(PhysicalPassagewayInfo(
       turn_degrees=degrees,
       color=colors[i][0]
     ))
