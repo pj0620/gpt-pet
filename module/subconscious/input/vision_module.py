@@ -15,7 +15,8 @@ from utils.vision_utils import label_passageways
 
 VISION_MODULE_SCHEMA = {
   "current_view_description": "a text description of what gptpet is currently seeing",
-  "passageway_descriptions": "list of descriptions for all passageways in gptpet's view"
+  "passageway_descriptions": "list of descriptions for all passageways in gptpet's view",
+  "seen_before": "has gptpet seen this view before. This should can be used to decide if this area should be explored."
 }
 
 VISION_MODULE_DESCRIPTION = "Summary of GPTPet's vision."
@@ -75,6 +76,8 @@ class VisionModule(BaseSubconsciousInputModule):
     base64_image = encode_image_array(image_arr).decode('utf-8')
     # check vectordb
     pet_view_description, xs_info = self.get_description_vectordb(base64_image, context.vectordb_adapter)
+    
+    # handle when this has not been seen before
     if pet_view_description is None:
       print('pet view not found in vectordb, calling llm: ')
       pet_view_description, xs_info = self.get_description_llm(
@@ -92,6 +95,13 @@ class VisionModule(BaseSubconsciousInputModule):
         )
       )
       print(f'created petview with id = {vectordb_petview_id}')
+      
+      # mark that this is the first time we have seen this view before
+      pet_view_description["seen_before"] = "false"
+      
+    else:
+      # mark that this is has been seen before
+      pet_view_description["seen_before"] = "true"
     
     return pet_view_description, xs_info
   

@@ -80,35 +80,7 @@ class VectorDBAdapterService:
     if len(room_view_arr) == 0:
       return []
     
-    if room_view_arr[0]['_additional']['distance'] < 0.1:
+    if room_view_arr[0]['_additional']['distance'] < 0.05:
       return room_view_arr
     else:
       return []
-  
-  # def create_image(self, image_data: str | bytes):
-  #   converted_img = image_data
-  #   if isinstance(image_data, bytes):
-  #     converted_img = image_data.decode('utf-8')
-  #
-  #   current_time = datetime.utcnow().isoformat() + 'Z'
-  #   new_image = Image(
-  #     image=converted_img,
-  #     createdAt=current_time,
-  #     modifiedAt=current_time,
-  #     lastAccessedAt=current_time
-  #   )
-  #   new_image_id = self.vectordb_client.data_object.create(
-  #     class_name=IMAGE_CLASS_NAME,
-  #     data_object=asdict(new_image)
-  #   )
-  #   print(f'successfully created new image with id: {new_image_id}')
-  #   return new_image_id
-  #
-  # def associate_room_with_image(self, room_id: str, image_id: str):
-  #   self.vectordb_client.data_object.reference.add(
-  #     from_class_name=ROOM_CLASS_NAME,
-  #     from_uuid=room_id,
-  #     from_property_name="images",
-  #     to_class_name=IMAGE_CLASS_NAME,
-  #     to_uuid=image_id,
-  #   )
