@@ -1,3 +1,7 @@
+import os
+from datetime import datetime
+
+import cv2
 import numpy as np
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -56,6 +60,9 @@ class VisionModule(BaseSubconsciousInputModule):
       visual_llm_adapter: VisualLLMAdapterService
   ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
     labeled_img, xs_info = label_passageways(image_arr, depth_image_arr)
+    if os.environ.get('SAVE_LOGGING') == 'true':
+      image_bgr = labeled_img[:, :, [2, 1, 0]]
+      cv2.imwrite(f'images/view_{str(datetime.now()).replace(" ", "_")}.png', image_bgr)
     base64_image = encode_image_array(labeled_img).decode('utf-8')
     response_str = visual_llm_adapter.call_visual_llm_with_system_prompt(
       system_prompt=self.system_prompt,
