@@ -80,7 +80,7 @@ class VectorDBAdapterService:
     if len(room_view_arr) == 0:
       return []
     
-    if room_view_arr[0]['_additional']['distance'] < 0.05:
+    if room_view_arr[0]['_additional']['distance'] < 0.01:
       return room_view_arr
     else:
       return []
