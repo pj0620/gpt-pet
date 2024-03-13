@@ -88,17 +88,33 @@ def label_passageways(
   # find sections where robot can walk
   threshold = config.passage_distance_threshold
   sections = []
+  centers_horz = []
+  
+  ### Used to compute weighted average in each section which will be the location of the x
+  
+  # x_0 * avg_0 + x_1 * avg_1 + ...
+  weighted_loc_sum = 0
+  
+  # avg_0 + avg_1 + ...
+  weight_sum = 0
+  
   in_section = False
   for k in range(row_avgs.shape[0]):
     avg = row_avgs[k]
     if avg > threshold:
+      weighted_loc_sum += k * avg
+      weight_sum += avg
       if in_section:
         sections[-1][1] = k
+        centers_horz[-1] = weighted_loc_sum / weight_sum
       else:
         sections.append([k, -1])
+        centers_horz.append(k)
         in_section = True
     else:
       in_section = False
+      weighted_loc_sum = 0
+      weight_sum = 0
   
   # If final section includes end of the image, close the section
   if len(sections) > 0 and sections[-1][1] == -1:
@@ -117,8 +133,8 @@ def label_passageways(
   # draw x to label each passageway
   x_height_percent = config.x_height_percent
   centers = [
-    ((left + right) // 2, x_height_percent * image_height)
-    for left, right in sections
+    (cx, x_height_percent * image_height)
+    for cx in centers_horz
   ]
   
   colors = [
