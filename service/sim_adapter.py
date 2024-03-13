@@ -11,7 +11,7 @@ from utils.math_utils import get_rotation_vector, dict_to_array
 
 WINDOW_NAME = 'Pet View'
 PROXIMITY_SENSOR_MAX_STEPS = 10
-PROXIMITY_SENSOR_RESOLUTION = 0.1
+PROXIMITY_SENSOR_RESOLUTION = 0.4
 
 # cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 
