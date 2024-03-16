@@ -86,7 +86,7 @@ class VisionModule(BaseSubconsciousInputModule):
     
     # handle when this has not been seen before
     if pet_view_description is None:
-      print('pet view not found in vectordb, calling llm: ')
+      print('pet view not found in vectordb, calling llm')
       pet_view_description, xs_info = self.get_description_llm(
         image_arr=image_arr,
         depth_image_arr=depth_image_arr,

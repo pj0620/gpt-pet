@@ -1,21 +1,33 @@
 import os
 from dataclasses import asdict
+from typing import SupportsIndex, Any
 
 import weaviate
+from langchain_openai import OpenAIEmbeddings
 
-from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
+from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME, SKILL_DB_SCHEMA_NAME
+from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA, \
+  PET_VIEW_DB_SCHEMA_NAME
 from constants.vectordb import VECTOR_DB_URL
+from model.conscious import TaskDefinition
+from model.skill_library import SkillCreateModel, FoundSkill
 from model.vision import CreatePetViewModel
+from utils.env_utils import check_env_flag
+from langchain_community.vectorstores import Weaviate
 
 
 class VectorDBAdapterService:
   def __init__(self):
+    assert "OPENAI_API_KEY" in os.environ.keys(), "error: please set OPENAI_API_KEY, or switch embedding model"
     for try_count in range(10):
       print(f'trying to connect to weaviate attempt number: {try_count}')
       try:
         self.vectordb_client = weaviate.Client(
           VECTOR_DB_URL,
-          timeout_config=(100, 60)
+          timeout_config=(100, 60),
+          additional_headers={
+            "X-OpenAI-Api-Key": os.environ.get("OPENAI_API_KEY")
+          }
         )
         break
       except weaviate.exceptions.WeaviateStartUpError as e:
@@ -25,21 +37,19 @@ class VectorDBAdapterService:
       raise Exception("Could not connect to weaviate at " + VECTOR_DB_URL)
     
     self.setup_dbs()
+    
+    self.weaviate_lc = Weaviate(
+      self.vectordb_client,
+      index_name=SKILL_CLASS_NAME,
+      text_key="task",
+      embedding=OpenAIEmbeddings(),
+      attributes=["code"]
+    )
   
   def setup_dbs(self):
     print('checking if we need to recreate vector db')
-    RECREATE_VECTOR_DB = os.environ.get('RECREATE_VECTOR_DB')
-    if RECREATE_VECTOR_DB is not None and RECREATE_VECTOR_DB.lower() == 'true':
-      print('recreating vector db')
-      for class_config in ROOM_VIEW_VECTORDB_SCHEMA["classes"]:
-        class_name = class_config["class"]
-        print(f"checking if {class_name} exists")
-        if self.vectordb_client.schema.exists(class_name):
-          print(f'found class exists, deleting {class_name}')
-          self.vectordb_client.schema.delete_class(class_name)
-      
-      print('creating db')
-      self.vectordb_client.schema.create(ROOM_VIEW_VECTORDB_SCHEMA)
+    if check_env_flag('RECREATE_ROOM_VIEW_DB'): self.delete_schema(ROOM_VIEW_VECTORDB_SCHEMA)
+    if check_env_flag('RECREATE_SKILL_DB'): self.delete_schema(SKILL_VECTORDB_SCHEMA)
   
   def get_pet_views(self,
                 query_fields: list[str] = None):
@@ -84,3 +94,50 @@ class VectorDBAdapterService:
       return room_view_arr
     else:
       return []
+    
+  def get_similar_skill(self, task_definition: TaskDefinition, skill_threshold: float) -> list[FoundSkill]:
+    raw_response = self.weaviate_lc.similarity_search_with_score(
+      task_definition.task,
+      k=4
+    )
+    print(f"found {len(raw_response)} skills that match the task {task_definition.task}")
+    
+    return [
+      FoundSkill(
+        code=doc[0].metadata['code'],
+        task=doc[0].page_content,
+        score=doc[1]
+      )
+      for doc in raw_response
+      if doc[1] >= skill_threshold
+    ]
+  
+  def create_skill(self, new_skill: SkillCreateModel):
+    new_skill_id = self.vectordb_client.data_object.create(
+      class_name=SKILL_CLASS_NAME,
+      data_object=asdict(new_skill)
+    )
+    print(f'successfully created new skill with id: {new_skill_id}')
+    return new_skill_id
+  
+  def delete_skill(self, skill: FoundSkill):
+    deleted_pet_view_id = self.vectordb_client.batch.delete_objects(
+      class_name=SKILL_CLASS_NAME,
+      where={
+        'operator': 'Equal',
+        'path': ['task'],
+        'valueText': skill.task
+      }
+    )
+    print(f'successfully deleted skills with id: {deleted_pet_view_id}')
+    return deleted_pet_view_id
+    
+  def delete_schema(self, schema: Any) -> None:
+    print(f'deleting recreating {schema["name"]} schema')
+    for class_config in schema["classes"]:
+      class_name = class_config["class"]
+      print(f"checking if {class_name} exists")
+      if self.vectordb_client.schema.exists(class_name):
+        print(f'found class exists, deleting {class_name}')
+        self.vectordb_client.schema.delete_class(class_name)
+    self.vectordb_client.schema.create(schema)

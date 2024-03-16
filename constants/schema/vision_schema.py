@@ -1,13 +1,15 @@
+from constants.schema.common import IMAGE_VECTORIZER
+
 PET_VIEW_DB_SCHEMA_NAME = 'RoomViewSchema'
 PET_VIEW_CLASS_NAME = 'RoomView'
 
 PET_VIEW_CLASS_SCHEMA = {
   "class": PET_VIEW_CLASS_NAME,
   "description": "An image captured from GPTPet's vision",
-  'vectorizer': 'img2vec-neural',
+  'vectorizer': IMAGE_VECTORIZER,
   'vectorIndexType': 'hnsw',
   'moduleConfig': {
-      'img2vec-neural': {
+      IMAGE_VECTORIZER: {
           'imageFields': [
               'image'
           ]

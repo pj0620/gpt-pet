@@ -18,3 +18,4 @@ class TaskDefinition:
 @dataclass
 class TaskResult:
   success: bool
+  final_code: str
