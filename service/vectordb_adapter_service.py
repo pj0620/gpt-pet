@@ -100,7 +100,7 @@ class VectorDBAdapterService:
       task_definition.task,
       k=4
     )
-    print(f"found {len(raw_response)} skills that match the task {task_definition.task}")
+    print(f"found {len(raw_response)} skills that match the task `{task_definition.task}`")
     
     return [
       FoundSkill(
