@@ -58,7 +58,7 @@ class LabelPassagewaysConfig:
   passage_distance_threshold: float = 0.5
   
   # minimum width of a passage for robot to consider passing through it
-  min_passage_width: int = 20
+  min_passage_width: int = 25
   
   # control where X labeling passages is placed vertically on the final image
   x_height_percent: float = 0.65
