@@ -35,6 +35,7 @@ class VisionModule(BaseSubconsciousInputModule):
     
   def get_description_vectordb(
       self,
+      context: GPTPetContext,
       base64_image: str,
       vectordb_adapter: VectorDBAdapterService
   ) -> tuple[None, None] | tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
@@ -47,6 +48,7 @@ class VisionModule(BaseSubconsciousInputModule):
     passageway_descriptions = resp['passageway_descriptions']
     vectordb_petview_id = resp['_additional']['id']
     print(f'found existing view in vectordb with id={vectordb_petview_id}')
+    context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
     return dict(
       current_view_description=description,
       passageway_descriptions=passageway_descriptions
@@ -55,15 +57,14 @@ class VisionModule(BaseSubconsciousInputModule):
   
   def get_description_llm(
       self,
+      context: GPTPetContext,
       image_arr: np.array,
       depth_image_arr: np.array,
       visual_llm_adapter: VisualLLMAdapterService
   ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
     labeled_img, xs_info = label_passageways(image_arr, depth_image_arr)
-    if os.environ.get('SAVE_LOGGING') == 'true':
-      image_bgr = labeled_img[:, :, [2, 1, 0]]
-      cv2.imwrite(f'images/view_{str(datetime.now()).replace(" ", "_")}.png', image_bgr)
     base64_image = encode_image_array(labeled_img).decode('utf-8')
+    context.analytics_service.new_image(base64_image)
     response_str = visual_llm_adapter.call_visual_llm_with_system_prompt(
       system_prompt=self.system_prompt,
       human_prompt="Please describe this image",
@@ -82,17 +83,20 @@ class VisionModule(BaseSubconsciousInputModule):
   ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
     base64_image = encode_image_array(image_arr).decode('utf-8')
     # check vectordb
-    pet_view_description, xs_info = self.get_description_vectordb(base64_image, context.vectordb_adapter)
+    pet_view_description, xs_info = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
     
     # handle when this has not been seen before
     if pet_view_description is None:
       print('pet view not found in vectordb, calling llm')
+      context.analytics_service.new_text(f'pet view not found in vectordb, calling llm')
       pet_view_description, xs_info = self.get_description_llm(
+        context=context,
         image_arr=image_arr,
         depth_image_arr=depth_image_arr,
         visual_llm_adapter=context.visual_llm_adapter
       )
       print(f'creating following view in vectordb, {pet_view_description=} {xs_info=}')
+      context.analytics_service.new_text(f'creating pet view in vectordb')
       vectordb_petview_id = context.vectordb_adapter.create_pet_view(
         CreatePetViewModel(
           description=pet_view_description['description'],
@@ -102,11 +106,13 @@ class VisionModule(BaseSubconsciousInputModule):
         )
       )
       print(f'created petview with id = {vectordb_petview_id}')
+      context.analytics_service.new_text(f'created petview with id = {vectordb_petview_id}')
       
       # mark that this is the first time we have seen this view before
       pet_view_description["seen_before"] = "false"
       
     else:
+      context.analytics_service.new_image(base64_image)
       # mark that this is has been seen before
       pet_view_description["seen_before"] = "true"
     

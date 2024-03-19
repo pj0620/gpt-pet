@@ -12,6 +12,7 @@ from module.subconscious.input.base_subconscious_input_module import BaseSubcons
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.vision_module import VisionModule
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
+from service.analytics_service import AnalyticsService
 from service.motor.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sensor.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
@@ -28,6 +29,7 @@ context = GPTPetContext()
 # setup vectordb
 context.vectordb_adapter = VectorDBAdapterService()
 context.visual_llm_adapter = VisualLLMAdapterService()
+context.analytics_service = AnalyticsService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()

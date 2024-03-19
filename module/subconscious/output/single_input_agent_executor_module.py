@@ -69,6 +69,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def execute_from_skill_manager(
       self,
+      context: GPTPetContext,
       vectordb_adapter: VectorDBAdapterService,
       new_task: TaskDefinition
   ) -> Tuple[str|None, bool]:
@@ -82,12 +83,14 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       return None, False
     
     skill = skills_from_skill_manager[0]
+    context.analytics_service.new_text(f"found previously existing skill, {skill}")
     print(f'executing code from skill manager')
     try:
       self.environment_tool.real_execute(code=skill.code)
       return skill.code, True
     except Exception as e:
       print('got exception while executing skill manager code, deleting from skill library', e)
+      context.analytics_service.new_text(f"got exception while executing skill manager code, deleting from skill library")
       vectordb_adapter.delete_skill(skill)
       return skill.code, False
     
@@ -95,14 +98,17 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     self.environment_tool.update_passageways(context.passageways)
     
-    code, completed_from_skill = self.execute_from_skill_manager(context.vectordb_adapter, new_task)
+    code, completed_from_skill = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
     if completed_from_skill:
       print("task was completed successfuly using skill from skill library")
+      context.analytics_service.new_text("task was completed successfuly using skill from skill library")
       return TaskResult(
         success=True,
         final_code=code
       )
     
+    context.analytics_service.new_text(f"no previous skill found matching new task, writing code: {new_task}")
+    print(f"no previous skill found matching new task, writing code: {new_task}")
     result = self.agent_executor.invoke(dict(
       input=new_task.task,
       chat_history=[],

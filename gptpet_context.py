@@ -2,6 +2,7 @@ from typing import Any
 
 from model.subconscious import ConsciousInput
 from model.vision import PhysicalPassagewayInfo
+from service.analytics_service import AnalyticsService
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
@@ -16,4 +17,5 @@ class GPTPetContext:
     sensory_outputs: dict[str, Any]
     conscious_inputs: list[ConsciousInput]
     passageways: list[PhysicalPassagewayInfo]
+    analytics_service: AnalyticsService
     
