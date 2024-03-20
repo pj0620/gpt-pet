@@ -19,7 +19,7 @@ class MobileNetObjectDetection(BaseObjectDetection):
     with open(f"{base_data_dir}/model/coco_names.txt", "r") as f:
       self.class_names = f.read().strip().split("\n")
     
-  def detect_objects(self, image: np.array):
+  def detect_objects(self, image: np.array, output_image: np.array) -> tuple[np.array, list[FoundObject]]:
     h = image.shape[0]
     w = image.shape[1]
     
@@ -30,7 +30,7 @@ class MobileNetObjectDetection(BaseObjectDetection):
     output = self.net.forward()
     
     objects = []
-    for detection in output[0, 0, :, :]:  # output[0, 0, :, :] has a shape of: (100, 7)
+    for i, detection in enumerate(output[0, 0, :, :]):  # output[0, 0, :, :] has a shape of: (100, 7)
       # the confidence of the model regarding the detected object
       probability = detection[2]
       
@@ -43,16 +43,22 @@ class MobileNetObjectDetection(BaseObjectDetection):
       # the (x, y) coordinates of the bounding box
       box = [int(a * b) for a, b in zip(detection[3:7], [w, h, w, h])]
       box = tuple(box)
-      # draw the bounding box of the object
-      cv2.rectangle(image, box[:2], box[2:], (0, 255, 0), thickness=2)
       
       # extract the ID of the detected object to get its name
       class_id = int(detection[1])
+      
+      # draw the bounding box of the object
+      cv2.rectangle(output_image, box[:2], box[2:], (0, 255, 0), thickness=2)
+      label = f"Box {i}: {self.class_names[class_id - 1].upper()} {probability * 100:.2f}%"
+      cv2.putText(output_image, label, (box[0], box[1] + 30),
+                  cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 3)
+      
       objects.append(FoundObject(
         bbox=box,
         class_name=self.class_names[class_id - 1].upper(),
-        probability=probability
+        probability=probability,
+        index=i
       ))
   
-    return objects
+    return output_image, objects
   

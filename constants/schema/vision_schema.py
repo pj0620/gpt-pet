@@ -31,6 +31,11 @@ PET_VIEW_CLASS_SCHEMA = {
       "description": "list of descriptions for all passageways in gptpet's view"
     },
     {
+      "name": "objects_descriptions",
+      "dataType": ["string"],
+      "description": "summary of all objects in GPTPet's view"
+    },
+    {
       "name": "passageways",
       "dataType": ["string"],
       "description": "list of all passageways in gptpet's view"

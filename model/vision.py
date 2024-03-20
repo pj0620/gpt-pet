@@ -23,6 +23,7 @@ class CreatePetViewModel:
   image: str
   description: str
   passageway_descriptions: str
+  objects_descriptions: str
   passageways: str
 
 

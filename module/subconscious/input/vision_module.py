@@ -9,6 +9,8 @@ from gptpet_context import GPTPetContext
 from model.subconscious import ConsciousInput
 from model.vision import CreatePetViewModel, PetViewDescription, PhysicalPassagewayInfo
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
+from service.object_detection.base_object_detection import BaseObjectDetection
+from service.object_detection.mobilenet_object_detection import MobileNetObjectDetection
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.prompt_utils import load_prompt, encode_image_array
@@ -20,6 +22,7 @@ from utils.vision_utils import label_passageways
 VISION_MODULE_SCHEMA = {
   "current_view_description": "a text description of what gptpet is currently seeing",
   "passageway_descriptions": "list of descriptions for all passageways in gptpet's view",
+  "objects_descriptions": "summary of all objects in GPTPet's view",
   "seen_before": "has gptpet seen this view before. This should can be used to decide if this area should be explored."
 }
 
@@ -31,6 +34,8 @@ class VisionModule(BaseSubconsciousInputModule):
     human_prompt_str = load_prompt('vision_module/human.txt')
     self.human_prompt = ChatPromptTemplate.from_template(human_prompt_str)
     self.json_parser = JsonOutputParser(pydantic_object=PetViewDescription)
+    
+    self.object_detection: BaseObjectDetection = MobileNetObjectDetection()
     
     
   def get_description_vectordb(
@@ -46,12 +51,14 @@ class VisionModule(BaseSubconsciousInputModule):
     description = resp['description']
     passageways = deserialize_dataclasses(resp['passageways'], PhysicalPassagewayInfo)
     passageway_descriptions = resp['passageway_descriptions']
+    objects_descriptions = resp['objects_descriptions']
     vectordb_petview_id = resp['_additional']['id']
     print(f'found existing view in vectordb with id={vectordb_petview_id}')
     context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
     return dict(
       current_view_description=description,
-      passageway_descriptions=passageway_descriptions
+      passageway_descriptions=passageway_descriptions,
+      objects_descriptions=objects_descriptions
     ), passageways
   
   
@@ -63,6 +70,7 @@ class VisionModule(BaseSubconsciousInputModule):
       visual_llm_adapter: VisualLLMAdapterService
   ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
     labeled_img, xs_info = label_passageways(image_arr, depth_image_arr)
+    labeled_img, objects_info = self.object_detection.detect_objects(image_arr, labeled_img)
     base64_image = encode_image_array(labeled_img).decode('utf-8')
     context.analytics_service.new_image(base64_image)
     response_str = visual_llm_adapter.call_visual_llm_with_system_prompt(
@@ -84,6 +92,7 @@ class VisionModule(BaseSubconsciousInputModule):
     base64_image = encode_image_array(image_arr).decode('utf-8')
     # check vectordb
     pet_view_description, xs_info = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
+    # pet_view_description, xs_info = None
     
     # handle when this has not been seen before
     if pet_view_description is None:
@@ -101,6 +110,7 @@ class VisionModule(BaseSubconsciousInputModule):
         CreatePetViewModel(
           description=pet_view_description['description'],
           passageway_descriptions=str(pet_view_description['passageway_descriptions']),
+          objects_descriptions=str(pet_view_description["objects_descriptions"]),
           passageways=serialize_dataclasses(xs_info),
           image=base64_image
         )

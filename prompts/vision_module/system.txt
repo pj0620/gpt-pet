@@ -10,6 +10,11 @@ passageway_descriptions - Passageways will be marked with a large X that will be
 the passageway leads to based on what you can see with the following keys; color = color of the x noting this passageway,
 and description which is a description of where this passageway leads to.
 
+objects_descriptions - Objects will be marked by colored rectangles which include a box number, a class name, and a
+probability that there is actually an object; for example, 'Box: 12 Car 60%'. For each object give a description of the
+object based on what you can see with the following keys; number = Box number, description = couple sentence description
+ of the object. Do not mention probability in this description.
+
 Example 1:
 {
     "description": "I see a person standing in a living room.",
@@ -17,6 +22,16 @@ Example 1:
         {
             "color": "red",
             "description": "This passageway leads to the living room"
+        }
+    ],
+    "objects_descriptions": [
+        {
+            "number": 0,
+            "description": "A lamp with a yellow shade. Looks to be very vintage and includes a silver base"
+        },
+        {
+            "number": 1,
+            "description": "A wooden kitchen table with tall legs. Oval shaped table top"
         }
     ]
 }
@@ -32,11 +47,18 @@ Example 2:
             "color": "blue",
             "description": "This passageway leads to a hallway"
         }
+    ],
+    "objects_descriptions": [
+        {
+            "number": 0,
+            "description": "Metal statue of John F Kennedy. Looks to be old and covered in dust with a golden base."
+        }
     ]
 }
 Example 3:
 {
     "description": "I see an empty kitchen. It is bright out and there is a passageways in front of me.",
-    "passageway_descriptions": []
+    "passageway_descriptions": [],
+    "objects_descriptions": []
 }
 

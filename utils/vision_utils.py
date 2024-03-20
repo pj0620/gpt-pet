@@ -65,7 +65,10 @@ class LabelPassagewaysConfig:
   
   
 def label_passageways(
-    camera_view_arr: np.array, depth_camera_view_arr: np.array, config: LabelPassagewaysConfig = None
+    camera_view_arr: np.array,
+    depth_camera_view_arr: np.array,
+    config: LabelPassagewaysConfig = None,
+    output_image: np.array = None
   ) -> tuple[np.array, list[PhysicalPassagewayInfo]]:
   if config is None:
     config = LabelPassagewaysConfig()
@@ -152,7 +155,10 @@ def label_passageways(
     ("black", (0, 0, 0)),
     ("white", (255, 255, 255)),
   ]
-  labeled_img = np.copy(camera_view_arr)
+  if output_image is None:
+    labeled_img = np.copy(camera_view_arr)
+  else:
+    labeled_img = output_image
   xs_info = []
   for i, center in enumerate(centers):
     draw_x(labeled_img, center, size=100, thickness=10, color=colors[i][1])
