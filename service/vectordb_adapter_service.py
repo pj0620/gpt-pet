@@ -131,7 +131,11 @@ class VectorDBAdapterService:
     )
     print(f'successfully deleted skills with id: {deleted_pet_view_id}')
     return deleted_pet_view_id
-    
+  
+  def put_objects(self):
+    # TODO: should probably save these objects at some point
+    pass
+  
   def delete_schema(self, schema: Any) -> None:
     print(f'deleting recreating {schema["name"]} schema')
     for class_config in schema["classes"]:

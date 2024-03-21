@@ -37,17 +37,11 @@ class VisualLLMAdapterService:
       encoded_image_prompt: str,
       human_prompt: str = None
   ):
-    messages = [{
-      "role": "system",
-      "content": [
-        {"type": "text", "text": system_prompt}
-      ],
-    }]
     human_content = [{
       "type": "image_url",
       "image_url": {
         "url": f"data:image/jpeg;base64,{encoded_image_prompt}",
-        "detail": "low"
+        "detail": "high"
       }
     }]
     if human_prompt is None:

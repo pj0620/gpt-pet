@@ -6,18 +6,18 @@ import numpy as np
 from langchain_core.prompts import ChatPromptTemplate
 
 from gptpet_context import GPTPetContext
+from model.object_detection import Object
 from model.subconscious import ConsciousInput
 from model.vision import CreatePetViewModel, PetViewDescription, PhysicalPassagewayInfo
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from service.object_detection.base_object_detection import BaseObjectDetection
-from service.object_detection.mobilenet_object_detection import MobileNetObjectDetection
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 
-from utils.serialization import serialize_dataclasses, deserialize_dataclasses
-from utils.vision_utils import label_passageways
+from utils.serialization import serialize_dataclasses, deserialize_dataclasses, serialize_dataclasses_dict
+from utils.vision_utils import label_passageways, add_horizontal_guide_encode
 
 VISION_MODULE_SCHEMA = {
   "current_view_description": "a text description of what gptpet is currently seeing",
@@ -34,9 +34,7 @@ class VisionModule(BaseSubconsciousInputModule):
     human_prompt_str = load_prompt('vision_module/human.txt')
     self.human_prompt = ChatPromptTemplate.from_template(human_prompt_str)
     self.json_parser = JsonOutputParser(pydantic_object=PetViewDescription)
-    
-    self.object_detection: BaseObjectDetection = MobileNetObjectDetection()
-    
+
     
   def get_description_vectordb(
       self,
@@ -70,8 +68,7 @@ class VisionModule(BaseSubconsciousInputModule):
       visual_llm_adapter: VisualLLMAdapterService
   ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
     labeled_img, xs_info = label_passageways(image_arr, depth_image_arr)
-    labeled_img, objects_info = self.object_detection.detect_objects(image_arr, labeled_img)
-    base64_image = encode_image_array(labeled_img).decode('utf-8')
+    base64_image = add_horizontal_guide_encode(labeled_img)
     context.analytics_service.new_image(base64_image)
     response_str = visual_llm_adapter.call_visual_llm_with_system_prompt(
       system_prompt=self.system_prompt,
@@ -80,6 +77,12 @@ class VisionModule(BaseSubconsciousInputModule):
     )
     print("called LLM and found text_description = ", response_str)
     parsed_response = self.json_parser.parse(response_str)
+    raw_object_descriptions = parsed_response["objects_descriptions"]
+    augmented_object_descriptions = self.augment_objects(
+      raw_objects_response=raw_object_descriptions,
+      image_width=image_arr.shape[1]
+    )
+    parsed_response["objects_descriptions"] = augmented_object_descriptions
     return parsed_response, xs_info
   
   
@@ -92,7 +95,6 @@ class VisionModule(BaseSubconsciousInputModule):
     base64_image = encode_image_array(image_arr).decode('utf-8')
     # check vectordb
     pet_view_description, xs_info = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
-    # pet_view_description, xs_info = None
     
     # handle when this has not been seen before
     if pet_view_description is None:
@@ -145,4 +147,23 @@ class VisionModule(BaseSubconsciousInputModule):
       schema=VISION_MODULE_SCHEMA,
       description=VISION_MODULE_DESCRIPTION
     )
+  
+  
+  def augment_objects(
+      self,
+      raw_objects_response: list[dict[str, str]],
+      image_width: int
+  ) -> list[dict[str, str]]:
+    objects = [
+      Object(
+        horizontal_angle=(float(obj_dict["horz_location"]) - image_width/2) * (70/image_width),
+        description=obj_dict["description"],
+        name=obj_dict["name"]
+      )
+      for obj_dict in raw_objects_response
+    ]
+    return serialize_dataclasses_dict(objects)
+    
+    
+    
   

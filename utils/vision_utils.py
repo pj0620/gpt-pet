@@ -1,4 +1,9 @@
+import base64
 from dataclasses import dataclass
+from io import BytesIO
+
+from matplotlib import pyplot as plt
+
 from constants.vision import FIELD_OF_VIEW
 
 import numpy as np
@@ -172,3 +177,23 @@ def label_passageways(
     ))
     
   return labeled_img, xs_info
+
+def add_horizontal_guide_encode(
+  camera_view_arr: np.array
+) -> np.array:
+  """
+  :param camera_view_arr: input image
+  :return: base64 encoded version of image with horizontally labeled axis
+  """
+  image_arr_with_scale = np.copy(camera_view_arr)
+  fig = plt.figure(figsize=(10, 10))
+  ax1 = fig.add_subplot(1, 1, 1)
+  ax1.set(yticklabels=[])
+  ax1.set(ylabel=None)  # remove the y-axis label
+  ax1.tick_params(left=False)
+  ax1.set_xticks(np.arange(image_arr_with_scale.shape[0], step=150))
+  ax1.imshow(image_arr_with_scale)
+  buf = BytesIO()
+  plt.savefig(buf, format='png')
+  buf.seek(0)
+  return base64.b64encode(buf.read()).decode('utf-8')

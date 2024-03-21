@@ -2,9 +2,7 @@ from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
-class FoundObject:
-  bbox: tuple[int, ...]
-  class_name: str
-  probability: float
-  index: int
-  
+class Object:
+  horizontal_angle: float
+  description: str
+  name: str
