@@ -1,0 +1,1 @@
+control_api.goto_object('Apple') # moves robot to the Apple

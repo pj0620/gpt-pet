@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from ai2thor.controller import Controller
 
-from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP
+from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP, AI2THOR_LOOK_DOWN, AI2THOR_MOVE_AHEAD
 from constants.motor import MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, MOVE_AHEAD
 from model.collision import CollisionError
 from utils.math_utils import get_rotation_vector, dict_to_array
@@ -18,7 +18,10 @@ PROXIMITY_SENSOR_RESOLUTION = 0.4
 class SimAdapter:
   def __init__(self):
     self.controller = Controller(
-      scene="FloorPlan2",
+      agentMode="locobot",
+      
+      # scene="FloorPlan2",
+      scene="FloorPlan13",
       gridSize=0.01,
       rotateStepDegrees=90,
       # camera properties
@@ -31,7 +34,8 @@ class SimAdapter:
       renderDepthImage=True
     )
     self.last_event = None
-    self.controller.step(AI2THOR_CROUCH)
+    # self.controller.step(AI2THOR_CROUCH)
+    # self.controller.step(AI2THOR_LOOK_DOWN, degrees=30)
     self.noop()
     
     self.skip_proximity_sensors = os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true'
@@ -41,7 +45,8 @@ class SimAdapter:
     self.update_proximity_sensors()
   
   def noop(self):
-    self.last_event = self.controller.step(AI2THOR_NOOP)
+    # self.last_event = self.controller.step(AI2THOR_NOOP)
+    self.last_event = self.controller.step(AI2THOR_MOVE_AHEAD, moveMagnitude=0)
   
   def do_step(self,
               action,

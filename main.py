@@ -47,7 +47,7 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModule(context.vectordb_adapter)
 ]
 
-if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true':
+if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
   subconscious_input_modules.append(ProximitySensorModule())
 
 gptpet = GPTPet(

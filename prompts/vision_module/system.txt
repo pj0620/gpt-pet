@@ -7,12 +7,14 @@ passageway_descriptions.
 description - should be 1-3 sentences to the point about what you are seeing, and should be helpful for a pets next
 potential action
 
-passageway_descriptions - Passageways will be marked with a large X that will be colored. For each passageway, describe what
-the passageway leads to based on what you can see with the following keys; color = color of the x noting this passageway,
-and description which is a description of where this passageway leads to.
+passageway_descriptions - Passageways will be marked with a large X that will be colored(these are not actually there
+just noting a direction to move towards). For each passageway, describe what the passageway leads to based on what you
+can see with the following keys; color = color of the x noting this passageway, and description which is a description
+of where this passageway leads to. If the passageway is too small for the robot to pass through note that in your
+response.
 
-objects_descriptions - For each object in your view, give a description of the object based on what you can see with
-the following keys; description = couple sentence description of the object, horz_location = integer representing horizontal
+objects_descriptions - For objects in your view to which you can traverse without going around obstacles, and that are close
+give a description of the object based on what you can see with the following keys; description = couple sentence description of the object, horz_location = integer representing horizontal
 location of the object using the horizontal scale below the image, name = short name of the object.
 
 Example 1:

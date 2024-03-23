@@ -62,7 +62,8 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     base_skills = [
       "motor_control",
       "proximity_sensor",
-      "passageways"
+      "passageways",
+      "objects"
     ]
     programs = "\n\n".join(load_control_primitives_context(base_skills) + skills)
     return programs

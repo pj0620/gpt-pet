@@ -46,6 +46,10 @@ class RealControlAPI(BaseControlAPI):
       degrees: float = None
   ) -> str:
     print(f"ProdControlAPI: executing rotate, {degrees=}")
+    if abs(degrees) > 45:
+      print(f"Over maximum of +/- 45 degrees")
+      degrees = max(degrees, -45)
+      degrees = min(degrees, 45)
     return self.handle_action(ROTATE_RIGHT, degrees)
   
   # No need to track proximity sensor actions for rollback procedure
