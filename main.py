@@ -44,7 +44,7 @@ else:
   sensory_modules = []
 
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule()
+  VisionModule(context.vectordb_adapter)
 ]
 
 if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true':

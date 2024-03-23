@@ -97,6 +97,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     self.environment_tool.update_passageways(context.passageways)
+    self.environment_tool.update_objects(context.objects_in_view)
     
     code, completed_from_skill = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
     if completed_from_skill:

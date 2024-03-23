@@ -6,11 +6,12 @@ import numpy as np
 from langchain_core.prompts import ChatPromptTemplate
 
 from gptpet_context import GPTPetContext
-from model.object_detection import Object
+from model.objects import Object
 from model.subconscious import ConsciousInput
 from model.vision import CreatePetViewModel, PetViewDescription, PhysicalPassagewayInfo
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from service.object_detection.base_object_detection import BaseObjectDetection
+from service.object_permanence_service import ObjectPermanenceService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.prompt_utils import load_prompt, encode_image_array
@@ -29,11 +30,15 @@ VISION_MODULE_SCHEMA = {
 VISION_MODULE_DESCRIPTION = "Summary of GPTPet's vision."
 
 class VisionModule(BaseSubconsciousInputModule):
-  def __init__(self):
+  def __init__(
+      self,
+      vectordb_adapter_service: VectorDBAdapterService
+  ):
     self.system_prompt = load_prompt('vision_module/system.txt')
     human_prompt_str = load_prompt('vision_module/human.txt')
     self.human_prompt = ChatPromptTemplate.from_template(human_prompt_str)
     self.json_parser = JsonOutputParser(pydantic_object=PetViewDescription)
+    self.object_permanence_service = ObjectPermanenceService(vectordb_adapter_service)
 
     
   def get_description_vectordb(
@@ -41,15 +46,16 @@ class VisionModule(BaseSubconsciousInputModule):
       context: GPTPetContext,
       base64_image: str,
       vectordb_adapter: VectorDBAdapterService
-  ) -> tuple[None, None] | tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
+  ) -> tuple[None, None, None] | tuple[dict[str, str], list[PhysicalPassagewayInfo], list[Object]]:
     vectordb_resp = vectordb_adapter.get_similar_pet_views(base64_image)
     if len(vectordb_resp) == 0:
-      return None, None
+      return None, None, None
     resp = vectordb_resp[0]
     description = resp['description']
     passageways = deserialize_dataclasses(resp['passageways'], PhysicalPassagewayInfo)
     passageway_descriptions = resp['passageway_descriptions']
     objects_descriptions = resp['objects_descriptions']
+    objects = deserialize_dataclasses(objects_descriptions, Object)
     vectordb_petview_id = resp['_additional']['id']
     print(f'found existing view in vectordb with id={vectordb_petview_id}')
     context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
@@ -57,7 +63,7 @@ class VisionModule(BaseSubconsciousInputModule):
       current_view_description=description,
       passageway_descriptions=passageway_descriptions,
       objects_descriptions=objects_descriptions
-    ), passageways
+    ), passageways, objects
   
   
   def get_description_llm(
@@ -66,7 +72,7 @@ class VisionModule(BaseSubconsciousInputModule):
       image_arr: np.array,
       depth_image_arr: np.array,
       visual_llm_adapter: VisualLLMAdapterService
-  ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
+  ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo], list[Object]]:
     labeled_img, xs_info = label_passageways(image_arr, depth_image_arr)
     base64_image = add_horizontal_guide_encode(labeled_img)
     context.analytics_service.new_image(base64_image)
@@ -78,12 +84,13 @@ class VisionModule(BaseSubconsciousInputModule):
     print("called LLM and found text_description = ", response_str)
     parsed_response = self.json_parser.parse(response_str)
     raw_object_descriptions = parsed_response["objects_descriptions"]
-    augmented_object_descriptions = self.augment_objects(
+    augmented_objects = self.object_permanence_service.augment_objects(
+      context=context,
       raw_objects_response=raw_object_descriptions,
       image_width=image_arr.shape[1]
     )
-    parsed_response["objects_descriptions"] = augmented_object_descriptions
-    return parsed_response, xs_info
+    parsed_response["objects_descriptions"] = serialize_dataclasses(augmented_objects)
+    return parsed_response, xs_info, augmented_objects
   
   
   def get_description(
@@ -91,16 +98,16 @@ class VisionModule(BaseSubconsciousInputModule):
       context: GPTPetContext,
       image_arr: np.array,
       depth_image_arr: np.array
-  ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo]]:
+  ) -> tuple[dict[str, str], list[PhysicalPassagewayInfo], list[Object]]:
     base64_image = encode_image_array(image_arr).decode('utf-8')
     # check vectordb
-    pet_view_description, xs_info = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
+    pet_view_description, xs_info, objects = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
     
     # handle when this has not been seen before
     if pet_view_description is None:
       print('pet view not found in vectordb, calling llm')
       context.analytics_service.new_text(f'pet view not found in vectordb, calling llm')
-      pet_view_description, xs_info = self.get_description_llm(
+      pet_view_description, xs_info, objects = self.get_description_llm(
         context=context,
         image_arr=image_arr,
         depth_image_arr=depth_image_arr,
@@ -128,41 +135,26 @@ class VisionModule(BaseSubconsciousInputModule):
       # mark that this is has been seen before
       pet_view_description["seen_before"] = "true"
     
-    return pet_view_description, xs_info
+    return pet_view_description, xs_info, objects
   
   def build_conscious_input(self, context: GPTPetContext) -> ConsciousInput:
     assert 'last_frame' in context.sensory_outputs, "last_frame must be in sensory_outputs"
     assert 'last_depth_frame' in context.sensory_outputs, "last_depth_frame must be in sensory_outputs"
     image_arr = context.sensory_outputs['last_frame']
     depth_image_arr = context.sensory_outputs['last_depth_frame']
-    view_description, xs_info = self.get_description(
+    view_description, xs_info, objects = self.get_description(
       image_arr=image_arr,
       depth_image_arr=depth_image_arr,
       context=context
     )
     context.passageways = xs_info
+    context.objects_in_view = objects
     
     return ConsciousInput(
       value=view_description,
       schema=VISION_MODULE_SCHEMA,
       description=VISION_MODULE_DESCRIPTION
     )
-  
-  
-  def augment_objects(
-      self,
-      raw_objects_response: list[dict[str, str]],
-      image_width: int
-  ) -> list[dict[str, str]]:
-    objects = [
-      Object(
-        horizontal_angle=(float(obj_dict["horz_location"]) - image_width/2) * (70/image_width),
-        description=obj_dict["description"],
-        name=obj_dict["name"]
-      )
-      for obj_dict in raw_objects_response
-    ]
-    return serialize_dataclasses_dict(objects)
     
     
     

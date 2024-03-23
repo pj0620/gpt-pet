@@ -5,7 +5,7 @@ SKILL_CLASS_NAME = 'Skill'
 
 SKILL_CLASS_SCHEMA = {
   "class": SKILL_CLASS_NAME,
-  "description": "An image captured from GPTPet's vision",
+  "description": "A gptpet skill",
   "vectorizer": TEXT_VECTORIZER,
   "properties": [
     {

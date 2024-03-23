@@ -4,7 +4,7 @@ from typing import Tuple
 import cv2
 import numpy as np
 
-from model.object_detection import FoundObject
+from model.objects import FoundObject
 from service.object_detection.base_object_detection import BaseObjectDetection
 
 

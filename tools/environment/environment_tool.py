@@ -10,6 +10,7 @@ from langchain.tools import BaseTool, StructuredTool, tool
 from langchain_core.callbacks import CallbackManagerForToolRun
 
 from constants.motor import ALL_MOTOR_ACTIONS
+from model.objects import Object
 from model.vision import PhysicalPassagewayInfo
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
@@ -41,6 +42,10 @@ class EnvironmentTool(BaseTool):
   def update_passageways(self, passageways: list[PhysicalPassagewayInfo]):
     self.mock_control_api.update_passageways(passageways)
     self.real_control_api.update_passageways(passageways)
+    
+  def update_objects(self, passageways: list[Object]):
+    self.mock_control_api.update_objects(passageways)
+    self.real_control_api.update_objects(passageways)
   
   def real_execute(self, code: str):
     return exec(code, {"control_api": self.real_control_api})

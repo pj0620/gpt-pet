@@ -1,5 +1,6 @@
 from typing import Any
 
+from model.objects import Object
 from model.subconscious import ConsciousInput
 from model.vision import PhysicalPassagewayInfo
 from service.analytics_service import AnalyticsService
@@ -17,5 +18,6 @@ class GPTPetContext:
     sensory_outputs: dict[str, Any]
     conscious_inputs: list[ConsciousInput]
     passageways: list[PhysicalPassagewayInfo]
+    objects_in_view: list[Object]
     analytics_service: AnalyticsService
     

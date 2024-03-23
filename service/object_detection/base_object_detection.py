@@ -2,7 +2,7 @@ from abc import ABC
 
 import numpy as np
 
-from model.object_detection import Object
+from model.objects import Object
 
 
 class BaseObjectDetection(ABC):

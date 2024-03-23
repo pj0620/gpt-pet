@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
+from model.objects import Object
 from model.vision import PhysicalPassagewayInfo
 
 
@@ -10,9 +11,13 @@ class BaseControlAPI(ABC):
   def __init__(self):
     self.last_steps = []
     self.passageways: list[PhysicalPassagewayInfo] = []
+    self.objects: list[Object] = []
     
   def update_passageways(self, new_passageways: list[PhysicalPassagewayInfo]):
     self.passageways = new_passageways
+    
+  def update_objects(self, new_objects: list[Object]):
+    self.objects = new_objects
   
   def push_new_action(self, action: str, params: dict[str, float]):
     print(f"push_new_action: {action} with {params}")
@@ -139,3 +144,10 @@ class BaseControlAPI(ABC):
     """
     :param passageway_color: color of passageway to move into
     """
+  
+  @abstractmethod
+  def goto_object(self, object_name: str) -> None:
+    """
+    :param object_name: name of object to move towards
+    """
+  

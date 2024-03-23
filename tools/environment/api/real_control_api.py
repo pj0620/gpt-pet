@@ -89,6 +89,20 @@ class RealControlAPI(BaseControlAPI):
     self.rotate(degrees_to_turn)
     dist = min(self.read_ahead_sensor() * 0.9, 10)
     return self.move_ahead(dist)
+  
+  def goto_object(self, object_name: str) -> str:
+    print(f"RealControlAPI: going towards following object `{object_name}`")
+    matching_objects = [p for p in self.objects if p.name == object_name]
+    if len(matching_objects) == 0:
+      raise Exception(f"failed to move toward object `{object_name}`. Does not exist. The only valid objects "
+                      f"are {self.objects}")
+    elif len(matching_objects) > 1:
+      warnings.warn(f"found multiple objects with the same name {object_name} choosing first")
+    found_object = matching_objects[0]
+    degrees_to_turn = found_object.horizontal_angle
+    self.rotate(degrees_to_turn)
+    dist = min(self.read_ahead_sensor() * 0.9, 10)
+    return self.move_ahead(dist)
 
   def handle_action(self, action: str, param: float):
     if 'Rotate' in action:

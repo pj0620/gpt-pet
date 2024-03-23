@@ -5,11 +5,13 @@ from typing import SupportsIndex, Any
 import weaviate
 from langchain_openai import OpenAIEmbeddings
 
+from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME, SKILL_DB_SCHEMA_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA, \
   PET_VIEW_DB_SCHEMA_NAME
-from constants.vectordb import VECTOR_DB_URL
+from constants.vectordb import VECTOR_DB_URL, OBJECT_SIMILARITY_THRESHOLD
 from model.conscious import TaskDefinition
+from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
 from model.vision import CreatePetViewModel
 from utils.env_utils import check_env_flag
@@ -38,18 +40,26 @@ class VectorDBAdapterService:
     
     self.setup_dbs()
     
-    self.weaviate_lc = Weaviate(
+    self.weaviate_skill_lc = Weaviate(
       self.vectordb_client,
       index_name=SKILL_CLASS_NAME,
       text_key="task",
       embedding=OpenAIEmbeddings(),
       attributes=["code"]
     )
+    self.weaviate_object_lc = Weaviate(
+      self.vectordb_client,
+      index_name=OBJECT_CLASS_NAME,
+      text_key="object_description",
+      embedding=OpenAIEmbeddings(),
+      attributes=["object_name"]
+    )
   
   def setup_dbs(self):
     print('checking if we need to recreate vector db')
-    if check_env_flag('RECREATE_ROOM_VIEW_DB'): self.delete_schema(ROOM_VIEW_VECTORDB_SCHEMA)
-    if check_env_flag('RECREATE_SKILL_DB'): self.delete_schema(SKILL_VECTORDB_SCHEMA)
+    if check_env_flag('RECREATE_ROOM_VIEW_DB'): self.recreate_schema(ROOM_VIEW_VECTORDB_SCHEMA)
+    if check_env_flag('RECREATE_SKILL_DB'): self.recreate_schema(SKILL_VECTORDB_SCHEMA)
+    if check_env_flag('RECREATE_OBJECT_DB'): self.recreate_schema(OBJECT_VECTORDB_SCHEMA)
   
   def get_pet_views(self,
                 query_fields: list[str] = None):
@@ -96,7 +106,7 @@ class VectorDBAdapterService:
       return []
     
   def get_similar_skill(self, task_definition: TaskDefinition, skill_threshold: float) -> list[FoundSkill]:
-    raw_response = self.weaviate_lc.similarity_search_with_score(
+    raw_response = self.weaviate_skill_lc.similarity_search_with_score(
       task_definition.task,
       k=4
     )
@@ -132,11 +142,40 @@ class VectorDBAdapterService:
     print(f'successfully deleted skills with id: {deleted_pet_view_id}')
     return deleted_pet_view_id
   
-  def put_objects(self):
-    # TODO: should probably save these objects at some point
-    pass
+  def create_objects(self, objects: list[ObjectCreateModel]):
+    for object_inp in objects:
+      self.vectordb_client.batch.add_data_object(
+        class_name=OBJECT_CLASS_NAME,
+        data_object=asdict(object_inp)
+      )
+    self.vectordb_client.batch.create_objects()
+    print(f'successfully created new {len(objects)} objects')
   
-  def delete_schema(self, schema: Any) -> None:
+  def get_similar_object(
+      self,
+      object: ObjectQueryModel
+  ) -> ObjectResponseModel | None:
+    raw_response = self.weaviate_object_lc.similarity_search_with_score(
+      object.description,
+      k=1
+    )
+    print(f"found {len(raw_response)} objects that match the object `{object.name}`")
+    
+    if len(raw_response) == 0:
+      return None
+    
+    raw_object = raw_response[0]
+    if raw_object[1] < OBJECT_SIMILARITY_THRESHOLD:
+      return None
+    
+    print(f"raw_object: {raw_object}")
+    
+    return ObjectResponseModel(
+      name = raw_object[0].metadata['object_name'],
+      description = raw_object[0].page_content
+    )
+  
+  def recreate_schema(self, schema: Any) -> None:
     print(f'deleting recreating {schema["name"]} schema')
     for class_config in schema["classes"]:
       class_name = class_config["class"]
