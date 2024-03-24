@@ -87,7 +87,8 @@ class VisionModule(BaseSubconsciousInputModule):
     augmented_objects = self.object_permanence_service.augment_objects(
       context=context,
       raw_objects_response=raw_object_descriptions,
-      image_width=image_arr.shape[1]
+      image_width=image_arr.shape[1],
+      depth_frame=depth_image_arr
     )
     parsed_response["objects_descriptions"] = serialize_dataclasses(augmented_objects)
     return parsed_response, xs_info, augmented_objects

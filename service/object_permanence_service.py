@@ -1,8 +1,27 @@
+from dataclasses import dataclass
+
+import numpy as np
+
 from gptpet_context import GPTPetContext
 from model.objects import Object, ObjectQueryModel, ObjectCreateModel
 from service.vectordb_adapter_service import VectorDBAdapterService
 from utils.serialization import serialize_dataclasses_dict
 
+
+@dataclass
+class LabelPassagewaysConfig:
+  # used to control what part of the depth image should be average to compute a passageway
+  top_clip_percent: float = 0.5
+  bottom_clip_percent: float = 1
+  
+  # average distance to be considered a path forward
+  passage_distance_threshold: float = 0.6
+  
+  # minimum width of a passage for robot to consider passing through it
+  min_passage_width: int = 40
+  
+  # control where X labeling passages is placed vertically on the final image
+  x_height_percent: float = 0.65
 
 class ObjectPermanenceService:
   def __init__(
@@ -10,12 +29,14 @@ class ObjectPermanenceService:
       vectordb_adapter_service: VectorDBAdapterService
   ):
     self.vectordb_adapter_service = vectordb_adapter_service
+    self.config = LabelPassagewaysConfig()
     
   def augment_objects(
       self,
       context: GPTPetContext,
       raw_objects_response: list[dict[str, str]],
-      image_width: int
+      image_width: int,
+      depth_frame: np.array
   ) -> list[Object]:
     create_objects: list[ObjectCreateModel] = []
     output_objects: list[Object] = []
@@ -23,9 +44,19 @@ class ObjectPermanenceService:
       if ("name" not in obj_dict) or ("description" not in obj_dict) or ("horz_location" not in obj_dict):
         continue
       
+      image_height = depth_frame.shape[0]
+      top_percent = self.config.top_clip_percent
+      bottom_percent = self.config.bottom_clip_percent
+      depth_image_arr_clipped = depth_frame[int(image_height * top_percent):int(image_height * bottom_percent), :]
+      
+      # compute average distances using depth camera view
+      n_cols = depth_image_arr_clipped.shape[1]
+      row_avgs = np.sum(depth_image_arr_clipped, axis=0) / n_cols
+      
       output_object = Object(
         # convert pixels to actual angle object is to gptpet
         horizontal_angle=(float(obj_dict["horz_location"]) - image_width / 2) * (70 / image_width),
+        object_distance=float(row_avgs[int(obj_dict["horz_location"])]),
         name=obj_dict["name"],
         description=obj_dict["description"],
         seen_before=False

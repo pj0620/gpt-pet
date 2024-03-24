@@ -19,6 +19,7 @@ class ObjectResponseModel:
 @dataclass
 class Object:
   horizontal_angle: float
+  object_distance: float
   description: str
   name: str
   seen_before: bool
