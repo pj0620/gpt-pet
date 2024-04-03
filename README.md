@@ -3,7 +3,7 @@ A LLM Powered Pet that continuously explores, learns, and interacts with people 
 
 Heavily inspired from [Voyager](https://github.com/MineDojo/Voyager), GPTPet has the following architecture.
 
-![light_GPTPet drawio](https://github.com/pj0620/gpt-pet/assets/37814424/d4ee05f6-880d-43e8-a112-809911353c27)
+![GPTPet drawio (1)](https://github.com/pj0620/gpt-pet/assets/37814424/994354cf-30c2-43c2-8606-7b8883a457fc)
 
 # Installation Instructions
 1. clone this git repo `git clone git@github.com:pj0620/gpt-pet.git`
