@@ -9,7 +9,7 @@ Heavily inspired from [Voyager](https://github.com/MineDojo/Voyager), GPTPet has
 
 By default, this project will run in a simulated house, and interact with the outside world via [Ai2Thor](https://github.com/allenai/ai2thor). However, the goal is to place this code inside a real robot and let it join the family just like any other pet. This is still in progress, I will continue to update as this is finished. The physical robot is being designed with [OnShape](https://www.onshape.com/en/). 
 
-Link to GPTPet's [3d model](https://cad.onshape.com/documents/8d74c2e4639a24043b115b26/w/624b64a1b1fd7dfb5e1b20de/e/c549b3f286116a91b375a18b) 
+Link to GPTPet's [3d model](https://cad.onshape.com/documents/8d74c2e4639a24043b115b26/w/624b64a1b1fd7dfb5e1b20de/e/058044791bb53dfd7cbace77?renderMode=0&uiState=660cf4c0aa941d096d645d6f) 
 
 <img width="400" alt="image" src="https://github.com/pj0620/gpt-pet/assets/37814424/645a1c9f-bb02-4f79-addb-7d3b4d878088">
 
