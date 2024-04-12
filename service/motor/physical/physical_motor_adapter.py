@@ -12,7 +12,7 @@ from service.motor.base_motor_adapter import BaseMotorAdapter
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
-    with open('gpio.json', 'r') as file:
+    with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
     
   
