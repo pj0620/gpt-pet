@@ -7,8 +7,10 @@ from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 
 from flask import Flask, jsonify, abort
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 test_env = 'physical'
 

@@ -59,6 +59,8 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
     
+    GPIO.cleanup()
+    
     return MovementResult(
       successful=True,
       action=action,
