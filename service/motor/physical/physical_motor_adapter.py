@@ -20,6 +20,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       pin = self.gpio[face][side][direction]
       try:
         GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+        sleep(10)
         print(f'successfully setup {pin}')
       except Exception as e:
         print(f'failed to setup {pin}', e)
