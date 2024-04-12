@@ -12,14 +12,7 @@ from service.motor.base_motor_adapter import BaseMotorAdapter
 GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
-for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
-  pin = gpio[face][side][direction]
-  try:
-    GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
-    sleep(1)
-    print(f'successfully setup {pin}')
-  except Exception as e:
-    print(f'failed to setup {pin}', e)
+
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
@@ -55,16 +48,19 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
+    GPIO.setmode(GPIO.BOARD)
+    
     for p in off_pins:
-      GPIO.output(p, GPIO.LOW)
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     for p in on_pins:
-      GPIO.output(p, GPIO.HIGH)
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.HIGH)
       
     sleep(1)
     
     for p in on_pins:
-      sleep(1)
       GPIO.output(p, GPIO.LOW)
+    
+    GPIO.cleanup()
     
     return MovementResult(
       successful=True,
