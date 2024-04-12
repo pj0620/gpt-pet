@@ -1,0 +1,22 @@
+{
+  "front": {
+    "right": {
+      "forward": 22,
+      "back": 24
+    },
+    "left": {
+      "forward": 35,
+      "back": 37
+    }
+  },
+  "back": {
+    "right": {
+      "forward": 26,
+      "back": 23
+    },
+    "left": {
+      "forward": 33,
+      "back": 31
+    }
+  }
+}
