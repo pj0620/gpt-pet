@@ -18,7 +18,11 @@ class PhysicalMotorService(BaseMotorAdapter):
     GPIO.setmode(GPIO.BOARD)
     for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
       pin = self.gpio[face][side][direction]
-      GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+      try:
+        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+        print(f'successfully setup {pin}')
+      except Exception as e:
+        print(f'failed to setup {pin}', e)
     
   
   def do_movement(
