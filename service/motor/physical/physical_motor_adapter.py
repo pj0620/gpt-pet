@@ -18,10 +18,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     GPIO.setmode(GPIO.BOARD)
     for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
       pin = self.gpio[face][side][direction]
-      try:
-        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
-      except:
-        print(f'pin in use: ${pin} for ${dict(face=face, side=side, direction=direction)}')
+      GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
     
   
   def do_movement(
