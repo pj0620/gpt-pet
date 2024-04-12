@@ -9,21 +9,22 @@ from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
+GPIO.setmode(GPIO.BOARD)
+with open('constants/gpio/gpio.json', 'r') as file:
+  gpio = json.load(file)
+for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
+  pin = gpio[face][side][direction]
+  try:
+    GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
+    sleep(1)
+    print(f'successfully setup {pin}')
+  except Exception as e:
+    print(f'failed to setup {pin}', e)
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
     with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
-    
-    GPIO.setmode(GPIO.BOARD)
-    for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
-      pin = self.gpio[face][side][direction]
-      try:
-        GPIO.setup(pin, GPIO.OUT, initial=GPIO.LOW)
-        sleep(10)
-        print(f'successfully setup {pin}')
-      except Exception as e:
-        print(f'failed to setup {pin}', e)
     
   
   def do_movement(
@@ -54,12 +55,16 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    for p in off_pins: GPIO.output(p, GPIO.LOW)
-    for p in on_pins: GPIO.output(p, GPIO.HIGH)
+    for p in off_pins:
+      GPIO.output(p, GPIO.LOW)
+    for p in on_pins:
+      GPIO.output(p, GPIO.HIGH)
       
     sleep(1)
     
-    for p in on_pins: GPIO.output(p, GPIO.LOW)
+    for p in on_pins:
+      sleep(1)
+      GPIO.output(p, GPIO.LOW)
     
     return MovementResult(
       successful=True,
