@@ -9,6 +9,8 @@ from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
+GPIO.setmode(GPIO.BOARD)
+
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
