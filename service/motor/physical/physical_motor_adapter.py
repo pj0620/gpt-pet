@@ -4,18 +4,20 @@ from time import sleep
 
 import RPi.GPIO as GPIO
 
-from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK
+from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
-
-GPIO.setmode(GPIO.BOARD)
 
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
     with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
+    
+    GPIO.setmode(GPIO.BOARD)
+    for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS):
+      GPIO.setup(self.gpio[face][side][direction], GPIO.OUT, initial=GPIO.LOW)
     
   
   def do_movement(
@@ -46,20 +48,12 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    for p in off_pins:
-      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
-      GPIO.output(p, GPIO.LOW)
-    
-    for p in on_pins:
-      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
-      GPIO.output(p, GPIO.HIGH)
+    for p in off_pins: GPIO.output(p, GPIO.LOW)
+    for p in on_pins: GPIO.output(p, GPIO.HIGH)
       
     sleep(1)
     
-    for p in on_pins:
-      GPIO.output(p, GPIO.LOW)
-    
-    GPIO.cleanup()
+    for p in on_pins: GPIO.output(p, GPIO.LOW)
     
     return MovementResult(
       successful=True,
