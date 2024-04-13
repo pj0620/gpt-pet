@@ -4,6 +4,8 @@ from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraMod
 from module.sensory.sim.ai2thor_proximity_module import Ai2ThorProximityModule
 from service.motor.physical.physical_motor_adapter import PhysicalMotorService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
+from service.sensor.physical.physical_proximity_sensor_adapter import PhysicalProximitySensorAdapter
+from service.sensor.sim.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 
 from flask import Flask, jsonify, abort
@@ -19,9 +21,10 @@ if test_env == 'local':
   motor_adapter = Ai2ThorMotorService(sim_adapter)
   camera_module = Ai2ThorCameraModule(sim_adapter)
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-  proximity_module = Ai2ThorProximityModule(sim_adapter)
+  proximity_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
 else:
   motor_adapter = PhysicalMotorService()
+  proximity_adapter = PhysicalProximitySensorAdapter()
   
 ACTION_MAPPING = dict(
   ahead=MOVE_AHEAD,
@@ -39,12 +42,9 @@ def move(direction):
     result = motor_adapter.do_movement(action)
     return jsonify({'moved': result, 'direction': direction})
 
-# @app.route('/distance/<direction>', methods=['GET'])
-# def distance(direction):
-#     if direction not in ['forward', 'right', 'left', 'back', 'up', 'down']:
-#         abort(400, 'Invalid direction')
-#     dist = get_distance(direction)
-#     return jsonify({'distance': dist, 'direction': direction})
+@app.route('/proximity-measurements', methods=['GET'])
+def distance():
+    return jsonify(proximity_adapter.get_measurements())
 
 # @app.route('/current-view', methods=['GET'])
 # def current_view():

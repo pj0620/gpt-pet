@@ -14,3 +14,4 @@ ai2thor==5.0.0
 weaviate-client
 Jetson.GPIO==2.1.6
 Flask-CORS==4.0.0
+pyserial==3.5
