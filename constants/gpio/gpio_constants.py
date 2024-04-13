@@ -1,6 +1,11 @@
-FACES = ["front", "back"]
-SIDES = ["left", "right"]
+FRONT = "front"
+BACK = "back"
+FACES = [FRONT, BACK]
+
+LEFT = "left"
+RIGHT = "right"
+SIDES = [LEFT, RIGHT]
 
 FORWARD = "forward"
-BACK = "back"
+BACKWARD = "backward"
 DIRECTIONS = [FORWARD, BACK]

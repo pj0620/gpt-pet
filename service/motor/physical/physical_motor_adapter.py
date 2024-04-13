@@ -4,8 +4,8 @@ from time import sleep
 
 import RPi.GPIO as GPIO
 
-from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS
-from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK
+from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT
+from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
@@ -33,17 +33,30 @@ class PhysicalMotorService(BaseMotorAdapter):
         for face, side in itertools.product(FACES, SIDES)
       ]
       off_pins = [
-        self.gpio[face][side][BACK]
+        self.gpio[face][side][BACKWARD]
         for face, side in itertools.product(FACES, SIDES)
       ]
     elif action == MOVE_BACK:
       on_pins = [
-        self.gpio[face][side][BACK]
+        self.gpio[face][side][BACKWARD]
         for face, side in itertools.product(FACES, SIDES)
       ]
       off_pins = [
         self.gpio[face][side][FORWARD]
         for face, side in itertools.product(FACES, SIDES)
+      ]
+    elif action == MOVE_LEFT:
+      on_pins = [
+        self.gpio[FRONT][LEFT][BACKWARD],
+        self.gpio[BACK][RIGHT][BACKWARD],
+        self.gpio[BACK][LEFT][FORWARD],
+        self.gpio[FRONT][RIGHT][FORWARD]
+      ]
+      off_pins = [
+        self.gpio[FRONT][LEFT][FORWARD],
+        self.gpio[BACK][RIGHT][FORWARD],
+        self.gpio[BACK][LEFT][BACKWARD],
+        self.gpio[FRONT][RIGHT][BACKWARD]
       ]
     else:
       raise Exception('Not implemented')
