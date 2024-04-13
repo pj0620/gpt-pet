@@ -12,7 +12,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
     self.serial_port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
     self.measurements = {
       'ahead': [],
-      'front': [],
+      'back': [],
       'right': [],
       'left': []
     }
@@ -26,10 +26,11 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
     while self.running:
       if self.serial_port.in_waiting > 0:
         line = self.serial_port.readline().decode('utf-8').strip()
+        print(line)
         parts = line.split(',')
         if len(parts) == 4:
           with self.lock:
-            for direction, value in zip(['ahead', 'front', 'right', 'left'], parts):
+            for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
@@ -37,7 +38,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
       averages = {}
-      for direction in ['ahead', 'front', 'right', 'left']:
+      for direction in ['ahead', 'back', 'right', 'left']:
         if len(self.measurements[direction]) > 0:
           averages[direction] = str(sum(self.measurements[direction]) / len(self.measurements[direction]))
         else:
