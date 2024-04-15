@@ -5,9 +5,9 @@ import numpy as np
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from module.conscious.agent_conscious_module import AgentConsciousModule
+from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
-from module.sensory.sim.ai2thor_proximity_module import Ai2ThorProximityModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.vision_module import VisionModule
@@ -37,11 +37,12 @@ if test_env == 'local':
   context.proximity_sensor_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
   sensory_modules = [
     Ai2ThorCameraModule(sim_adapter),
-    Ai2ThorDepthCameraModule(sim_adapter),
-    Ai2ThorProximityModule(sim_adapter)
+    Ai2ThorDepthCameraModule(sim_adapter)
   ]
 else:
   sensory_modules = []
+  
+sensory_modules.append(ProximityModule(context.proximity_sensor_adapter))
 
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModule(context.vectordb_adapter)
