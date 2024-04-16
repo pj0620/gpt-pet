@@ -7,7 +7,7 @@ from module.sensory.base_sensory_module import BaseSensoryModule
 from service.sim_adapter import SimAdapter
 
 
-class Ai2ThorProximityModule(BaseSensoryModule):
+class Ai2ThorProximityModuleLegacy(BaseSensoryModule):
   def __init__(
       self,
       sim_adapter: SimAdapter
