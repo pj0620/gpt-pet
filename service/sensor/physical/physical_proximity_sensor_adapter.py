@@ -27,10 +27,11 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
       if self.serial_port.in_waiting > 0:
         line = self.serial_port.readline().decode('utf-8').strip()
         parts = line.split(',')
-        print("parts: ", parts)
         if len(parts) == 4:
+          print("four parts!")
           with self.lock:
             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
+              print("appending to " + direction)
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
