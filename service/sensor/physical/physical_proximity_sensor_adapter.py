@@ -27,6 +27,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
       if self.serial_port.in_waiting > 0:
         line = self.serial_port.readline().decode('utf-8').strip()
         parts = line.split(',')
+        print("parts: ", parts)
         if len(parts) == 4:
           with self.lock:
             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
