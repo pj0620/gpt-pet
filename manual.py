@@ -1,7 +1,6 @@
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
-from module.sensory.sim.ai2thor_proximity_module_legacy import Ai2ThorProximityModule
 from service.motor.physical.physical_motor_adapter import PhysicalMotorService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sensor.physical.physical_proximity_sensor_adapter import PhysicalProximitySensorAdapter
