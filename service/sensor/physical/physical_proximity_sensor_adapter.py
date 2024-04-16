@@ -38,6 +38,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
       averages = {}
+      print('self.measurements: ', self.measurements)
       for direction in ['ahead', 'back', 'right', 'left']:
         if len(self.measurements[direction]) > 0:
           averages[direction] = str(sum(self.measurements[direction]) / len(self.measurements[direction]))
