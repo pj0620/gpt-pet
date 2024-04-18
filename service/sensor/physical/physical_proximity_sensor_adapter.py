@@ -26,6 +26,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
   def record_measurements(self):
     while self.running:
       if self.serial_port.in_waiting > 0:
+        self.serial_port.flush()
         line = self.serial_port.readline().decode('utf-8').strip()
         parts = line.split(',')
         if len(parts) == 4:
@@ -34,7 +35,6 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
-      time.sleep(0.1)
       print(f"record_measurements: {self.measurements=}")
   
   def get_measurements(self) -> dict[str, str]:
