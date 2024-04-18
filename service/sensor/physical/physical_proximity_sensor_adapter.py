@@ -1,4 +1,5 @@
 import threading
+import time
 from typing import Literal
 
 import serial
@@ -33,6 +34,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
+      time.sleep(0.1)
       print(f"record_measurements: {self.measurements=}")
   
   def get_measurements(self) -> dict[str, str]:
