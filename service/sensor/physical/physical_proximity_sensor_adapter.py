@@ -28,19 +28,17 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
         line = self.serial_port.readline().decode('utf-8').strip()
         parts = line.split(',')
         if len(parts) == 4:
-          print("four parts!")
           with self.lock:
             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
-              print("appending to " + direction + " value of " + str(value) + " = " + str(float(value)))
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
-              print(f'now {self.measurements=}')
   
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
       averages = {}
       for direction in ['ahead', 'back', 'right', 'left']:
+        print(f"get mesasurements: {self.measurements=} {direction=}")
         if len(self.measurements[direction]) > 0:
           averages[direction] = str(sum(self.measurements[direction]) / len(self.measurements[direction]))
         else:
