@@ -31,7 +31,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
           print("four parts!")
           with self.lock:
             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
-              print("appending to " + direction + " vale of " + value + " = " + float(value))
+              print("appending to " + direction + " vale of " + value + " = " + str(float(value)))
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
