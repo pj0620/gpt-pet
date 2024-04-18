@@ -31,7 +31,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
           print("four parts!")
           with self.lock:
             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
-              print("appending to " + direction)
+              print("appending to " + direction + " vale of " + value + " = " + float(value))
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
@@ -39,7 +39,6 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
       averages = {}
-      print('self.measurements: ', self.measurements)
       for direction in ['ahead', 'back', 'right', 'left']:
         if len(self.measurements[direction]) > 0:
           averages[direction] = str(sum(self.measurements[direction]) / len(self.measurements[direction]))
