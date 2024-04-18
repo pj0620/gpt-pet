@@ -35,13 +35,12 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
-      print(f"record_measurements: {self.measurements=}")
+      # print(f"record_measurements: {self.measurements=}")
   
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
       averages = {}
       for direction in ['ahead', 'back', 'right', 'left']:
-        print(f"get mesasurements: {self.measurements=} {direction=}")
         if len(self.measurements[direction]) > 0:
           averages[direction] = str(sum(self.measurements[direction]) / len(self.measurements[direction]))
         else:
