@@ -33,6 +33,7 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
               self.measurements[direction].append(float(value))
               if len(self.measurements[direction]) > self.k:
                 self.measurements[direction].pop(0)
+      print(f"record_measurements: {self.measurements=}")
   
   def get_measurements(self) -> dict[str, str]:
     with self.lock:
