@@ -35,10 +35,8 @@ class PhysicalProximitySensorAdapter:
             except serial.SerialException as e:
                 print(f"Serial exception: {e}")
                 self.handle_serial_error()
-                break
             except Exception as e:
                 print(f"Unexpected error: {e}")
-                break
 
     def handle_serial_error(self):
         # Attempt to close and reopen the serial connection
@@ -47,6 +45,7 @@ class PhysicalProximitySensorAdapter:
 
     def get_measurements(self):
         with self.lock:
+            print(f'get_measurements: {self.measurements=}')
             averages = {}
             for direction in ['ahead', 'back', 'right', 'left']:
                 if len(self.measurements[direction]) > 0:
