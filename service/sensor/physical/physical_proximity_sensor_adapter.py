@@ -36,7 +36,7 @@ class PhysicalProximitySensorAdapter:
                                     self.measurements[direction].pop(0)
             except serial.SerialException as e:
                 print(f"Serial exception: {e}")
-                self.close()  # Consider closing or resetting the connection
+                # self.close()  # Consider closing or resetting the connection
                 break
             except Exception as e:
                 print(f"Unexpected error: {e}")
