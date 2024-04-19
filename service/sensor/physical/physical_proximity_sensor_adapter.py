@@ -31,9 +31,7 @@ class PhysicalProximitySensorAdapter:
                                 self.measurements[direction].append(float(value))
                                 if len(self.measurements[direction]) > self.k:
                                     self.measurements[direction].pop(0)
-                else:
-                    # Handle case where no data is read
-                    print("No data read from the serial port.")
+                    print(f'record_measurements: self.measurements: {self.measurements}')
             except serial.SerialException as e:
                 print(f"Serial exception: {e}")
                 self.handle_serial_error()
