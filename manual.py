@@ -1,3 +1,5 @@
+import time
+
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -60,6 +62,10 @@ from flask_cors import CORS
 
 
 if __name__ == '__main__':
-    print("working")
+    while True:
+        time.sleep(1)
+        print("working")
+    
+    
     # app.run(debug=True, port=5001, host='0.0.0.0')
 
