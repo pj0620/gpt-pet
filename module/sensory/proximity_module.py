@@ -1,19 +1,16 @@
 from typing import Any
 
-from PIL import Image
-
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
-from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
-from service.sim_adapter import SimAdapter
+from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 
 
 class ProximityModule(BaseSensoryModule):
   def __init__(
       self,
-      proximity_adapter: BaseProximitySensorAdapter
+      device_io_adapter: BaseDeviceIOAdapter
   ):
-    self.proximity_adapter = proximity_adapter
+    self.device_io_adapter = device_io_adapter
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
-    return {'proximity_measurements': self.proximity_adapter.get_measurements()}
+    return {'proximity_measurements': self.device_io_adapter.get_measurements()}
