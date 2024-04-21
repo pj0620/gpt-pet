@@ -186,7 +186,7 @@ def add_horizontal_guide_encode(
   :return: base64 encoded version of image with horizontally labeled axis
   """
   image_arr_with_scale = np.copy(camera_view_arr)
-  fig = plt.figure(figsize=(5, 5))
+  fig = plt.figure(figsize=(1, 1))
   ax1 = fig.add_subplot(1, 1, 1)
   ax1.set(yticklabels=[])
   ax1.set(ylabel=None)  # remove the y-axis label
