@@ -10,12 +10,6 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort
 from flask_cors import CORS
 
-from utils.env_utils import check_port_in_use
-
-# if check_port_in_use(host='0.0.0.0', port=5001):
-#   print("port in use, exiting")
-#   exit()
-
 app = Flask(__name__)
 CORS(app)
 
