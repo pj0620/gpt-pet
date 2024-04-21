@@ -71,7 +71,7 @@ def current_view():
     sensory_output = camera_module.build_subconscious_input(context)
     np_array = sensory_output['last_frame']
     base64_image = add_horizontal_guide_encode(np_array)
-    return base64_image
+    return jsonify(dict(image=base64_image))
 
 # @app.route('/current-depth-view', methods=['GET'])
 # def current_depth_view():
