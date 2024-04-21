@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 
 def check_env_flag(env_var: str) -> bool:
@@ -10,4 +11,15 @@ def get_env_var(env_var: str) -> str:
   if val is None:
     raise Exception(f'environment variable {env_var} is not set')
   return val
+
+def check_if_process_running(process_search: str) -> bool:
+  # Define the command to check for the process
+  command = f"ps aux | grep {process_search} | grep -v grep"
+  
+  # Run the command
+  result = subprocess.run(command, shell=True, text=True, capture_output=True)
+  
+  # Check if the output is non-empty
+  return bool(result.stdout)
+  
   
