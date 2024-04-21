@@ -92,6 +92,24 @@ class PhysicalMotorService(BaseMotorAdapter):
       successful=True,
       action=action,
     )
+  
+  def stop(self):
+    all_pins = [
+      self.gpio[face][side][direction]
+      for face, side, direction in itertools.product(FACES, SIDES, DIRECTIONS)
+    ]
+    
+    GPIO.setmode(GPIO.BOARD)
+    
+    for p in all_pins:
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
+    
+    sleep(1)
+    
+    for p in all_pins:
+      GPIO.output(p, GPIO.LOW)
+    
+    GPIO.cleanup()
 
   # def do_rotate(
   #     self,

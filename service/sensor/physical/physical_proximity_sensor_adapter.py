@@ -2,6 +2,7 @@ import threading
 import serial
 import time
 
+
 class PhysicalProximitySensorAdapter:
     def __init__(self, k=5):
         self.initialize_serial()
@@ -9,7 +10,10 @@ class PhysicalProximitySensorAdapter:
         self.k = k
         self.lock = threading.Lock()
         self.running = True
-        self.thread = threading.Thread(target=self.record_measurements)
+        self.thread = threading.Thread(
+            target=self.record_measurements,
+            kwargs=dict(adapter_ref=self)
+        )
         self.thread.start()
 
     def initialize_serial(self):
@@ -19,7 +23,7 @@ class PhysicalProximitySensorAdapter:
             print(f"Failed to open serial port: {e}")
             raise
 
-    def record_measurements(self):
+    def record_measurements(self, adapter_ref):
         while self.running:
             try:
                 if self.serial_port.in_waiting > 0:
@@ -28,9 +32,9 @@ class PhysicalProximitySensorAdapter:
                     if len(parts) == 4:
                         with self.lock:
                             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
-                                self.measurements[direction].append(float(value))
-                                if len(self.measurements[direction]) > self.k:
-                                    self.measurements[direction].pop(0)
+                                adapter_ref.measurements[direction].append(float(value))
+                                if len(adapter_ref.measurements[direction]) > self.k:
+                                    adapter_ref.measurements[direction].pop(0)
                     print(f'record_measurements: self.measurements: {self.measurements}')
             except serial.SerialException as e:
                 print(f"Serial exception: {e}")

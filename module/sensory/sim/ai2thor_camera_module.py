@@ -1,7 +1,5 @@
 from typing import Any
 
-from PIL import Image
-
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
 from service.sim_adapter import SimAdapter

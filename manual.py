@@ -24,7 +24,10 @@ if test_env == 'local':
 else:
   motor_adapter = PhysicalMotorService()
   proximity_adapter = PhysicalProximitySensorAdapter()
-  
+
+print('stopping motors')
+motor_adapter.stop()
+
 ACTION_MAPPING = dict(
   ahead=MOVE_AHEAD,
   right=MOVE_RIGHT,

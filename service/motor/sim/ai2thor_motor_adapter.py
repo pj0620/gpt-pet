@@ -60,3 +60,6 @@ class Ai2ThorMotorService(BaseMotorAdapter):
         successful=False,
         action=action,
       )
+    
+  def stop(self):
+    print("Ai2ThorMotorService: stop called")
