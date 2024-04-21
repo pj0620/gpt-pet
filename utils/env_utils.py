@@ -14,7 +14,7 @@ def get_env_var(env_var: str) -> str:
 
 def check_if_process_running(process_search: str) -> bool:
   # Define the command to check for the process
-  command = f"pgrep -f manual.py"
+  command = f"pgrep -l -a -f manual.py"
   
   # Run the command
   result = subprocess.run(command, shell=True, text=True, capture_output=True)
