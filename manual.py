@@ -56,6 +56,8 @@ def set_color():
     # Get the data from the request
     rgb_data = request.data.decode('utf-8').strip()
     device_io_adapter.set_color(rgb_data)
+    
+    return 'success'
 
 # @app.route('/current-view', methods=['GET'])
 # def current_view():
