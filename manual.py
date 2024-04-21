@@ -13,7 +13,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-test_env = 'local'
+test_env = 'physical'
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
