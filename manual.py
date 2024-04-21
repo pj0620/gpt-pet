@@ -1,5 +1,7 @@
 import time
 
+from pykinect2 import PyKinectRuntime, PyKinectV2
+
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -25,8 +27,13 @@ else:
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
+  from module.sensory.physical.physical_camera_module import PhysicalCameraModule
   motor_adapter = PhysicalMotorService()
   device_io_adapter = PhysicalDeviceIOAdapter()
+  
+  kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color | PyKinectV2.FrameSourceTypes_Depth)
+  camera_module = PhysicalCameraModule(kinect)
+  
 
 print('stopping motors')
 motor_adapter.stop()
@@ -59,11 +66,10 @@ def set_color():
     
     return 'success'
 
-# @app.route('/current-view', methods=['GET'])
-# def current_view():
-#     view = get_current_view()
-#     return jsonify({'current_view': view})
-#
+@app.route('/current-view', methods=['GET'])
+def current_view():
+    return jsonify(camera_module.build_subconscious_input())
+
 # @app.route('/current-depth-view', methods=['GET'])
 # def current_depth_view():
 #     depth_view = get_current_depth_view()
