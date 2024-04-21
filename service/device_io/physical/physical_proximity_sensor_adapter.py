@@ -33,7 +33,6 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
         while True:
             try:
                 line = serial_port.readline().decode('utf-8').strip()
-                print(f'Received line: {line}')
                 parts = line.split(',')
                 # Check if the line contains all four expected parts
                 if len(parts) == 4:
@@ -47,7 +46,6 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
                         if self.new_color is not None:
                             serial_port.write(self.new_color.encode('utf-8'))
                         self.new_color = None
-                    print(f'Updated measurements: {self.measurements}')
             except Exception as e:
                 print(f"Unexpected error in record_measurements: {e}")
 
