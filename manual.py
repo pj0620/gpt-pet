@@ -10,12 +10,6 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort
 from flask_cors import CORS
 
-from utils.env_utils import check_if_process_running
-
-if check_if_process_running("gpt-pet/manual.py"):
-  print("manual.py already running exiting")
-  exit()
-
 app = Flask(__name__)
 CORS(app)
 
