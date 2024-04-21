@@ -3,9 +3,7 @@ import time
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
-from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
 from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorDeviceIOAdapter
-from service.motor.physical.physical_motor_adapter import PhysicalMotorService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 
@@ -15,7 +13,7 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 
-test_env = 'physical'
+test_env = 'local'
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
@@ -24,6 +22,9 @@ if test_env == 'local':
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
   device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 else:
+  # keep imports here to avoid GPIO libraries causing issues
+  from service.motor.physical.physical_motor_adapter import PhysicalMotorService
+  from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
   motor_adapter = PhysicalMotorService()
   device_io_adapter = PhysicalDeviceIOAdapter()
 
@@ -54,7 +55,7 @@ def distance():
 def set_color():
     # Get the data from the request
     rgb_data = request.data.decode('utf-8').strip()
-    device_io_adapter.set_color()
+    device_io_adapter.set_color(rgb_data)
 
 # @app.route('/current-view', methods=['GET'])
 # def current_view():

@@ -19,7 +19,7 @@ PROXIMITY_SENSOR_MODULE_DESCRIPTION = ("Summary of Proximity Sensors on GPTPet w
 class ProximitySensorModule(BaseSubconsciousInputModule):
   def build_conscious_input(self, context: GPTPetContext) -> ConsciousInput:
     return ConsciousInput(
-      value=context.proximity_sensor_adapter.get_measurements(),
+      value=context.device_io_adapter.get_measurements(),
       schema=PROXIMITY_SENSOR_MODULE_SCHEMA,
       description=PROXIMITY_SENSOR_MODULE_DESCRIPTION
     )

@@ -23,7 +23,7 @@ class AgentExecutorModule(BaseExecutorModule):
     print('context.motor_service: ', context.motor_adapter)
     self.environment_tool = EnvironmentTool(
       motor_adapter=context.motor_adapter,
-      proximity_sensor_adapter=context.proximity_sensor_adapter
+      proximity_sensor_adapter=context.device_io_adapter
     )
     tools = [ self.environment_tool ]
     prompt_system = load_prompt('executor/system.txt')

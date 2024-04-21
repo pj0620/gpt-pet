@@ -34,7 +34,7 @@ context.analytics_service = AnalyticsService()
 if test_env == 'local':
   sim_adapter = SimAdapter()
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
-  context.proximity_sensor_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
+  context.device_io_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
   sensory_modules = [
     Ai2ThorCameraModule(sim_adapter),
     Ai2ThorDepthCameraModule(sim_adapter)
@@ -42,7 +42,7 @@ if test_env == 'local':
 else:
   sensory_modules = []
   
-sensory_modules.append(ProximityModule(context.proximity_sensor_adapter))
+sensory_modules.append(ProximityModule(context.device_io_adapter))
 
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModule(context.vectordb_adapter)
