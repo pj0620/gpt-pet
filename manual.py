@@ -12,21 +12,21 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort
 from flask_cors import CORS
 
-# app = Flask(__name__)
-# CORS(app)
-#
-# test_env = 'physical'
-#
-# if test_env == 'local':
-#   sim_adapter = SimAdapter()
-#   motor_adapter = Ai2ThorMotorService(sim_adapter)
-#   camera_module = Ai2ThorCameraModule(sim_adapter)
-#   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-#   proximity_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
-# else:
-#   motor_adapter = PhysicalMotorService()
-#   proximity_adapter = PhysicalProximitySensorAdapter()
-#
+app = Flask(__name__)
+CORS(app)
+
+test_env = 'physical'
+
+if test_env == 'local':
+  sim_adapter = SimAdapter()
+  motor_adapter = Ai2ThorMotorService(sim_adapter)
+  camera_module = Ai2ThorCameraModule(sim_adapter)
+  depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
+  proximity_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
+else:
+  motor_adapter = PhysicalMotorService()
+  proximity_adapter = PhysicalProximitySensorAdapter()
+
 # print('stopping motors')
 # motor_adapter.stop()
 #
