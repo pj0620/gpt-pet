@@ -1,8 +1,5 @@
-import time
-
-from pykinect2 import PyKinectRuntime, PyKinectV2
-
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
+from gptpet_context import GPTPetContext
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorDeviceIOAdapter
@@ -12,10 +9,14 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
+from utils.vision_utils import add_horizontal_guide_encode
+
 app = Flask(__name__)
 CORS(app)
 
 test_env = 'physical'
+
+context = GPTPetContext()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
@@ -31,8 +32,7 @@ else:
   motor_adapter = PhysicalMotorService()
   device_io_adapter = PhysicalDeviceIOAdapter()
   
-  kinect = PyKinectRuntime.PyKinectRuntime(PyKinectV2.FrameSourceTypes_Color | PyKinectV2.FrameSourceTypes_Depth)
-  camera_module = PhysicalCameraModule(kinect)
+  camera_module = PhysicalCameraModule()
   
 
 print('stopping motors')
@@ -68,7 +68,10 @@ def set_color():
 
 @app.route('/current-view', methods=['GET'])
 def current_view():
-    return jsonify(camera_module.build_subconscious_input())
+    sensory_output = camera_module.build_subconscious_input(context)
+    np_array = sensory_output['last_frame']
+    base64_image = add_horizontal_guide_encode(np_array)
+    return base64_image
 
 # @app.route('/current-depth-view', methods=['GET'])
 # def current_depth_view():
