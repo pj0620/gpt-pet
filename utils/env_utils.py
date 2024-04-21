@@ -18,8 +18,11 @@ def check_if_process_running(process_search: str) -> bool:
   
   # Run the command
   result = subprocess.run(command, shell=True, text=True, capture_output=True)
+  is_running_process = bool(result.stdout)
+  if is_running_process:
+    print("process already running: stdout = ", result.stdout)
   
   # Check if the output is non-empty
-  return bool(result.stdout)
+  return is_running_process
   
   
