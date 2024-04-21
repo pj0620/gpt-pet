@@ -46,9 +46,9 @@ def move(direction):
     result = motor_adapter.do_movement(action)
     return jsonify({'moved': result, 'direction': direction})
 
-@app.route('/proximity-measurements', methods=['GET'])
-def distance():
-    return jsonify(proximity_adapter.get_measurements())
+# @app.route('/proximity-measurements', methods=['GET'])
+# def distance():
+#     return jsonify(proximity_adapter.get_measurements())
 
 # @app.route('/current-view', methods=['GET'])
 # def current_view():
