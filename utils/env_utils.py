@@ -14,13 +14,14 @@ def get_env_var(env_var: str) -> str:
 
 def check_if_process_running(process_search: str) -> bool:
   # Define the command to check for the process
-  command = f"ps aux | grep {process_search} | grep -v grep"
+  command = f"pgrep -f manual.py"
   
   # Run the command
   result = subprocess.run(command, shell=True, text=True, capture_output=True)
   is_running_process = bool(result.stdout)
   if is_running_process:
-    print("process already running: stdout = ", result.stdout)
+    print("process already running: stdout = ")
+    print(result.stdout)
   
   # Check if the output is non-empty
   return is_running_process
