@@ -5,7 +5,7 @@ from model.subconscious import ConsciousInput
 from model.vision import PhysicalPassagewayInfo
 from service.analytics_service import AnalyticsService
 from service.motor.base_motor_adapter import BaseMotorAdapter
-from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
+from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 

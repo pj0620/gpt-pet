@@ -14,7 +14,7 @@ from module.subconscious.input.vision_module import VisionModule
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
-from service.sensor.sim.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
+from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService

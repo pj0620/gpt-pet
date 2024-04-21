@@ -3,13 +3,13 @@ import time
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
+from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
+from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorDeviceIOAdapter
 from service.motor.physical.physical_motor_adapter import PhysicalMotorService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
-from service.sensor.physical.physical_proximity_sensor_adapter import PhysicalProximitySensorAdapter
-from service.sensor.sim.ai2thor_proximity_sensor_adapter import Ai2thorProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 
-from flask import Flask, jsonify, abort
+from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
 app = Flask(__name__)
@@ -22,10 +22,10 @@ if test_env == 'local':
   motor_adapter = Ai2ThorMotorService(sim_adapter)
   camera_module = Ai2ThorCameraModule(sim_adapter)
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-  proximity_adapter = Ai2thorProximitySensorAdapter(sim_adapter)
+  device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 else:
   motor_adapter = PhysicalMotorService()
-  proximity_adapter = PhysicalProximitySensorAdapter()
+  device_io_adapter = PhysicalDeviceIOAdapter()
 
 print('stopping motors')
 motor_adapter.stop()
@@ -48,7 +48,13 @@ def move(direction):
 
 @app.route('/proximity-measurements', methods=['GET'])
 def distance():
-    return jsonify(proximity_adapter.get_measurements())
+    return jsonify(device_io_adapter.get_measurements())
+
+@app.route('/color', methods=['POST'])
+def set_color():
+    # Get the data from the request
+    rgb_data = request.data.decode('utf-8').strip()
+    device_io_adapter.set_color()
 
 # @app.route('/current-view', methods=['GET'])
 # def current_view():

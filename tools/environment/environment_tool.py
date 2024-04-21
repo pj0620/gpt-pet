@@ -13,7 +13,7 @@ from constants.motor import ALL_MOTOR_ACTIONS
 from model.objects import Object
 from model.vision import PhysicalPassagewayInfo
 from service.motor.base_motor_adapter import BaseMotorAdapter
-from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
+from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
 from tools.environment.api.mock_control_api import MockControlAPI
 from tools.environment.api.real_control_api import RealControlAPI

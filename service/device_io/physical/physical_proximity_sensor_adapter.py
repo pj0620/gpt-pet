@@ -7,20 +7,22 @@ import threading
 import serial
 import time
 
-from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
+from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 
 
-class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
+class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
     def __init__(self, k=5):
         self.k = k  # Number of measurements to keep
         self.measurements = {'ahead': [], 'back': [], 'right': [], 'left': []}
         self.lock = threading.Lock()  # Mutex for thread-safe access to measurements
 
         # Start the measurement recording thread
-        self.thread = threading.Thread(target=self.record_measurements)
+        self.thread = threading.Thread(target=self.serial_thread)
         self.thread.start()
+      
+        self.new_color = None
 
-    def record_measurements(self):
+    def serial_thread(self):
         try:
             serial_port = serial.Serial('/dev/ttyUSB0', 9600, timeout=2)
             serial_port.flush()
@@ -41,6 +43,10 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
                             self.measurements[direction].append(float(value))
                             if len(self.measurements[direction]) > self.k:
                                 self.measurements[direction].pop(0)
+                          
+                        if self.new_color is not None:
+                            serial_port.write(self.new_color)
+                        self.new_color = None
                     print(f'Updated measurements: {self.measurements}')
             except Exception as e:
                 print(f"Unexpected error in record_measurements: {e}")
@@ -56,4 +62,12 @@ class PhysicalProximitySensorAdapter(BaseProximitySensorAdapter):
                     averages[direction] = "unknown"
             print(f'Current averages: {averages}')
             return averages
+    
+    def set_color(
+        self,
+        color: str
+    ) -> None:
+        print('setting color to ', color)
+        with self.lock:
+            self.new_color = color
 

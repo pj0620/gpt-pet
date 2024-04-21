@@ -1,6 +1,6 @@
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT, ROTATE_LEFT
 from service.motor.base_motor_adapter import BaseMotorAdapter
-from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
+from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
 import warnings
 

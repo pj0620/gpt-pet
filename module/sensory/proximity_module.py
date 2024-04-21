@@ -4,7 +4,7 @@ from PIL import Image
 
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
-from service.sensor.base_proximity_sensor_adapter import BaseProximitySensorAdapter
+from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
 from service.sim_adapter import SimAdapter
 
 
