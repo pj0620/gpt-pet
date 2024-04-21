@@ -45,7 +45,7 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
                                 self.measurements[direction].pop(0)
                           
                         if self.new_color is not None:
-                            serial_port.write(self.new_color)
+                            serial_port.write(self.new_color.encode('utf-8'))
                         self.new_color = None
                     print(f'Updated measurements: {self.measurements}')
             except Exception as e:
