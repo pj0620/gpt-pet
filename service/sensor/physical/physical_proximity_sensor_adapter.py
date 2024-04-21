@@ -27,8 +27,9 @@ class PhysicalProximitySensorAdapter:
         while adapter_ref.running:
             try:
                 if adapter_ref.serial_port.in_waiting > 0:
+                    adapter_ref.serial_port.readline()
                     line = adapter_ref.serial_port.readline().decode('utf-8').strip()
-                    print(f'line: ${line}')
+                    print(f'line: {line}')
                     parts = line.split(',')
                     if len(parts) == 4:
                         with adapter_ref.lock:
