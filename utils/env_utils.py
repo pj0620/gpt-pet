@@ -1,5 +1,6 @@
 import os
 import subprocess
+import socket
 
 
 def check_env_flag(env_var: str) -> bool:
@@ -25,5 +26,23 @@ def check_if_process_running(process_search: str) -> bool:
   
   # Check if the output is non-empty
   return is_running_process
+  
+def check_port_in_use(host, port):
+  """
+  Check if a port is in use on a specified host.
+
+  Args:
+  host (str): The hostname or IP address to check.
+  port (int): The port number to check.
+
+  Returns:
+  bool: True if the port is in use, False otherwise.
+  """
+  with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+    try:
+      s.bind((host, port))
+      return False  # The port is available
+    except socket.error as e:
+      return True  # The port is in use
   
   
