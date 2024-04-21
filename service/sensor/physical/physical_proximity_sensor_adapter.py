@@ -24,18 +24,18 @@ class PhysicalProximitySensorAdapter:
             raise
 
     def record_measurements(self, adapter_ref):
-        while self.running:
+        while adapter_ref.running:
             try:
-                if self.serial_port.in_waiting > 0:
-                    line = self.serial_port.readline().decode('utf-8').strip()
+                if adapter_ref.serial_port.in_waiting > 0:
+                    line = adapter_ref.serial_port.readline().decode('utf-8').strip()
                     parts = line.split(',')
                     if len(parts) == 4:
-                        with self.lock:
+                        with adapter_ref.lock:
                             for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
                                 adapter_ref.measurements[direction].append(float(value))
-                                if len(adapter_ref.measurements[direction]) > self.k:
+                                if len(adapter_ref.measurements[direction]) > adapter_ref.k:
                                     adapter_ref.measurements[direction].pop(0)
-                    print(f'record_measurements: self.measurements: {self.measurements}')
+                    print(f'record_measurements: self.measurements: {adapter_ref.measurements}')
             except Exception as e:
                 print(f"Unexpected error: {e}")
 
