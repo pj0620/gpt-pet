@@ -29,22 +29,23 @@ class PhysicalProximitySensorAdapter:
             raise
 
     def record_measurements(self):
-        try:
-            self.serial_port.readline()
-            line = self.serial_port.readline().decode('utf-8').strip()
-            print(f'Received line: {line}')
-            parts = line.split(',')
-            # Check if the line contains all four expected parts
-            if len(parts) == 4:
-                with self.lock:
-                    # Update the measurements and maintain only the last 'k' measurements
-                    for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
-                        self.measurements[direction].append(float(value))
-                        if len(self.measurements[direction]) > self.k:
-                            self.measurements[direction].pop(0)
-                print(f'Updated measurements: {self.measurements}')
-        except Exception as e:
-            print(f"Unexpected error in record_measurements: {e}")
+        while True:
+            try:
+                self.serial_port.readline()
+                line = self.serial_port.readline().decode('utf-8').strip()
+                print(f'Received line: {line}')
+                parts = line.split(',')
+                # Check if the line contains all four expected parts
+                if len(parts) == 4:
+                    with self.lock:
+                        # Update the measurements and maintain only the last 'k' measurements
+                        for direction, value in zip(['ahead', 'back', 'right', 'left'], parts):
+                            self.measurements[direction].append(float(value))
+                            if len(self.measurements[direction]) > self.k:
+                                self.measurements[direction].pop(0)
+                    print(f'Updated measurements: {self.measurements}')
+            except Exception as e:
+                print(f"Unexpected error in record_measurements: {e}")
 
     def get_measurements(self):
         with self.lock:
