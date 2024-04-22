@@ -15,6 +15,8 @@ with open('constants/gpio/gpio.json', 'r') as file:
 
 STEP_TIME = 1
 TIME_DIVISIONS = 100
+DUTY_CYCLE_WIDTH = 10
+DUTY_CYCLE_ON = 0.4
 
 
 class PhysicalMotorService(BaseMotorAdapter):
@@ -86,7 +88,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       
     for division in range(TIME_DIVISIONS):
       value = GPIO.LOW
-      if division % 2 == 0:
+      if division % DUTY_CYCLE_WIDTH < DUTY_CYCLE_ON:
         value = GPIO.HIGH
       for p in on_pins:
         GPIO.output(p, value)
