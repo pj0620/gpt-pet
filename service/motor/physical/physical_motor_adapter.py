@@ -14,7 +14,7 @@ with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
 STEP_TIME = 1
-TIME_DIVISIONS = 10
+TIME_DIVISIONS = 100
 
 
 class PhysicalMotorService(BaseMotorAdapter):
