@@ -1,5 +1,6 @@
 from typing import Any
 
+import numpy as np
 
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
