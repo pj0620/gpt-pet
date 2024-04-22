@@ -19,7 +19,7 @@ VERT_DUTY_CYCLE_WIDTH = 10
 VERT_CYCLE_ON = 5
 
 HORZ_DUTY_CYCLE_WIDTH = 10
-HORZ_CYCLE_ON = 10
+HORZ_CYCLE_ON = 8
 
 
 class PhysicalMotorService(BaseMotorAdapter):
