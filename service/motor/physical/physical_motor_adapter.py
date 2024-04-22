@@ -13,6 +13,9 @@ GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
+STEP_TIME = 1
+TIME_DIVISIONS = 10
+
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
@@ -79,9 +82,15 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in off_pins:
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     for p in on_pins:
-      GPIO.setup(p, GPIO.OUT, initial=GPIO.HIGH)
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
       
-    sleep(1)
+    for division in range(TIME_DIVISIONS):
+      value = GPIO.LOW
+      if division % 2 == 0:
+        value = GPIO.HIGH
+      for p in on_pins:
+        GPIO.output(p, value)
+      sleep(STEP_TIME / TIME_DIVISIONS)
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
