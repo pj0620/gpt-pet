@@ -19,6 +19,8 @@ class PhysicalDepthCameraModule(BaseSensoryModule):
     
     # Convert depth to a visual format (normalized 0-255 scale for display purposes)
     # Normalizing from assumed reasonable depth range (0mm to 2048mm)
+    print("max: " + depth.max())
+    print("min: " + depth.min())
     normalized_depth = (depth / 2048 * 255).astype(np.uint8)
     
     # Optionally apply a colormap for better visualization

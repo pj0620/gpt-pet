@@ -66,7 +66,7 @@ def move(direction):
 @app.route('/rotate/<degrees>', methods=['POST'])
 def rotate(degrees: str):
     try:
-      num_degrees = float(degrees)
+      num_degrees = float(degrees) # /home/gptpetclient/libfreenect/build/bin/freenect-micview
     except ValueError:
       abort(400, 'Invalid number of degrees: ' + degrees)
     if num_degrees > 0:
