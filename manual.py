@@ -6,6 +6,7 @@ import base64
 
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from gptpet_context import GPTPetContext
+from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorDeviceIOAdapter
@@ -39,6 +40,7 @@ else:
   device_io_adapter = PhysicalDeviceIOAdapter()
   
   camera_module = PhysicalCameraModule()
+  depth_camera_module = PhysicalDepthCameraModule()
   
 
 print('stopping motors')
@@ -95,10 +97,28 @@ def current_view():
     
     return jsonify(dict(image=base64_string))
 
-# @app.route('/current-depth-view', methods=['GET'])
-# def current_depth_view():
-#     depth_view = get_current_depth_view()
-#     return jsonify({'current_depth_view': depth_view})
+@app.route('/current-depth-view', methods=['GET'])
+def current_depth_view():
+    sensory_output = depth_camera_module.build_subconscious_input(context)
+    np_array = sensory_output['last_depth_frame']
+    
+    # Convert the NumPy array to an image
+    image = Image.fromarray(np_array)
+    
+    # Save the image to a bytes buffer instead of a file
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")  # You can change PNG to JPEG, etc.
+    
+    # Retrieve the image bytes
+    image_bytes = buffer.getvalue()
+    
+    # Encode the bytes in base64
+    base64_bytes = base64.b64encode(image_bytes)
+    
+    # Convert bytes to a string for easier handling/storage/transmission
+    base64_string = base64_bytes.decode('utf-8')
+    
+    return jsonify(dict(image=base64_string))
 
 @app.route('/helloworld', methods=['GET'])
 def hello_world():
