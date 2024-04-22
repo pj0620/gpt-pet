@@ -64,7 +64,7 @@ def move(direction):
 
 
 @app.route('/rotate/<degrees>', methods=['POST'])
-def move(degrees: str):
+def rotate(degrees: str):
     try:
       num_degrees = float(degrees)
     except ValueError:
