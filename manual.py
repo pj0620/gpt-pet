@@ -4,7 +4,7 @@ from PIL import Image
 import io
 import base64
 
-from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
+from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
 from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
@@ -62,9 +62,24 @@ def move(direction):
     result = motor_adapter.do_movement(action)
     return jsonify({'moved': result, 'direction': direction})
 
+
+@app.route('/rotate/<degrees>', methods=['POST'])
+def move(degrees: str):
+    try:
+      num_degrees = float(degrees)
+    except ValueError:
+      abort(400, 'Invalid number of degrees: ' + degrees)
+    if num_degrees > 0:
+      result = motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
+    else:
+      result = motor_adapter.do_rotate(ROTATE_LEFT, -1 * num_degrees)
+    return jsonify({'moved': result})
+
+
 @app.route('/proximity-measurements', methods=['GET'])
 def distance():
     return jsonify(device_io_adapter.get_measurements())
+
 
 @app.route('/color', methods=['POST'])
 def set_color():

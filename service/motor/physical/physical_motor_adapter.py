@@ -5,7 +5,8 @@ from time import sleep
 import RPi.GPIO as GPIO
 
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT
-from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT
+from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
+  ROTATE_LEFT
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
@@ -17,16 +18,16 @@ STEP_TIME = 1
 TIME_DIVISIONS = 1000
 VERT_DUTY_CYCLE_WIDTH = 10
 VERT_CYCLE_ON = 5
-
 HORZ_DUTY_CYCLE_WIDTH = 10
 HORZ_CYCLE_ON = 8
+ROT_DUTY_CYCLE_WIDTH = 10
+ROT_CYCLE_ON = 8
 
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
     with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
-    
   
   def do_movement(
       self,
@@ -88,25 +89,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    GPIO.setmode(GPIO.BOARD)
-    
-    for p in off_pins:
-      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
-    for p in on_pins:
-      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
-      
-    for division in range(TIME_DIVISIONS):
-      value = GPIO.LOW
-      if division % duty_cycle_width < cycle_on:
-        value = GPIO.HIGH
-      for p in on_pins:
-        GPIO.output(p, value)
-      sleep(STEP_TIME / TIME_DIVISIONS)
-    
-    for p in on_pins:
-      GPIO.output(p, GPIO.LOW)
-    
-    GPIO.cleanup()
+    self.power_pins(on_pins, off_pins, duty_cycle_width, cycle_on)
     
     return MovementResult(
       successful=True,
@@ -130,28 +113,75 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
-
-  # def do_rotate(
-  #     self,
-  #     action: str,
-  #     degrees: float = None
-  # ) -> MovementResult:
-  #   assert action in ROTATE_TO_AI2THOR_ROTATE.keys(), f'invalid rotate action {action}'
-  #
-  #   self.sim_adapter.do_step(
-  #     action=ROTATE_TO_AI2THOR_ROTATE[action],
-  #     degrees=degrees
-  #   )
-  #
-  #   if self.sim_adapter.last_event_successful():
-  #     return MovementResult(
-  #       successful=True,
-  #       action=action,
-  #       degrees=degrees
-  #     )
-  #   else:
-  #     return MovementResult(
-  #       successful=False,
-  #       action=action,
-  #     )
   
+  def do_rotate(
+      self,
+      action: str,
+      degrees: float = None
+  ) -> MovementResult:
+    assert action in ROTATE_ACTIONS, f'invalid rotate action {action}'
+    
+    if action == ROTATE_RIGHT:
+      on_pins = [
+        self.gpio[FRONT][LEFT][FORWARD],
+        self.gpio[FRONT][RIGHT][BACKWARD],
+        self.gpio[BACK][LEFT][FORWARD],
+        self.gpio[BACK][RIGHT][BACKWARD]
+      ]
+      off_pins = [
+        self.gpio[FRONT][LEFT][BACKWARD],
+        self.gpio[FRONT][RIGHT][FORWARD],
+        self.gpio[BACK][LEFT][BACKWARD],
+        self.gpio[BACK][RIGHT][FORWARD]
+      ]
+    elif action == ROTATE_LEFT:
+      off_pins = [
+        self.gpio[FRONT][LEFT][FORWARD],
+        self.gpio[FRONT][RIGHT][BACKWARD],
+        self.gpio[BACK][LEFT][FORWARD],
+        self.gpio[BACK][RIGHT][BACKWARD]
+      ]
+      on_pins = [
+        self.gpio[FRONT][LEFT][BACKWARD],
+        self.gpio[FRONT][RIGHT][FORWARD],
+        self.gpio[BACK][LEFT][BACKWARD],
+        self.gpio[BACK][RIGHT][FORWARD]
+      ]
+    else:
+      raise Exception("action not implemented " + action)
+    
+    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON)
+    
+    return MovementResult(
+      successful=True,
+      action=action,
+      degrees=degrees
+    )
+  
+  
+  def power_pins(
+      self,
+      on_pins: list[int],
+      off_pins: list[int],
+      duty_cycle_width: int,
+      cycle_on: int
+  ):
+    GPIO.setmode(GPIO.BOARD)
+    
+    for p in off_pins:
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
+    for p in on_pins:
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
+    
+    for division in range(TIME_DIVISIONS):
+      value = GPIO.LOW
+      if division % duty_cycle_width < cycle_on:
+        value = GPIO.HIGH
+      for p in on_pins:
+        GPIO.output(p, value)
+      sleep(STEP_TIME / TIME_DIVISIONS)
+    
+    for p in on_pins:
+      GPIO.output(p, GPIO.LOW)
+    
+    GPIO.cleanup()
