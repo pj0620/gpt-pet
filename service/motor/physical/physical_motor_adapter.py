@@ -16,7 +16,7 @@ with open('constants/gpio/gpio.json', 'r') as file:
 STEP_TIME = 1
 TIME_DIVISIONS = 100
 DUTY_CYCLE_WIDTH = 10
-DUTY_CYCLE_ON = 0.4
+DUTY_CYCLE_ON = 4
 
 
 class PhysicalMotorService(BaseMotorAdapter):
