@@ -15,8 +15,11 @@ with open('constants/gpio/gpio.json', 'r') as file:
 
 STEP_TIME = 1
 TIME_DIVISIONS = 1000
-DUTY_CYCLE_WIDTH = 10
-DUTY_CYCLE_ON = 5
+VERT_DUTY_CYCLE_WIDTH = 10
+VERT_CYCLE_ON = 5
+
+HORZ_DUTY_CYCLE_WIDTH = 10
+HORZ_CYCLE_ON = 10
 
 
 class PhysicalMotorService(BaseMotorAdapter):
@@ -31,8 +34,12 @@ class PhysicalMotorService(BaseMotorAdapter):
       move_magnitude: float = 1
   ) -> MovementResult:
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
-
+    
+    duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
+    cycle_on = HORZ_CYCLE_ON
     if action == MOVE_AHEAD:
+      duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
+      cycle_on = VERT_CYCLE_ON
       on_pins = [
         self.gpio[face][side][FORWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -42,6 +49,8 @@ class PhysicalMotorService(BaseMotorAdapter):
         for face, side in itertools.product(FACES, SIDES)
       ]
     elif action == MOVE_BACK:
+      duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
+      cycle_on = VERT_CYCLE_ON
       on_pins = [
         self.gpio[face][side][BACKWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -88,7 +97,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       
     for division in range(TIME_DIVISIONS):
       value = GPIO.LOW
-      if division % DUTY_CYCLE_WIDTH < DUTY_CYCLE_ON:
+      if division % duty_cycle_width < cycle_on:
         value = GPIO.HIGH
       for p in on_pins:
         GPIO.output(p, value)
