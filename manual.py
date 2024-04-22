@@ -1,3 +1,9 @@
+import base64
+
+from PIL import Image
+import io
+import base64
+
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK
 from gptpet_context import GPTPetContext
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
@@ -70,8 +76,24 @@ def set_color():
 def current_view():
     sensory_output = camera_module.build_subconscious_input(context)
     np_array = sensory_output['last_frame']
-    base64_image = add_horizontal_guide_encode(np_array)
-    return jsonify(dict(image=base64_image))
+    
+    # Convert the NumPy array to an image
+    image = Image.fromarray(np_array)
+    
+    # Save the image to a bytes buffer instead of a file
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")  # You can change PNG to JPEG, etc.
+    
+    # Retrieve the image bytes
+    image_bytes = buffer.getvalue()
+    
+    # Encode the bytes in base64
+    base64_bytes = base64.b64encode(image_bytes)
+    
+    # Convert bytes to a string for easier handling/storage/transmission
+    base64_string = base64_bytes.decode('utf-8')
+    
+    return jsonify(dict(image=base64_string))
 
 # @app.route('/current-depth-view', methods=['GET'])
 # def current_depth_view():

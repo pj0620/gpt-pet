@@ -58,7 +58,7 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
                     averages[direction] = sum(self.measurements[direction]) / len(self.measurements[direction])
                 else:
                     averages[direction] = "unknown"
-            print(f'Current averages: {averages}')
+            print(f'Current proximity measurements: {averages}')
             return averages
     
     def set_color(
