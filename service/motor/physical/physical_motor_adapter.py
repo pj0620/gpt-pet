@@ -14,8 +14,9 @@ GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
-STEP_TIME = 1
-TIME_DIVISIONS = 1000
+TIME_DIVISION_STEP = 0.001
+TIME_DIVISIONS_PER_SECOND = 1000
+
 VERT_DUTY_CYCLE_WIDTH = 10
 VERT_CYCLE_ON = 5
 HORZ_DUTY_CYCLE_WIDTH = 10
@@ -182,13 +183,15 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in on_pins:
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     
-    for division in range(TIME_DIVISIONS):
-      value = GPIO.LOW
+    last_value = GPIO.LOW
+    for division in range(int(duration * TIME_DIVISIONS_PER_SECOND)):
+      new_value = GPIO.LOW
       if division % duty_cycle_width < cycle_on:
-        value = GPIO.HIGH
-      for p in on_pins:
-        GPIO.output(p, value)
-      sleep(duration * STEP_TIME / TIME_DIVISIONS)
+        new_value = GPIO.HIGH
+      if last_value != new_value:
+        for p in on_pins:
+          GPIO.output(p, new_value)
+      sleep(TIME_DIVISION_STEP)
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
