@@ -71,10 +71,7 @@ def rotate(degrees: str):
       num_degrees = float(degrees) # /home/gptpetclient/libfreenect/build/bin/freenect-micview
     except ValueError:
       abort(400, 'Invalid number of degrees: ' + degrees)
-    if num_degrees > 0:
-      result = motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
-    else:
-      result = motor_adapter.do_rotate(ROTATE_LEFT, -1 * num_degrees)
+    result = motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
     return jsonify({'moved': result})
 
 
