@@ -23,6 +23,10 @@ HORZ_CYCLE_ON = 8
 ROT_DUTY_CYCLE_WIDTH = 10
 ROT_CYCLE_ON = 5
 
+INVERSE_ROTATE_ACTIONS = {
+  ROTATE_RIGHT: ROTATE_LEFT,
+  ROTATE_LEFT: ROTATE_RIGHT
+}
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
@@ -121,7 +125,11 @@ class PhysicalMotorService(BaseMotorAdapter):
   ) -> MovementResult:
     assert action in ROTATE_ACTIONS, f'invalid rotate action {action}'
     
-    if action == ROTATE_RIGHT:
+    fixed_action = action
+    if degrees < 0:
+      fixed_action = INVERSE_ROTATE_ACTIONS[action]
+    
+    if fixed_action == ROTATE_RIGHT:
       on_pins = [
         self.gpio[FRONT][LEFT][FORWARD],
         self.gpio[FRONT][RIGHT][BACKWARD],
@@ -134,7 +142,7 @@ class PhysicalMotorService(BaseMotorAdapter):
         self.gpio[BACK][LEFT][BACKWARD],
         self.gpio[BACK][RIGHT][FORWARD]
       ]
-    elif action == ROTATE_LEFT:
+    elif fixed_action == ROTATE_LEFT:
       off_pins = [
         self.gpio[FRONT][LEFT][FORWARD],
         self.gpio[FRONT][RIGHT][BACKWARD],
