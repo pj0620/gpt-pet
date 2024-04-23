@@ -21,7 +21,7 @@ VERT_CYCLE_ON = 5
 HORZ_DUTY_CYCLE_WIDTH = 10
 HORZ_CYCLE_ON = 8
 ROT_DUTY_CYCLE_WIDTH = 10
-ROT_CYCLE_ON = 8
+ROT_CYCLE_ON = 5
 
 
 class PhysicalMotorService(BaseMotorAdapter):
@@ -89,7 +89,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    self.power_pins(on_pins, off_pins, duty_cycle_width, cycle_on)
+    self.power_pins(on_pins, off_pins, duty_cycle_width, cycle_on, move_magnitude)
     
     return MovementResult(
       successful=True,
@@ -150,7 +150,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception("action not implemented " + action)
     
-    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON)
+    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, 1.0)
     
     return MovementResult(
       successful=True,
@@ -164,7 +164,8 @@ class PhysicalMotorService(BaseMotorAdapter):
       on_pins: list[int],
       off_pins: list[int],
       duty_cycle_width: int,
-      cycle_on: int
+      cycle_on: int,
+      duration: float
   ):
     GPIO.setmode(GPIO.BOARD)
     
@@ -179,7 +180,7 @@ class PhysicalMotorService(BaseMotorAdapter):
         value = GPIO.HIGH
       for p in on_pins:
         GPIO.output(p, value)
-      sleep(STEP_TIME / TIME_DIVISIONS)
+      sleep(duration * STEP_TIME / TIME_DIVISIONS)
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)

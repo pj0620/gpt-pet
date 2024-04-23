@@ -56,6 +56,7 @@ ACTION_MAPPING = dict(
 
 @app.route('/move/<direction>', methods=['POST'])
 def move(direction):
+    print("move request: ", direction)
     if direction not in ACTION_MAPPING.keys():
         abort(400, 'Invalid direction')
     action = ACTION_MAPPING[direction]
@@ -65,6 +66,7 @@ def move(direction):
 
 @app.route('/rotate/<degrees>', methods=['POST'])
 def rotate(degrees: str):
+    print("rotate request: ", degrees)
     try:
       num_degrees = float(degrees) # /home/gptpetclient/libfreenect/build/bin/freenect-micview
     except ValueError:
@@ -78,11 +80,13 @@ def rotate(degrees: str):
 
 @app.route('/proximity-measurements', methods=['GET'])
 def distance():
+    print("proximity-measurements request")
     return jsonify(device_io_adapter.get_measurements())
 
 
 @app.route('/color', methods=['POST'])
 def set_color():
+    print("set_color request")
     # Get the data from the request
     rgb_data = request.data.decode('utf-8').strip()
     device_io_adapter.set_color(rgb_data)
@@ -91,6 +95,7 @@ def set_color():
 
 @app.route('/current-view', methods=['GET'])
 def current_view():
+    print("current_view request")
     sensory_output = camera_module.build_subconscious_input(context)
     np_array = sensory_output['last_frame']
     
@@ -114,6 +119,7 @@ def current_view():
 
 @app.route('/current-depth-view', methods=['GET'])
 def current_depth_view():
+    print("current_depth_view request")
     sensory_output = depth_camera_module.build_subconscious_input(context)
     np_array = sensory_output['last_depth_frame']
     

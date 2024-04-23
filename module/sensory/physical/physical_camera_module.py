@@ -1,7 +1,7 @@
 from typing import Any
 
 import cv2
-# this will fail in local avoid importing unless installed from source
+# this will fail in local. avoid importing unless installed from source
 import freenect
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
