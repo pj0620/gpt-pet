@@ -148,6 +148,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       raise Exception("action not implemented " + action)
     
     duration = (degrees / 360.) * FULL_TURN_DURATION
+    print("spinning for a duration of ", duration)
     self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, duration)
     
     return MovementResult(
