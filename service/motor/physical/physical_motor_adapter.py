@@ -188,9 +188,10 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.output(p, GPIO.LOW)
       
     # go backwards momentarily to stop robot
+    # todo: needs counter balance to no fall over
     for p in off_pins:
       GPIO.output(p, GPIO.HIGH)
-    sleep(0.1)
+    sleep(0.05)
     for p in off_pins:
       GPIO.output(p, GPIO.LOW)
     
