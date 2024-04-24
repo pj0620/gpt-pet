@@ -7,29 +7,13 @@ import RPi.GPIO as GPIO
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
   ROTATE_LEFT
+from constants.physical_motor import *
 from model.motor import MovementResult
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
 GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
-
-TIME_DIVISION_STEP = 0.001
-TIME_DIVISIONS_PER_SECOND = 1000
-
-VERT_DUTY_CYCLE_WIDTH = 10
-# VERT_CYCLE_ON = 5
-VERT_CYCLE_ON = 11
-HORZ_DUTY_CYCLE_WIDTH = 10
-# HORZ_CYCLE_ON = 8
-HORZ_CYCLE_ON = 11
-ROT_DUTY_CYCLE_WIDTH = 10
-ROT_CYCLE_ON = 5
-
-INVERSE_ROTATE_ACTIONS = {
-  ROTATE_RIGHT: ROTATE_LEFT,
-  ROTATE_LEFT: ROTATE_RIGHT
-}
 
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(self):
@@ -129,8 +113,10 @@ class PhysicalMotorService(BaseMotorAdapter):
     assert action in ROTATE_ACTIONS, f'invalid rotate action {action}'
     
     fixed_action = action
+    fixed_degrees = degrees
     if degrees < 0:
       fixed_action = INVERSE_ROTATE_ACTIONS[action]
+      fixed_degrees *= -1
     
     if fixed_action == ROTATE_RIGHT:
       on_pins = [
@@ -161,7 +147,8 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception("action not implemented " + action)
     
-    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, 1.0)
+    duration = (degrees / 360.) * FULL_TURN_DURATION
+    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, duration)
     
     return MovementResult(
       successful=True,
