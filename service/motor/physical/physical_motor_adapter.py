@@ -29,9 +29,11 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
     cycle_on = HORZ_CYCLE_ON
+    duration = HORZ_ONE_METER_DURATION * move_magnitude
     if action == MOVE_AHEAD:
       duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
       cycle_on = VERT_CYCLE_ON
+      duration = VERT_ONE_METER_DURATION * move_magnitude
       on_pins = [
         self.gpio[face][side][FORWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -43,6 +45,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     elif action == MOVE_BACK:
       duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
       cycle_on = VERT_CYCLE_ON
+      duration = VERT_ONE_METER_DURATION * move_magnitude
       on_pins = [
         self.gpio[face][side][BACKWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -80,7 +83,13 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    self.power_pins(on_pins, off_pins, duty_cycle_width, cycle_on, move_magnitude)
+    self.power_pins(
+      on_pins=on_pins,
+      off_pins=off_pins,
+      duty_cycle_width=duty_cycle_width,
+      cycle_on=cycle_on,
+      duration=duration
+    )
     
     return MovementResult(
       successful=True,
@@ -149,7 +158,13 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     duration = (fixed_degrees / 360.) * FULL_TURN_DURATION
     print("spinning for a duration of ", duration)
-    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, duration)
+    self.power_pins(
+      on_pins=on_pins,
+      off_pins=off_pins,
+      duty_cycle_width=ROT_DUTY_CYCLE_WIDTH,
+      cycle_on=ROT_CYCLE_ON,
+      duration=duration
+    )
     
     return MovementResult(
       successful=True,
