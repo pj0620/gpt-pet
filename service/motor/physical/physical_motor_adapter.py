@@ -181,6 +181,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       if last_value != new_value:
         for p in on_pins:
           GPIO.output(p, new_value)
+        last_value = new_value
       sleep(TIME_DIVISION_STEP)
     
     for p in on_pins:
