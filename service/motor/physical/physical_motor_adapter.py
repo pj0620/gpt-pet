@@ -186,5 +186,12 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
+      
+    # go backwards momentarily to stop robot
+    for p in off_pins:
+      GPIO.output(p, GPIO.HIGH)
+    sleep(0.1)
+    for p in on_pins:
+      GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
