@@ -27,9 +27,11 @@ class PhysicalMotorService(BaseMotorAdapter):
   ) -> MovementResult:
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
     
-    duty_cycle = HORZ_DUTY_CYCLE
+    duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
+    cycle_on = HORZ_CYCLE_ON
     if action == MOVE_AHEAD:
-      duty_cycle = VERT_DUTY_CYCLE
+      duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
+      cycle_on = VERT_CYCLE_ON
       on_pins = [
         self.gpio[face][side][FORWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -39,7 +41,8 @@ class PhysicalMotorService(BaseMotorAdapter):
         for face, side in itertools.product(FACES, SIDES)
       ]
     elif action == MOVE_BACK:
-      duty_cycle = VERT_DUTY_CYCLE
+      duty_cycle_width = VERT_DUTY_CYCLE_WIDTH
+      cycle_on = VERT_CYCLE_ON
       on_pins = [
         self.gpio[face][side][BACKWARD]
         for face, side in itertools.product(FACES, SIDES)
@@ -77,12 +80,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    self.power_pins(
-      on_pins=on_pins,
-      off_pins=off_pins,
-      duty_cycle=duty_cycle,
-      duration=move_magnitude
-    )
+    self.power_pins(on_pins, off_pins, duty_cycle_width, cycle_on, move_magnitude)
     
     return MovementResult(
       successful=True,
@@ -151,7 +149,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     duration = (fixed_degrees / 360.) * FULL_TURN_DURATION
     print("spinning for a duration of ", duration)
-    self.power_pins(on_pins=on_pins, off_pins=off_pins, duty_cycle=ROT_DUTY_CYCLE, duration=duration)
+    self.power_pins(on_pins, off_pins, ROT_DUTY_CYCLE_WIDTH, ROT_CYCLE_ON, duration)
     
     return MovementResult(
       successful=True,
@@ -164,7 +162,8 @@ class PhysicalMotorService(BaseMotorAdapter):
       self,
       on_pins: list[int],
       off_pins: list[int],
-      duty_cycle: int,
+      duty_cycle_width: int,
+      cycle_on: int,
       duration: float
   ):
     GPIO.setmode(GPIO.BOARD)
@@ -174,11 +173,16 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in on_pins:
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     
-    pwms = [GPIO.PWM(pin, 100) for pin in on_pins]
-    map(lambda pwm: pwm.ChangeDutyCycle(duty_cycle), pwms)
-    map(lambda pwm: pwm.start(), pwms)
-    sleep(duration)
-    map(lambda pwm: pwm.stop(), pwms)
+    last_value = GPIO.LOW
+    for division in range(int(duration * TIME_DIVISIONS_PER_SECOND)):
+      new_value = GPIO.LOW
+      if division % duty_cycle_width < cycle_on:
+        new_value = GPIO.HIGH
+      if last_value != new_value:
+        for p in on_pins:
+          GPIO.output(p, new_value)
+        last_value = new_value
+      sleep(TIME_DIVISION_STEP)
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
