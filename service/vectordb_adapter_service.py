@@ -1,31 +1,31 @@
 import os
 from dataclasses import asdict
-from typing import SupportsIndex, Any
+from typing import Any
 
 import weaviate
 from langchain_openai import OpenAIEmbeddings
 
 from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
-from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME, SKILL_DB_SCHEMA_NAME
-from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA, \
-  PET_VIEW_DB_SCHEMA_NAME
-from constants.vectordb import VECTOR_DB_URL, OBJECT_SIMILARITY_THRESHOLD
+from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
+from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
+from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
 from model.conscious import TaskDefinition
 from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
 from model.vision import CreatePetViewModel
-from utils.env_utils import check_env_flag
+from utils.env_utils import check_env_flag, get_env_var
 from langchain_community.vectorstores import Weaviate
 
 
 class VectorDBAdapterService:
   def __init__(self):
+    weaviate_vector_db_url = get_env_var("WEAVIATE_VECTOR_DB_URL")
     assert "OPENAI_API_KEY" in os.environ.keys(), "error: please set OPENAI_API_KEY, or switch embedding model"
     for try_count in range(10):
       print(f'trying to connect to weaviate attempt number: {try_count}')
       try:
         self.vectordb_client = weaviate.Client(
-          VECTOR_DB_URL,
+          weaviate_vector_db_url,
           timeout_config=(100, 60),
           additional_headers={
             "X-OpenAI-Api-Key": os.environ.get("OPENAI_API_KEY")
@@ -36,7 +36,7 @@ class VectorDBAdapterService:
         print('failed to connect to weaviate', e)
     
     if self.vectordb_client is None:
-      raise Exception("Could not connect to weaviate at " + VECTOR_DB_URL)
+      raise Exception("Could not connect to weaviate at " + weaviate_vector_db_url)
     
     self.setup_dbs()
     
