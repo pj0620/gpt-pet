@@ -206,7 +206,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in off_pins:
       GPIO.output(p, GPIO.HIGH)
     stop_time = min(0.05, duration * 0.25)
-    sleep(0.05)
+    sleep(stop_time)
     for p in off_pins:
       GPIO.output(p, GPIO.LOW)
     
