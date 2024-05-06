@@ -5,7 +5,6 @@ import numpy as np
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from module.conscious.agent_conscious_module import AgentConsciousModule
-from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -36,20 +35,21 @@ context.analytics_service = AnalyticsService()
 gptpet_env = get_env_var('GPTPET_ENV')
 if gptpet_env == 'local':
   sim_adapter = SimAdapter()
-  motor_adapter = Ai2ThorMotorService(sim_adapter)
+  context.motor_adapter = Ai2ThorMotorService(sim_adapter)
   sensory_modules = [
     Ai2ThorCameraModule(sim_adapter),
     Ai2ThorDepthCameraModule(sim_adapter)
   ]
-  device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
+  context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
+  from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
   
-  motor_adapter = PhysicalMotorService()
-  device_io_adapter = PhysicalDeviceIOAdapter()
+  context.motor_adapter = PhysicalMotorService()
+  context.device_io_adapter = PhysicalDeviceIOAdapter()
   
   sensory_modules = [
     PhysicalCameraModule(),

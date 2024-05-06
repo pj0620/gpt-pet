@@ -12,8 +12,8 @@ from langchain_core.callbacks import CallbackManagerForToolRun
 from constants.motor import ALL_MOTOR_ACTIONS
 from model.objects import Object
 from model.vision import PhysicalPassagewayInfo
+from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
-from service.device_io.base_device_io_adapter import BaseProximitySensorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
 from tools.environment.api.mock_control_api import MockControlAPI
 from tools.environment.api.real_control_api import RealControlAPI
@@ -31,7 +31,7 @@ class EnvironmentTool(BaseTool):
   real_control_api: BaseControlAPI
   
   def __init__(self,
-               proximity_sensor_adapter: BaseProximitySensorAdapter,
+               proximity_sensor_adapter: BaseDeviceIOAdapter,
                motor_adapter: BaseMotorAdapter):
     real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter)
     super(EnvironmentTool, self).__init__(
