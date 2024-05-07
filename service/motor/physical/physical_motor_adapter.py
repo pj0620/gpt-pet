@@ -112,6 +112,8 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in all_pins:
       GPIO.output(p, GPIO.LOW)
+      
+    GPIO.cleanup()
   
   def setup_motors(self):
     motor_control_pins = self.gpio[MOTOR_CONTROLLERS]
@@ -121,6 +123,8 @@ class PhysicalMotorService(BaseMotorAdapter):
     for p in motor_control_pins:
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
       GPIO.output(p, GPIO.LOW)
+    
+    GPIO.cleanup()
   
   def do_rotate(
       self,
