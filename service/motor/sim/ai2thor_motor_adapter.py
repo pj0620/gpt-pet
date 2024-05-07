@@ -63,3 +63,6 @@ class Ai2ThorMotorService(BaseMotorAdapter):
     
   def stop(self):
     print("Ai2ThorMotorService: stop called")
+    
+  def setup_motors(self):
+    print("Ai2ThorMotorService: setup_motors called")

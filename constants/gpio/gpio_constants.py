@@ -9,3 +9,5 @@ SIDES = [LEFT, RIGHT]
 FORWARD = "forward"
 BACKWARD = "backward"
 DIRECTIONS = [FORWARD, BACKWARD]
+
+MOTOR_CONTROLLERS = "motor_controllers"

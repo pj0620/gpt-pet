@@ -25,9 +25,14 @@ class BaseMotorAdapter(ABC):
     """
     pass
   
-  def stop_movements(self):
+  def stop(self):
     """
     stops all motors
     """
     pass
   
+  def setup_motors(self):
+    """
+    stops all motors
+    """
+    pass

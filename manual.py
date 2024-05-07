@@ -45,6 +45,7 @@ else:
 
 print('stopping motors')
 motor_adapter.stop()
+motor_adapter.setup_motors()
 
 ACTION_MAPPING = dict(
   ahead=MOVE_AHEAD,

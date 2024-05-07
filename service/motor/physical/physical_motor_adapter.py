@@ -4,7 +4,8 @@ from time import sleep
 
 import RPi.GPIO as GPIO
 
-from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT
+from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT, \
+  MOTOR_CONTROLLERS
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
   ROTATE_LEFT
 from constants.physical_motor import *
@@ -111,8 +112,14 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in all_pins:
       GPIO.output(p, GPIO.LOW)
+  
+  def setup_motors(self):
+    motor_control_pins = self.gpio[MOTOR_CONTROLLERS]
     
-    GPIO.cleanup()
+    GPIO.setmode(GPIO.BOARD)
+    
+    for p in motor_control_pins:
+      GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
   
   def do_rotate(
       self,

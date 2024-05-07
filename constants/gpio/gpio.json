@@ -18,5 +18,7 @@
       "forward": 33,
       "backward": 31
     }
-  }
+  },
+
+  "motor_controllers": [11, 13]
 }
