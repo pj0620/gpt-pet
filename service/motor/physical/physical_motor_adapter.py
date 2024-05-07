@@ -120,6 +120,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in motor_control_pins:
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
+      GPIO.output(p, GPIO.LOW)
   
   def do_rotate(
       self,
