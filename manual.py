@@ -1,5 +1,6 @@
 import base64
 
+import numpy as np
 from PIL import Image
 import io
 import base64
@@ -16,7 +17,7 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
-from utils.vision_utils import add_horizontal_guide_encode
+from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
 
 app = Flask(__name__)
 CORS(app)
@@ -97,23 +98,7 @@ def current_view():
   print("current_view request")
   sensory_output = camera_module.build_subconscious_input(context)
   np_array = sensory_output['last_frame']
-  
-  # Convert the NumPy array to an image
-  image = Image.fromarray(np_array)
-  
-  # Save the image to a bytes buffer instead of a file
-  buffer = io.BytesIO()
-  image.save(buffer, format="PNG")  # You can change PNG to JPEG, etc.
-  
-  # Retrieve the image bytes
-  image_bytes = buffer.getvalue()
-  
-  # Encode the bytes in base64
-  base64_bytes = base64.b64encode(image_bytes)
-  
-  # Convert bytes to a string for easier handling/storage/transmission
-  base64_string = base64_bytes.decode('utf-8')
-  
+  base64_string = np_img_to_base64(np_array)
   return jsonify(dict(image=base64_string))
 
 
@@ -122,24 +107,23 @@ def current_depth_view():
   print("current_depth_view request")
   sensory_output = depth_camera_module.build_subconscious_input(context)
   np_array = sensory_output['last_depth_frame']
-  
-  # Convert the NumPy array to an image
-  image = Image.fromarray(np_array)
-  
-  # Save the image to a bytes buffer instead of a file
-  buffer = io.BytesIO()
-  image.save(buffer, format="PNG")  # You can change PNG to JPEG, etc.
-  
-  # Retrieve the image bytes
-  image_bytes = buffer.getvalue()
-  
-  # Encode the bytes in base64
-  base64_bytes = base64.b64encode(image_bytes)
-  
-  # Convert bytes to a string for easier handling/storage/transmission
-  base64_string = base64_bytes.decode('utf-8')
-  
+  base64_string = np_img_to_base64(np_array)
   return jsonify(dict(image=base64_string))
+
+
+@app.route('/current-labeled-view', methods=['GET'])
+def current_labeled_view():
+  print("current_labeled_view request")
+  depth_sensory_output = depth_camera_module.build_subconscious_input(context)
+  depth_camera_arr: np.array = depth_sensory_output['last_depth_frame']
+  
+  camera_sensory_output = camera_module.build_subconscious_input(context)
+  camera_arr: np.array = camera_sensory_output['last_frame']
+  
+  labeled_img, xs_info = label_passageways(camera_arr, depth_camera_arr)
+  base64_image = add_horizontal_guide_encode(labeled_img)
+  
+  return jsonify(dict(image=base64_image))
 
 
 @app.route('/helloworld', methods=['GET'])

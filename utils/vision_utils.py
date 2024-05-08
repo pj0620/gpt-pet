@@ -1,7 +1,9 @@
 import base64
+import io
 from dataclasses import dataclass
 from io import BytesIO
 
+from PIL import Image
 from matplotlib import pyplot as plt
 
 from constants.vision import FIELD_OF_VIEW
@@ -197,3 +199,21 @@ def add_horizontal_guide_encode(
   plt.savefig(buf, format='png')
   buf.seek(0)
   return base64.b64encode(buf.read()).decode('utf-8')
+
+
+def np_img_to_base64(np_array: np.array):
+  # Convert the NumPy array to an image
+  image = Image.fromarray(np_array)
+  
+  # Save the image to a bytes buffer instead of a file
+  buffer = io.BytesIO()
+  image.save(buffer, format="PNG")  # You can change PNG to JPEG, etc.
+  
+  # Retrieve the image bytes
+  image_bytes = buffer.getvalue()
+  
+  # Encode the bytes in base64
+  base64_bytes = base64.b64encode(image_bytes)
+  
+  # Convert bytes to a string for easier handling/storage/transmission
+  return base64_bytes.decode('utf-8')
