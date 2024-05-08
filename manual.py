@@ -124,8 +124,12 @@ def current_depth_view():
 
     # Convert numpy image to base64 for transmission
     def np_img_to_base64(img):
-        _, buffer = cv2.imencode('.png', img)
-        return base64.b64encode(buffer).decode('utf-8')
+      # Convert from RGB to BGR
+      img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+      # Encode the image in PNG format
+      _, buffer = cv2.imencode('.png', img_bgr)
+      # Convert the buffer to a base64 string
+      return base64.b64encode(buffer).decode('utf-8')
 
     base64_string = np_img_to_base64(colored_image)
 
