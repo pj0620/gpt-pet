@@ -116,7 +116,7 @@ def current_depth_view():
   # COLORMAP_JET is commonly used for depth visualization
   depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
   base64_string = np_img_to_base64(depth_colored)
-  return jsonify(dict(image=base64_string))
+  return jsonify(dict(image=base64_string, raw_image=np_array))
 
 
 @app.route('/current-labeled-view', methods=['GET'])
