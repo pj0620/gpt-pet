@@ -1,5 +1,6 @@
 import base64
 
+import cv2
 import numpy as np
 from PIL import Image
 import io
@@ -107,7 +108,14 @@ def current_depth_view():
   print("current_depth_view request")
   sensory_output = depth_camera_module.build_subconscious_input(context)
   np_array = sensory_output['last_depth_frame']
-  base64_string = np_img_to_base64(np_array)
+  # Convert depth to a visual format (normalized 0-255 scale for display purposes)
+  # Normalizing from assumed reasonable depth range (0mm to 2048mm)
+  normalized_depth = (np_array / 2048 * 255).astype(np.uint8)
+  
+  # Optionally apply a colormap for better visualization
+  # COLORMAP_JET is commonly used for depth visualization
+  depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
+  base64_string = np_img_to_base64(depth_colored)
   return jsonify(dict(image=base64_string))
 
 
