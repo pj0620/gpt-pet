@@ -107,21 +107,34 @@ def current_view():
 
 @app.route('/current-depth-view', methods=['GET'])
 def current_depth_view():
-  print("current_depth_view request")
-  sensory_output = depth_camera_module.build_subconscious_input(context)
-  raw_depth_arr = sensory_output['last_depth_frame']
-  normalized_depth = 255 * (raw_depth_arr - raw_depth_arr.min()) / (raw_depth_arr.max() - raw_depth_arr.min())
-  normalized_depth = normalized_depth.astype(np.uint8)  # Convert to unsigned byte type
-  bw_depth = np.stack([normalized_depth] * 3, axis=-1)
-  base64_string = np_img_to_base64(bw_depth)
-  
-  # compress and serializae raw image
-  serialized_array = pickle.dumps(raw_depth_arr)
-  compressed_array = zlib.compress(serialized_array)
-  encoded_string = base64.b64encode(compressed_array).decode('utf-8')
-  
-  return jsonify(dict(image=base64_string, raw_image=encoded_string))
+    print("current-depth-view request")
+    sensory_output = depth_camera_module.build_subconscious_input(context)
+    raw_depth_arr = sensory_output['last_depth_frame']
 
+    # Normalize the depth image to range 0-255
+    normalized_depth = 255 * (raw_depth_arr - raw_depth_arr.min()) / (raw_depth_arr.max() - raw_depth_arr.min())
+    normalized_depth = normalized_depth.astype(np.uint8)  # Convert to unsigned byte type
+
+    # Create an image array with 3 channels initialized to zeros
+    colored_image = np.zeros((raw_depth_arr.shape[0], raw_depth_arr.shape[1], 3), dtype=np.uint8)
+
+    # Adjust the green and red channels based on depth
+    colored_image[:, :, 0] = 255 - normalized_depth  # Red channel (closer is more red)
+    colored_image[:, :, 1] = normalized_depth        # Green channel (farther is more green)
+
+    # Convert numpy image to base64 for transmission
+    def np_img_to_base64(img):
+        _, buffer = cv2.imencode('.png', img)
+        return base64.b64encode(buffer).decode('utf-8')
+
+    base64_string = np_img_to_base64(colored_image)
+
+    # Compress and serialize raw image
+    serialized_array = pickle.dumps(raw_depth_arr)
+    compressed_array = zlib.compress(serialized_array)
+    encoded_string = base64.b64encode(compressed_array).decode('utf-8')
+
+    return jsonify(dict(image=base64_string, raw_image=encoded_string))
 
 @app.route('/current-labeled-view', methods=['GET'])
 def current_labeled_view():
