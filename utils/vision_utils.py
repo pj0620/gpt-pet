@@ -190,6 +190,7 @@ def add_horizontal_guide_encode(
   image_arr_with_scale = np.copy(camera_view_arr)
   fig = plt.figure(figsize=(6, 5))
   ax1 = fig.add_subplot(1, 1, 1)
+  ax1.set_aspect('equal')
   ax1.set(yticklabels=[])
   ax1.set(ylabel=None)  # remove the y-axis label
   ax1.tick_params(left=False)
