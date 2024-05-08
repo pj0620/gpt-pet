@@ -194,7 +194,7 @@ def add_horizontal_guide_encode(
   ax1.set(yticklabels=[])
   ax1.set(ylabel=None)  # remove the y-axis label
   ax1.tick_params(left=False)
-  ax1.set_xticks(np.arange(image_arr_with_scale.shape[0], step=100))
+  ax1.set_xticks(np.arange(image_arr_with_scale.shape[0], step=150))
   ax1.imshow(image_arr_with_scale)
   buf = BytesIO()
   plt.savefig(buf, format='png')
