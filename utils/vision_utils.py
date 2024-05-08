@@ -197,7 +197,7 @@ def add_horizontal_guide_encode(
   ax1.set_xticks(np.arange(image_arr_with_scale.shape[0], step=150))
   ax1.imshow(image_arr_with_scale)
   buf = BytesIO()
-  plt.savefig(buf, format='png')
+  plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
   buf.seek(0)
   return base64.b64encode(buf.read()).decode('utf-8')
 
