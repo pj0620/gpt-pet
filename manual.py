@@ -5,6 +5,8 @@ import numpy as np
 from PIL import Image
 import io
 import base64
+import pickle
+import zlib
 
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
@@ -116,7 +118,13 @@ def current_depth_view():
   # COLORMAP_JET is commonly used for depth visualization
   depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
   base64_string = np_img_to_base64(depth_colored)
-  return jsonify(dict(image=base64_string, raw_image=np_array))
+  
+  # compress and serializae raw image
+  serialized_array = pickle.dumps(np_array)
+  compressed_array = zlib.compress(serialized_array)
+  encoded_string = base64.b64encode(compressed_array).decode('utf-8')
+  
+  return jsonify(dict(image=base64_string, raw_image=encoded_string))
 
 
 @app.route('/current-labeled-view', methods=['GET'])
