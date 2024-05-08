@@ -109,18 +109,14 @@ def current_view():
 def current_depth_view():
   print("current_depth_view request")
   sensory_output = depth_camera_module.build_subconscious_input(context)
-  np_array = sensory_output['last_depth_frame']
-  # Convert depth to a visual format (normalized 0-255 scale for display purposes)
-  # Normalizing from assumed reasonable depth range (0mm to 2048mm)
-  normalized_depth = (np_array / 2048 * 255).astype(np.uint8)
-  
-  # Optionally apply a colormap for better visualization
-  # COLORMAP_JET is commonly used for depth visualization
-  depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
-  base64_string = np_img_to_base64(depth_colored)
+  raw_depth_arr = sensory_output['last_depth_frame']
+  normalized_depth = 255 * (raw_depth_arr - raw_depth_arr.min()) / (raw_depth_arr.max() - raw_depth_arr.min())
+  normalized_depth = normalized_depth.astype(np.uint8)  # Convert to unsigned byte type
+  bw_depth = np.stack([normalized_depth] * 3, axis=-1)
+  base64_string = np_img_to_base64(bw_depth)
   
   # compress and serializae raw image
-  serialized_array = pickle.dumps(np_array)
+  serialized_array = pickle.dumps(raw_depth_arr)
   compressed_array = zlib.compress(serialized_array)
   encoded_string = base64.b64encode(compressed_array).decode('utf-8')
   
