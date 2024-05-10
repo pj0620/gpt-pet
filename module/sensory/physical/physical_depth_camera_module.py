@@ -14,8 +14,6 @@ class PhysicalDepthCameraModule(BaseSensoryModule):
     # Get depth data from the depth camera
     depth, _ = freenect.sync_get_depth()
     
-    print(depth)
-    print(f'type: {depth.dtype}')
-    depth /= 1000.
+    depth = depth.astype('float64') / 1000.
     
     return {'last_depth_frame': depth}
