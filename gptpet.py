@@ -10,6 +10,9 @@ from time import sleep
 
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from module.subconscious.output.base_executor_module import BaseExecutorModule
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 class GPTPet:
