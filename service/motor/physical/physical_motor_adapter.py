@@ -28,6 +28,8 @@ class PhysicalMotorService(BaseMotorAdapter):
   ) -> MovementResult:
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
     
+    move_magnitude = min(move_magnitude, 2.)
+    
     duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
     cycle_on = HORZ_CYCLE_ON
     duration = HORZ_ONE_METER_DURATION * move_magnitude
