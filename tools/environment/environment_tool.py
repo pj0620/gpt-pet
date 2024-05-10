@@ -10,6 +10,7 @@ from langchain.tools import BaseTool, StructuredTool, tool
 from langchain_core.callbacks import CallbackManagerForToolRun
 
 from constants.motor import ALL_MOTOR_ACTIONS
+from gptpet_context import GPTPetContext
 from model.objects import Object
 from model.vision import PhysicalPassagewayInfo
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
@@ -32,7 +33,8 @@ class EnvironmentTool(BaseTool):
   
   def __init__(self,
                proximity_sensor_adapter: BaseDeviceIOAdapter,
-               motor_adapter: BaseMotorAdapter):
+               motor_adapter: BaseMotorAdapter,
+               context: GPTPetContext):
     real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter)
     super(EnvironmentTool, self).__init__(
       mock_control_api=MockControlAPI(),

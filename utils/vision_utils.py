@@ -59,7 +59,7 @@ def draw_x(img, center, size, thickness, color):
 class LabelPassagewaysConfig:
   # used to control what part of the depth image should be average to compute a passageway
   top_clip_percent: float = 0.5
-  bottom_clip_percent: float = 1
+  bottom_clip_percent: float = 0.9
   
   # average distance to be considered a path forward
   passage_distance_threshold: float = 0.6

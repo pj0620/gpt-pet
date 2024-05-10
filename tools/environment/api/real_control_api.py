@@ -1,4 +1,5 @@
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT, ROTATE_LEFT
+from gptpet_context import GPTPetContext
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
@@ -8,10 +9,14 @@ class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorAdapter
   proximity_sensor_adapter: BaseDeviceIOAdapter
   
-  def __init__(self, proximity_sensor_adapter: BaseDeviceIOAdapter, motor_adapter: BaseMotorAdapter):
+  def __init__(self,
+               proximity_sensor_adapter: BaseDeviceIOAdapter,
+               motor_adapter: BaseMotorAdapter,
+               context: GPTPetContext):
     super().__init__()
     self.proximity_sensor_adapter = proximity_sensor_adapter
     self.motor_adapter = motor_adapter
+    self.context = context
   
   def move_right(
       self,

@@ -53,6 +53,9 @@ class ObjectPermanenceService:
       n_cols = depth_image_arr_clipped.shape[1]
       row_avgs = np.sum(depth_image_arr_clipped, axis=0) / n_cols
       
+      # average in a band around object
+      
+      
       output_object = Object(
         # convert pixels to actual angle object is to gptpet
         horizontal_angle=(float(obj_dict["horz_location"]) - image_width / 2) * (70 / image_width),

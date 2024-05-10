@@ -13,7 +13,7 @@ from gptpet_context import GPTPetContext
 from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
-from service.device_io.sim.ai2thor_proximity_sensor_adapter import Ai2thorDeviceIOAdapter
+from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 
@@ -38,7 +38,7 @@ if test_env == 'local':
 else:
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
-  from service.device_io.physical.physical_proximity_sensor_adapter import PhysicalDeviceIOAdapter
+  from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
   
   motor_adapter = PhysicalMotorService()

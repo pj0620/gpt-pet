@@ -1,6 +1,7 @@
 import itertools
 import json
 from time import sleep
+from typing import Literal
 
 import RPi.GPIO as GPIO
 
@@ -9,7 +10,9 @@ from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTION
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
   ROTATE_LEFT
 from constants.physical_motor import *
+from gptpet_context import GPTPetContext
 from model.motor import MovementResult
+from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
 
 GPIO.setmode(GPIO.BOARD)
@@ -17,9 +20,13 @@ with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
 class PhysicalMotorService(BaseMotorAdapter):
-  def __init__(self):
+  def __init__(
+      self,
+      context: GPTPetContext
+  ):
     with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
+    self.context = context
   
   def do_movement(
       self,
@@ -86,12 +93,13 @@ class PhysicalMotorService(BaseMotorAdapter):
     else:
       raise Exception('Not implemented')
     
-    self.power_pins(
+    self._do_action(
       on_pins=on_pins,
       off_pins=off_pins,
       duty_cycle_width=duty_cycle_width,
       cycle_on=cycle_on,
-      duration=duration
+      duration=duration,
+      direction=ACTION_TO_DIRECTION[action]
     )
     
     return MovementResult(
@@ -172,12 +180,13 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     duration = (fixed_degrees / 360.) * FULL_TURN_DURATION
     print("spinning for a duration of ", duration)
-    self.power_pins(
+    self._do_action(
       on_pins=on_pins,
       off_pins=off_pins,
       duty_cycle_width=ROT_DUTY_CYCLE_WIDTH,
       cycle_on=ROT_CYCLE_ON,
-      duration=duration
+      duration=duration,
+      direction=None
     )
     
     return MovementResult(
@@ -187,13 +196,14 @@ class PhysicalMotorService(BaseMotorAdapter):
     )
   
   
-  def power_pins(
+  def _do_action(
       self,
       on_pins: list[int],
       off_pins: list[int],
       duty_cycle_width: int,
       cycle_on: int,
-      duration: float
+      duration: float,
+      direction: Literal['right', 'ahead', 'left', 'back'] | None
   ):
     GPIO.setmode(GPIO.BOARD)
     
@@ -203,6 +213,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     
     last_value = GPIO.LOW
+    break_dist = -1
     for division in range(int(duration * TIME_DIVISIONS_PER_SECOND)):
       new_value = GPIO.LOW
       if division % duty_cycle_width < cycle_on:
@@ -211,10 +222,22 @@ class PhysicalMotorService(BaseMotorAdapter):
         for p in on_pins:
           GPIO.output(p, new_value)
         last_value = new_value
+        
+      # dont hit walls
+      if direction is not None:
+        dist_to_hitting_something = float(self.context.device_io_adapter.get_measurements()[direction])
+        if dist_to_hitting_something < 15:
+          break_dist = dist_to_hitting_something
+          break
+      
       sleep(TIME_DIVISION_STEP)
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
+      
+    if break_dist != -1:
+      self.context.analytics_service.new_text(f"GPTPet stopped early while moving in the {direction} direction at a "
+                                         f"distance of {break_dist} to not hit a wall")
       
     # go backwards momentarily to stop robot
     for p in off_pins:
