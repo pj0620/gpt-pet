@@ -16,4 +16,3 @@ Jetson.GPIO==2.1.6
 Flask-CORS==4.0.0
 pyserial==3.5
 python-dotenv==1.0.1
-langchain-anthropic==0.1.11

@@ -2,7 +2,6 @@ from json import tool
 from typing import Tuple
 
 from langchain import hub
-from langchain_anthropic import ChatAnthropic
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
   HumanMessagePromptTemplate
