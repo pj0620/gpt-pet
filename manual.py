@@ -175,7 +175,8 @@ def current_labeled_view():
 def hello_world():
   return 'Hello World'
 
-@app.route('/command', method=['POST'])
+
+@app.route('/command', methods=['POST'])
 def command():
   # Parse JSON data from the request
   data = request.get_json()
