@@ -35,7 +35,7 @@ class PhysicalMotorService(BaseMotorAdapter):
   ) -> MovementResult:
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
     
-    move_magnitude = min(move_magnitude, 2.)
+    move_magnitude = min(move_magnitude, 1.)
     
     duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
     cycle_on = HORZ_CYCLE_ON
@@ -222,13 +222,6 @@ class PhysicalMotorService(BaseMotorAdapter):
         for p in on_pins:
           GPIO.output(p, new_value)
         last_value = new_value
-        
-      # dont hit walls
-      if direction is not None:
-        dist_to_hitting_something = float(self.context.device_io_adapter.get_measurements()[direction])
-        if dist_to_hitting_something < 15:
-          break_dist = dist_to_hitting_something
-          break
       
       sleep(TIME_DIVISION_STEP)
     
