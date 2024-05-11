@@ -92,8 +92,9 @@ def label_passageways(
   depth_image_arr_clipped = depth_camera_view_arr[int(image_height * top_percent):int(image_height * bottom_percent), :]
   
   # compute average distances using depth camera view
-  n_cols = depth_image_arr_clipped.shape[1]
-  row_avgs = np.sum(depth_image_arr_clipped, axis=0) / n_cols
+  non_zero_count = np.count_nonzero(depth_image_arr_clipped, axis=0)
+  col_sums = np.sum(depth_image_arr_clipped, axis=0)
+  row_avgs = np.divide(col_sums, non_zero_count, where=(non_zero_count != 0))
   
   # find sections where robot can walk
   threshold = config.passage_distance_threshold
