@@ -138,7 +138,8 @@ def label_passageways(
       return False
     
     return True
-  sections = filter(passage_valid, sections)
+  
+  centers_horz = [center for i, center in enumerate(centers_horz) if passage_valid(sections[i])]
   
   # draw x to label each passageway
   x_height_percent = config.x_height_percent
