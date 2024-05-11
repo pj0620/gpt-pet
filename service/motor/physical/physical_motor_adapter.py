@@ -186,7 +186,8 @@ class PhysicalMotorService(BaseMotorAdapter):
       duty_cycle_width=ROT_DUTY_CYCLE_WIDTH,
       cycle_on=ROT_CYCLE_ON,
       duration=duration,
-      direction=None
+      direction=None,
+      stop_after=degrees > 20
     )
     
     return MovementResult(
@@ -203,7 +204,8 @@ class PhysicalMotorService(BaseMotorAdapter):
       duty_cycle_width: int,
       cycle_on: int,
       duration: float,
-      direction: Literal['right', 'ahead', 'left', 'back'] | None
+      direction: Literal['right', 'ahead', 'left', 'back'] | None,
+      stop_after: bool = True
   ):
     GPIO.setmode(GPIO.BOARD)
     
@@ -233,11 +235,12 @@ class PhysicalMotorService(BaseMotorAdapter):
                                          f"distance of {break_dist} to not hit a wall")
       
     # go backwards momentarily to stop robot
-    for p in off_pins:
-      GPIO.output(p, GPIO.HIGH)
-    stop_time = min(0.05, duration * 0.25)
-    sleep(stop_time)
-    for p in off_pins:
+    if stop_after:
+      for p in off_pins:
+        GPIO.output(p, GPIO.HIGH)
+      stop_time = min(0.05, duration * 0.25)
+      sleep(stop_time)
+    for p in [*off_pins, *on_pins]:
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
