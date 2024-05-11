@@ -31,7 +31,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     self.environment_tool = EnvironmentTool(
       motor_adapter=context.motor_adapter,
       proximity_sensor_adapter=context.device_io_adapter,
-      context=GPTPetContext
+      context=context
     )
     tools = [self.environment_tool]
     response_format = load_prompt('executor_single_input/response_format.txt')

@@ -10,9 +10,12 @@ import zlib
 
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
+from model.conscious import TaskDefinition
 from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
+from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
+from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
@@ -20,6 +23,8 @@ from service.sim_adapter import SimAdapter
 from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
+from service.vectordb_adapter_service import VectorDBAdapterService
+from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
 
 app = Flask(__name__)
@@ -27,7 +32,11 @@ CORS(app)
 
 test_env = 'physical'
 
+# setup vectordb
 context = GPTPetContext()
+context.vectordb_adapter = VectorDBAdapterService()
+context.visual_llm_adapter = VisualLLMAdapterService()
+context.analytics_service = AnalyticsService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
@@ -43,13 +52,17 @@ else:
   
   motor_adapter = PhysicalMotorService()
   device_io_adapter = PhysicalDeviceIOAdapter()
-  
   camera_module = PhysicalCameraModule()
   depth_camera_module = PhysicalDepthCameraModule()
+
+context.motor_adapter = motor_adapter
+context.device_io_adapter = device_io_adapter
 
 print('stopping motors')
 motor_adapter.stop()
 motor_adapter.setup_motors()
+
+executor = SingleInputAgentExecutorModule(context)
 
 ACTION_MAPPING = dict(
   ahead=MOVE_AHEAD,
@@ -57,7 +70,6 @@ ACTION_MAPPING = dict(
   left=MOVE_LEFT,
   back=MOVE_BACK
 )
-
 
 @app.route('/move/<direction>', methods=['POST'])
 def move(direction):
@@ -158,6 +170,28 @@ def current_labeled_view():
 @app.route('/helloworld', methods=['GET'])
 def hello_world():
   return 'Hello World'
+
+@app.route('/command', method=['POST'])
+def command():
+  # Parse JSON data from the request
+  data = request.get_json()
+  if not data:
+    return jsonify({'error': 'No JSON data provided'}), 400
+  
+  # Extract user_input and reasoning from the JSON body
+  user_input = data.get('user_input')
+  reasoning = data.get('reasoning')
+  
+  # Check if necessary data is present
+  if user_input is None or reasoning is None:
+    return jsonify({'error': 'Missing data in request'}), 400
+  
+  result = executor.execute(
+    context=context,
+    new_task=TaskDefinition(input=user_input, reasoning=reasoning, task=user_input)
+  )
+  
+  return jsonify(result)
 
 
 if __name__ == '__main__':
