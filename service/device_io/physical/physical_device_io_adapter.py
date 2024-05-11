@@ -39,7 +39,8 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
                     with self.lock:
                         # Update the measurements and maintain only the last 'k' measurements
                         for direction, value in zip(['ahead', 'right', 'back', 'left'], parts):
-                            self.measurements[direction].append(float(value) / 10.)
+                            # convert to cm -> m
+                            self.measurements[direction].append(float(value) / 100.)
                             if len(self.measurements[direction]) > self.k:
                                 self.measurements[direction].pop(0)
                           
