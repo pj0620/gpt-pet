@@ -54,10 +54,10 @@ else:
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
   
-  motor_adapter = PhysicalMotorService()
   device_io_adapter = PhysicalDeviceIOAdapter()
   camera_module = PhysicalCameraModule()
   depth_camera_module = PhysicalDepthCameraModule()
+  motor_adapter = PhysicalMotorService(context=context)
 
 context.motor_adapter = motor_adapter
 context.device_io_adapter = device_io_adapter
