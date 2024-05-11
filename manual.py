@@ -8,6 +8,8 @@ import base64
 import pickle
 import zlib
 
+from dotenv import load_dotenv
+
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
 from model.conscious import TaskDefinition
@@ -26,6 +28,8 @@ from flask_cors import CORS
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
+
+load_dotenv()
 
 app = Flask(__name__)
 CORS(app)
