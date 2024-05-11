@@ -8,9 +8,10 @@ import RPi.GPIO as GPIO
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT, \
   MOTOR_CONTROLLERS
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
-  ROTATE_LEFT
+  ROTATE_LEFT, MIN_WALL_DIST
 from constants.physical_motor import *
 from gptpet_context import GPTPetContext
+from model.collision import CollisionError
 from model.motor import MovementResult
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
@@ -34,6 +35,14 @@ class PhysicalMotorService(BaseMotorAdapter):
       move_magnitude: float = 1
   ) -> MovementResult:
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
+    
+    direction = ACTION_TO_DIRECTION[action]
+    dist = float(self.context.device_io_adapter.get_measurements()[direction])
+    if dist < MIN_WALL_DIST:
+      error_msg = (f"Action '{action}' aborted: moveMagnitude {move_magnitude} exceeds proximity in {direction} "
+                   f"({dist}m < minimum {MIN_WALL_DIST}m)")
+      self.context.analytics_service.new_text(error_msg)
+      raise CollisionError(error_msg)
     
     move_magnitude = min(move_magnitude, 1.)
     
@@ -99,7 +108,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       duty_cycle_width=duty_cycle_width,
       cycle_on=cycle_on,
       duration=duration,
-      direction=ACTION_TO_DIRECTION[action]
+      direction=direction
     )
     
     return MovementResult(
@@ -215,7 +224,6 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.setup(p, GPIO.OUT, initial=GPIO.LOW)
     
     last_value = GPIO.LOW
-    break_dist = -1
     for division in range(int(duration * TIME_DIVISIONS_PER_SECOND)):
       new_value = GPIO.LOW
       if division % duty_cycle_width < cycle_on:
@@ -229,10 +237,6 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
-      
-    if break_dist != -1:
-      self.context.analytics_service.new_text(f"GPTPet stopped early while moving in the {direction} direction at a "
-                                         f"distance of {break_dist} to not hit a wall")
       
     # go backwards momentarily to stop robot
     if stop_after:

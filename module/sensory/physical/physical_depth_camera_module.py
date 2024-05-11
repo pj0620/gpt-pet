@@ -23,9 +23,6 @@ class PhysicalDepthCameraModule(BaseSensoryModule):
     depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
     
     print(f"raw depth: shape={depth.shape}, min={depth.min()}, max={depth.max()}")
-    for a in [0, -1]:
-      for b in [0, -1]:
-        print(f"depth[{a}][{b}] = {depth[a][b]}")
     
     depth = depth.astype('float64') / 1000.
     
