@@ -129,7 +129,7 @@ def current_depth_view():
 
     # Normalize the depth image to range 0-255
     normalized_depth = (raw_depth_arr / 2.048 * 255).astype(np.uint8)
-    depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
+    depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_WINTER)
     
     # Convert numpy image to base64 for transmission
     def np_img_to_base64(img):
