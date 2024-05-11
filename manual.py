@@ -128,7 +128,7 @@ def current_depth_view():
     raw_depth_arr = sensory_output['last_depth_frame']
 
     # Normalize the depth image to range 0-255
-    normalized_depth = (raw_depth_arr / 2048 * 255).astype(np.uint8)
+    normalized_depth = (raw_depth_arr / 2.048 * 255).astype(np.uint8)
     depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
     
     # Convert numpy image to base64 for transmission
