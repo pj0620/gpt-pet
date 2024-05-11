@@ -20,7 +20,7 @@ HORZ_ONE_METER_DURATION = 0.5
 VERT_ONE_METER_DURATION = 1.0
 
 ACTION_TO_DIRECTION = {
-  MOVE_AHEAD: 'front',
+  MOVE_AHEAD: 'ahead',
   MOVE_BACK: 'back',
   MOVE_LEFT: 'left',
   MOVE_RIGHT: 'right'
