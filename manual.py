@@ -128,16 +128,9 @@ def current_depth_view():
     raw_depth_arr = sensory_output['last_depth_frame']
 
     # Normalize the depth image to range 0-255
-    normalized_depth = 255 * (raw_depth_arr - raw_depth_arr.min()) / (raw_depth_arr.max() - raw_depth_arr.min())
-    normalized_depth = normalized_depth.astype(np.uint8)  # Convert to unsigned byte type
-
-    # Create an image array with 3 channels initialized to zeros
-    colored_image = np.zeros((raw_depth_arr.shape[0], raw_depth_arr.shape[1], 3), dtype=np.uint8)
-
-    # Adjust the green and red channels based on depth
-    colored_image[:, :, 0] = 255 - normalized_depth  # Red channel (closer is more red)
-    colored_image[:, :, 1] = normalized_depth        # Green channel (farther is more green)
-
+    normalized_depth = (raw_depth_arr / 2048 * 255).astype(np.uint8)
+    depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_JET)
+    
     # Convert numpy image to base64 for transmission
     def np_img_to_base64(img):
       # Convert from RGB to BGR
@@ -147,7 +140,7 @@ def current_depth_view():
       # Convert the buffer to a base64 string
       return base64.b64encode(buffer).decode('utf-8')
 
-    base64_string = np_img_to_base64(colored_image)
+    base64_string = np_img_to_base64(depth_colored)
 
     # Compress and serialize raw image
     serialized_array = pickle.dumps(raw_depth_arr)
