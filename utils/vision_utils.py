@@ -62,7 +62,7 @@ class LabelPassagewaysConfig:
   bottom_clip_percent: float = 0.9
   
   # average distance to be considered a path forward
-  passage_distance_threshold: float = 0.6
+  passage_distance_threshold: float = 1
   
   # minimum width of a passage for robot to consider passing through it
   min_passage_width: int = 40
