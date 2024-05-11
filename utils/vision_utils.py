@@ -199,6 +199,7 @@ def add_horizontal_guide_encode(
   buf = BytesIO()
   plt.savefig(buf, format='png', bbox_inches='tight', pad_inches=0)
   buf.seek(0)
+  plt.close(fig)
   return base64.b64encode(buf.read()).decode('utf-8')
 
 
