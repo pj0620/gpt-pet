@@ -46,22 +46,30 @@ class VisualLLMAdapterService:
     }]
     if human_prompt is None:
       human_content.append({ "type": "text", "text": human_prompt })
-    response = self.client.chat.completions.create(
-      model="gpt-4-vision-preview",
-      messages=[
-        {
-          "role": "system",
-          "content": [
-            {"type": "text", "text": system_prompt}
+    response = None
+    for try_count in range(5):
+      try:
+        response = self.client.chat.completions.create(
+          model="gpt-4-vision-preview",
+          messages=[
+            {
+              "role": "system",
+              "content": [
+                {"type": "text", "text": system_prompt}
+              ],
+            },
+            {
+              "role": "user",
+              "content": human_content,
+            }
           ],
-        },
-        {
-          "role": "user",
-          "content": human_content,
-        }
-      ],
-      max_tokens=300,
-    )
+          max_tokens=300,
+        )
+      except Exception as e:
+        error_msg = f'failed {try_count + 1} times to call visual llm'
+        print(f'failed {try_count + 1} times to call visual llm', e)
+    if response is None:
+      raise Exception("Cannot connect to vision llm")
     return response.choices[0].message.content
   
   
