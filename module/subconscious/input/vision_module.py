@@ -98,7 +98,7 @@ class VisionModule(BaseSubconsciousInputModule):
       dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
       for obj in augmented_objects
     ]
-    parsed_response["objects_descriptions"] = str(serialize_dataclasses(objects_mini))
+    parsed_response["objects_descriptions"] = str(objects_mini)
     return parsed_response, xs_info, augmented_objects
   
   
