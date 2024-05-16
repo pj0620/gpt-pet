@@ -49,6 +49,7 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
                         self.new_color = None
             except Exception as e:
                 print(f"Unexpected error in record_measurements: {e}")
+                time.sleep(1)
 
     def get_measurements(self):
         with self.lock:
