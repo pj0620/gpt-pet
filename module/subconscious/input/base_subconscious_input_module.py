@@ -2,12 +2,17 @@ from abc import ABC
 from typing import Any
 
 from gptpet_context import GPTPetContext
+from model.subconscious import ConsciousInput
 from module.base_module import BaseModule
 
 
 class BaseSubconsciousInputModule(ABC):
-  def build_conscious_input(self, context: GPTPetContext) -> dict[str, Any]:
-    """ Build input needed for Conscious Modules
+  def build_conscious_input(self, context: GPTPetContext) -> ConsciousInput:
+    """
+    Build input needed for Conscious Modules
     from this SubConscious Module
+    :param context: GPTPet Context
+    :return: tuple of output from this module
+      (full output from this module, minified module to be passed to llm)
     """
     pass

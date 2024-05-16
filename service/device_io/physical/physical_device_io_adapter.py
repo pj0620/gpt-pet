@@ -56,7 +56,8 @@ class PhysicalDeviceIOAdapter(BaseDeviceIOAdapter):
             averages = {}
             for direction in ['ahead', 'back', 'right', 'left']:
                 if len(self.measurements[direction]) > 0:
-                    averages[direction] = sum(self.measurements[direction]) / len(self.measurements[direction])
+                    averages[direction] = "{:.2f}".format(sum(self.measurements[direction]) /
+                                                          len(self.measurements[direction]))
                 else:
                     averages[direction] = "unknown"
             print(f'Current proximity measurements: {averages}')

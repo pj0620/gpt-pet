@@ -22,9 +22,6 @@ from utils.env_utils import get_env_var
 
 np.set_printoptions(precision=3, suppress=True)
 
-# TODO: request param
-test_env = 'local'
-
 context = GPTPetContext()
 
 # setup vectordb

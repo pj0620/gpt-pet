@@ -2,6 +2,7 @@ import base64
 import io
 from dataclasses import dataclass
 from io import BytesIO
+from scipy.ndimage import gaussian_filter
 
 from PIL import Image
 from matplotlib import pyplot as plt
@@ -53,7 +54,37 @@ def draw_x(img, center, size, thickness, color):
   # Draw both lines
   draw_line(img, start1, end1, color, thickness)
   draw_line(img, start2, end2, color, thickness)
+
+
+def filter_close_values(values, min_distance):
+  """
+  Filter out values from a list of floats that are too close together.
+
+  Parameters:
+      values (list of float): The list of floating-point numbers to filter.
+      min_distance (float): The minimum allowed distance between any two values.
+
+  Returns:
+      list of float: A list of filtered values with minimum specified distance.
+  """
+  if not values:
+    return []
   
+  # Sort the values to make it easier to compare adjacent values
+  sorted_values = sorted(values)
+  
+  # Initialize the filtered list with the first value
+  filtered_values = [sorted_values[0]]
+  
+  # Go through the sorted values and add a value only if it's far enough from the last added value
+  for value in sorted_values[1:]:
+    if value - filtered_values[-1] >= min_distance:
+      filtered_values.append(value)
+    else:
+      print(f'discarding passageway with horz_loc={value} since it is to close to another center')
+  
+  return filtered_values
+
 
 @dataclass
 class LabelPassagewaysConfig:
@@ -65,18 +96,21 @@ class LabelPassagewaysConfig:
   passage_distance_threshold: float = 1
   
   # minimum width of a passage for robot to consider passing through it
-  min_passage_width: int = 100
+  min_passage_width: int = 30
   
   # control where X labeling passages is placed vertically on the final image
   x_height_percent: float = 0.65
   
-  
+  # std deviation for col averages gaussian blurring
+  sigma: float = 4.
+
+
 def label_passageways(
     camera_view_arr: np.array,
     depth_camera_view_arr: np.array,
     config: LabelPassagewaysConfig = None,
     output_image: np.array = None
-  ) -> tuple[np.array, list[PhysicalPassagewayInfo]]:
+) -> tuple[np.array, list[PhysicalPassagewayInfo]]:
   if config is None:
     config = LabelPassagewaysConfig()
   
@@ -92,9 +126,11 @@ def label_passageways(
   depth_image_arr_clipped = depth_camera_view_arr[int(image_height * top_percent):int(image_height * bottom_percent), :]
   
   # compute average distances using depth camera view
+  depth_image_arr_clipped[depth_image_arr_clipped == 2.047] = 0
   non_zero_count = np.count_nonzero(depth_image_arr_clipped, axis=0)
   col_sums = np.sum(depth_image_arr_clipped, axis=0)
-  row_avgs = np.divide(col_sums, non_zero_count, where=(non_zero_count != 0))
+  row_avgs = np.where(non_zero_count != 0, col_sums / non_zero_count, 0)
+  row_avgs_blurred = gaussian_filter(row_avgs, sigma=config.sigma)
   
   # find sections where robot can walk
   threshold = config.passage_distance_threshold
@@ -110,8 +146,8 @@ def label_passageways(
   weight_sum = 0
   
   in_section = False
-  for k in range(row_avgs.shape[0]):
-    avg = row_avgs[k]
+  for k in range(row_avgs_blurred.shape[0]):
+    avg = row_avgs_blurred[k]
     if avg > threshold:
       weighted_loc_sum += k * avg
       weight_sum += avg
@@ -129,10 +165,11 @@ def label_passageways(
   
   # If final section includes end of the image, close the section
   if len(sections) > 0 and sections[-1][1] == -1:
-    sections[-1][1] = row_avgs.shape[0] - 1
+    sections[-1][1] = row_avgs_blurred.shape[0] - 1
   
   # filter out passages to small to passthrough
   min_passage_width = config.min_passage_width
+  
   def passage_valid(section: list[int]) -> bool:
     if section[1] - section[0] < min_passage_width:
       print(f'Filtering out passageway for being to narrow width={section[1] - section[0]}, {min_passage_width=}')
@@ -141,6 +178,7 @@ def label_passageways(
     return True
   
   centers_horz = [center for i, center in enumerate(centers_horz) if passage_valid(sections[i])]
+  centers_horz = filter_close_values(centers_horz, 10.)
   
   # draw x to label each passageway
   x_height_percent = config.x_height_percent
@@ -179,11 +217,12 @@ def label_passageways(
       turn_degrees=degrees,
       color=colors[i][0]
     ))
-    
+  
   return labeled_img, xs_info
 
+
 def add_horizontal_guide_encode(
-  camera_view_arr: np.array
+    camera_view_arr: np.array
 ) -> np.array:
   """
   :param camera_view_arr: input image

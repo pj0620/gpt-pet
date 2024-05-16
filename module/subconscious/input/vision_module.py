@@ -56,13 +56,17 @@ class VisionModule(BaseSubconsciousInputModule):
     passageway_descriptions = resp['passageway_descriptions']
     objects_descriptions = resp['objects_descriptions']
     objects = deserialize_dataclasses(objects_descriptions, Object)
+    objects_mini = [
+      dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
+      for obj in objects
+    ]
     vectordb_petview_id = resp['_additional']['id']
     print(f'found existing view in vectordb with id={vectordb_petview_id}')
     context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
     return dict(
       current_view_description=description,
       passageway_descriptions=passageway_descriptions,
-      objects_descriptions=objects_descriptions
+      objects_descriptions=str(objects_mini)
     ), passageways, objects
   
   
@@ -90,7 +94,11 @@ class VisionModule(BaseSubconsciousInputModule):
       image_width=image_arr.shape[1],
       depth_frame=depth_image_arr
     )
-    parsed_response["objects_descriptions"] = serialize_dataclasses(augmented_objects)
+    objects_mini = [
+      dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
+      for obj in augmented_objects
+    ]
+    parsed_response["objects_descriptions"] = str(serialize_dataclasses(objects_mini))
     return parsed_response, xs_info, augmented_objects
   
   

@@ -168,8 +168,6 @@ class VectorDBAdapterService:
     if raw_object[1] < OBJECT_SIMILARITY_THRESHOLD:
       return None
     
-    print(f"raw_object: {raw_object}")
-    
     return ObjectResponseModel(
       name = raw_object[0].metadata['object_name'],
       description = raw_object[0].page_content
