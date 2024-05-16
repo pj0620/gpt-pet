@@ -21,7 +21,7 @@ import pprint
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
-    self.memory = ConversationBufferWindowMemory(k=10, memory_key="chat_history")
+    self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history")
     self.prompt_human = PromptTemplate.from_template(load_prompt('conscious/human.txt'))
     prompt = ChatPromptTemplate.from_messages(
       [
