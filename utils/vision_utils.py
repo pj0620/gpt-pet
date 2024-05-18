@@ -123,7 +123,9 @@ def label_passageways(
   image_width = camera_view_arr.shape[1]
   top_percent = config.top_clip_percent
   bottom_percent = config.bottom_clip_percent
-  depth_image_arr_clipped = depth_camera_view_arr[int(image_height * top_percent):int(image_height * bottom_percent), :]
+  depth_image_arr_clipped = (depth_camera_view_arr
+                             [int(image_height * top_percent):int(image_height * bottom_percent), :]
+                             .copy())
   
   # compute average distances using depth camera view
   depth_image_arr_clipped[depth_image_arr_clipped == 2.047] = 0
