@@ -66,7 +66,6 @@ class VisualLLMAdapterService:
           max_tokens=300,
         )
       except Exception as e:
-        error_msg = f'failed {try_count + 1} times to call visual llm'
         print(f'failed {try_count + 1} times to call visual llm', e)
     if response is None:
       raise Exception("Cannot connect to vision llm")
