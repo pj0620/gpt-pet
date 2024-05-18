@@ -11,7 +11,7 @@ class VisualLLMAdapterService:
       encoded_image_prompt: str
   ):
     response = self.client.chat.completions.create(
-      model="gpt-4-vision-preview",
+      model="gpt-4o",
       messages=[
         {
           "role": "user",
