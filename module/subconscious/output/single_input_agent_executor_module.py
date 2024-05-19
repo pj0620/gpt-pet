@@ -129,7 +129,6 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     
     code, completed_from_skill = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
     if completed_from_skill:
-      print("task was completed successfuly using skill from skill library")
       context.analytics_service.new_text("task was completed successfuly using skill from skill library")
       return TaskResult(
         success=True,
@@ -137,7 +136,6 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       )
     
     context.analytics_service.new_text(f"no previous skill found matching new task, writing code: {new_task}")
-    print(f"no previous skill found matching new task, writing code: {new_task}")
     result = self.agent_executor.invoke(dict(
       input=new_task.task,
       chat_history=[],

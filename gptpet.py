@@ -30,12 +30,12 @@ class GPTPet:
     context.analytics_service.new_text("Geworfenheit")
     with tracing_v2_enabled(project_name="gpt-pet"):
       while True:
+        context.analytics_service.new_text("calling sensory modules")
         # get all sensor outputs from sensory modules
         context.sensory_outputs = {}
         for sensory_module in self.sensory_modules:
           context.sensory_outputs |= sensory_module.build_subconscious_input(context)
         
-        print('context.sensory_outputs.keys(): ', context.sensory_outputs.keys())
         context.analytics_service.new_text(
           f'context.sensory_outputs.keys(): {context.sensory_outputs.keys()}'
         )
@@ -45,14 +45,12 @@ class GPTPet:
         for subconscious_input_modules in self.subconscious_input_modules:
           context.conscious_inputs.append(subconscious_input_modules.build_conscious_input(context))
         
-        print('context.conscious_inputs: ', context.conscious_inputs)
         context.analytics_service.new_text(
           f'conscious_inputs: {context.conscious_inputs}'
         )
         
         new_task = self.conscious_module.generate_new_task(context)
         
-        print(f'new task: task={new_task.task}, reasoning={new_task.reasoning}')
         context.analytics_service.new_text(
           f'new task: task={new_task.task}, reasoning={new_task.reasoning}'
         )
@@ -61,7 +59,6 @@ class GPTPet:
         
         self.conscious_module.report_task_result(new_task, context.task_result)
   
-        print('task_result: ', context.task_result)
         context.analytics_service.new_text(
           f'task_result: {context.task_result}'
         )

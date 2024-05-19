@@ -61,7 +61,6 @@ class VisionModule(BaseSubconsciousInputModule):
       for obj in objects
     ]
     vectordb_petview_id = resp['_additional']['id']
-    print(f'found existing view in vectordb with id={vectordb_petview_id}')
     context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
     return dict(
       current_view_description=description,
@@ -114,7 +113,6 @@ class VisionModule(BaseSubconsciousInputModule):
     
     # handle when this has not been seen before
     if pet_view_description is None:
-      print('pet view not found in vectordb, calling llm')
       context.analytics_service.new_text(f'pet view not found in vectordb, calling llm')
       pet_view_description, xs_info, objects = self.get_description_llm(
         context=context,
@@ -133,7 +131,6 @@ class VisionModule(BaseSubconsciousInputModule):
           image=base64_image
         )
       )
-      print(f'created petview with id = {vectordb_petview_id}')
       context.analytics_service.new_text(f'created petview with id = {vectordb_petview_id}')
       
       # mark that this is the first time we have seen this view before

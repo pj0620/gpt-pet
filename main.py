@@ -32,11 +32,17 @@ context.analytics_service = AnalyticsService()
 gptpet_env = get_env_var('GPTPET_ENV')
 if gptpet_env == 'local':
   sim_adapter = SimAdapter()
+  
+  context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
+  
+  context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
     Ai2ThorCameraModule(sim_adapter),
     Ai2ThorDepthCameraModule(sim_adapter)
   ]
+  
+  context.analytics_service.new_text("initializing DeviceIOAdapter")
   context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
@@ -45,11 +51,15 @@ elif gptpet_env == 'physical':
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
   from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
   
+  context.analytics_service.new_text("initializing DeviceIOAdapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
+  
+  context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = PhysicalMotorService(
     context=context
   )
   
+  context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
     PhysicalCameraModule(),
     PhysicalDepthCameraModule()
@@ -57,15 +67,25 @@ elif gptpet_env == 'physical':
 else:
   raise Exception(f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
   
+context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))
 
+context.analytics_service.new_text("initializing vision module")
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModule(context.vectordb_adapter)
 ]
 
 if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
+  context.analytics_service.new_text("initializing subconscious proximity sensor module")
   subconscious_input_modules.append(ProximitySensorModule())
 
+context.analytics_service.new_text("initializing conscious module")
+conscious_module=AgentConsciousModule()
+
+context.analytics_service.new_text("initializing executor module")
+executor_module=SingleInputAgentExecutorModule(context)
+
+context.analytics_service.new_text("initializing GPTPet instance")
 gptpet = GPTPet(
   # collects raw sensor data
   sensory_modules=sensory_modules,
@@ -74,10 +94,11 @@ gptpet = GPTPet(
   subconscious_input_modules=subconscious_input_modules,
   
   # use text input to create task
-  conscious_module=AgentConsciousModule(),
+  conscious_module=conscious_module,
   
   # executes task
-  executor_module=SingleInputAgentExecutorModule(context)
+  executor_module=executor_module
 )
 
+context.analytics_service.new_text("beginning existence")
 gptpet.exist(context)
