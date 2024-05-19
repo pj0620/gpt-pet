@@ -25,8 +25,13 @@ np.set_printoptions(precision=3, suppress=True)
 context = GPTPetContext()
 
 # setup vectordb
+context.analytics_service.new_text("initializing vectordb adapter")
 context.vectordb_adapter = VectorDBAdapterService()
+
+context.analytics_service.new_text("initializing vision llm adapter")
 context.visual_llm_adapter = VisualLLMAdapterService()
+
+context.analytics_service.new_text("initializing analytics")
 context.analytics_service = AnalyticsService()
 
 gptpet_env = get_env_var('GPTPET_ENV')
