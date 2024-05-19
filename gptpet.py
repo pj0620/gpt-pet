@@ -59,7 +59,7 @@ class GPTPet:
         
         context.task_result = self.executor_module.execute(context, new_task)
         
-        self.conscious_module.report_task_result(new_task, task_result)
+        self.conscious_module.report_task_result(new_task, context.task_result)
   
         print('task_result: ', context.task_result)
         context.analytics_service.new_text(
