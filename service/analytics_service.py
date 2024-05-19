@@ -13,7 +13,7 @@ class AnalyticsService:
   def __init__(self):
     self.base_url = get_env_var('ANALYTICS_SERVER_ENDPOINT')
     self.loop = asyncio.get_event_loop()
-    self.executor = concurrent.futures.ThreadPoolExecutor()
+    self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
   
   async def _make_request(self, endpoint: str, data=None):
     """
