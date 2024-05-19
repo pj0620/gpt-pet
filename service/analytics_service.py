@@ -42,6 +42,7 @@ class AnalyticsService:
     :return: Response from the analytics server or error message
     """
     payload = {'text': text}
+    print(text)
     return self.loop.run_in_executor(self.executor, asyncio.run, self._make_request('/text', data=payload))
   
   def new_image(self, image: str):

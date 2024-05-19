@@ -2,6 +2,7 @@ from json import tool
 from typing import Tuple
 
 from langchain import hub
+from langchain.output_parsers import BooleanOutputParser
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
   HumanMessagePromptTemplate
@@ -55,6 +56,20 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       max_iterations=5,
       return_intermediate_steps=True
     )
+    
+    system_validation_prompt = load_prompt('executor_single_input/skill_validation_system.txt')
+    human_validation_prompt = load_prompt('executor_single_input/skill_validation_human.txt')
+    validation_prompt = ChatPromptTemplate.from_messages([
+      SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=['programs'], template=system_validation_prompt)),
+      MessagesPlaceholder(variable_name='chat_history', optional=True),
+      HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['skill', 'task'], template=human_validation_prompt))
+    ])
+    validation_prompt = validation_prompt.partial(
+      programs=self.get_programs()
+    )
+    bool_output_parser = BooleanOutputParser()
+    
+    self.validation_chain = validation_prompt | llm | bool_output_parser
   
   def get_programs(self, skills=None):
     if skills is None:
@@ -85,6 +100,18 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     
     skill = skills_from_skill_manager[0]
     context.analytics_service.new_text(f"found previously existing skill, {skill}")
+    
+    # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
+    # check skill validator chain
+    valid = self.validation_chain.invoke(dict(
+      skill=skill.code,
+      task=new_task.task
+    ))
+    if not valid:
+      context.analytics_service.new_text(f"validation chain found previously existing skill `{skill}` does NOT complete "
+                                         f"the task `{new_task.task}` rejecting")
+      return None, False
+    
     print(f'executing code from skill manager')
     try:
       self.environment_tool.real_execute(code=skill.code)
