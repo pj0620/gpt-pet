@@ -4,17 +4,21 @@ from time import sleep
 from typing import Literal
 
 import RPi.GPIO as GPIO
+import numpy as np
 
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT, \
   MOTOR_CONTROLLERS
+from constants.kinect import FREENECT_DEPTH_REGISTERED
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
   ROTATE_LEFT, MIN_WALL_DIST
 from constants.physical_motor import *
 from gptpet_context import GPTPetContext
-from model.collision import CollisionError
+from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
+
+import freenect
 
 GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
@@ -43,6 +47,9 @@ class PhysicalMotorService(BaseMotorAdapter):
                    f"({dist}m < minimum {MIN_WALL_DIST}m)")
       self.context.analytics_service.new_text(error_msg)
       raise CollisionError(error_msg)
+    
+    print("calculating before average depth")
+    before_avg_depth = self._calc_average_dist()
     
     move_magnitude = min(move_magnitude, 1.)
     
@@ -110,6 +117,18 @@ class PhysicalMotorService(BaseMotorAdapter):
       duration=duration,
       direction=direction
     )
+    
+    print("calculating after average depth")
+    after_avg_depth = self._calc_average_dist()
+    
+    if action == MOVE_AHEAD and (after_avg_depth >= before_avg_depth):
+      error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
+      self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+      raise StuckError(error_msg)
+    elif action == MOVE_BACK and (before_avg_depth >= after_avg_depth):
+      error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
+      self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+      raise StuckError(error_msg)
     
     return MovementResult(
       successful=True,
@@ -248,3 +267,13 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
+    
+  def _calc_average_dist(self):
+    print("calculating avergae depth from depth sensor")
+    
+    depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
+    
+    # a value of 2047 means invalid measurement set these to zero to filter them from depth average
+    depth[depth == 2047] = 0
+    depth = depth.astype('float64') / 1000.
+    return depth.sum() / np.count_nonzero(depth)

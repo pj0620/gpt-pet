@@ -61,8 +61,8 @@ class GPTPet:
         
         self.conscious_module.report_task_result(new_task, task_result)
   
-        print('task_result: ', task_result)
+        print('task_result: ', context.task_result)
         context.analytics_service.new_text(
-          f'task_result: {task_result}'
+          f'task_result: {context.task_result}'
         )
       

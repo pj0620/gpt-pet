@@ -2,19 +2,12 @@ from typing import Any
 
 import numpy as np
 
+from constants.kinect import FREENECT_DEPTH_REGISTERED
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
 import cv2
 # this will fail in local avoid importing unless installed from source
 import freenect
-
-# ref: https://stackoverflow.com/questions/12819599/freenect-depth-registered-has-no-effect-with-libfreenect
-FREENECT_DEPTH_10BIT = 1
-FREENECT_DEPTH_11BIT_PACKED = 2
-FREENECT_DEPTH_10BIT_PACKED = 3
-FREENECT_DEPTH_REGISTERED = 4
-FREENECT_DEPTH_MM = 5
-FREENECT_DEPTH_DUMMY = 2147483647
 
 class PhysicalDepthCameraModule(BaseSensoryModule):
   

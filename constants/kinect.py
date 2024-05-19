@@ -1,0 +1,7 @@
+# ref: https://stackoverflow.com/questions/12819599/freenect-depth-registered-has-no-effect-with-libfreenect
+FREENECT_DEPTH_10BIT = 1
+FREENECT_DEPTH_11BIT_PACKED = 2
+FREENECT_DEPTH_10BIT_PACKED = 3
+FREENECT_DEPTH_REGISTERED = 4
+FREENECT_DEPTH_MM = 5
+FREENECT_DEPTH_DUMMY = 2147483647
