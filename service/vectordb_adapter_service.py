@@ -32,7 +32,7 @@ class VectorDBAdapterService:
           }
         )
         break
-      except weaviate.exceptions.WeaviateStartUpError as e:
+      except weaviate.exceptions.WeaviateStartUpError | ConnectionError as e:
         print('failed to connect to weaviate', e)
     
     if self.vectordb_client is None:
