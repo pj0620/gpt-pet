@@ -48,7 +48,7 @@ if gptpet_env == 'local':
     Ai2ThorDepthCameraModule(sim_adapter)
   ]
   
-  context.analytics_service.new_text("initializing DeviceIOAdapter")
+  context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
@@ -57,7 +57,7 @@ elif gptpet_env == 'physical':
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
   from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
   
-  context.analytics_service.new_text("initializing DeviceIOAdapter")
+  context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
   
   context.analytics_service.new_text("initializing motor service")

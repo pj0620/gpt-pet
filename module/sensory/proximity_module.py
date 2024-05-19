@@ -11,6 +11,7 @@ class ProximityModule(BaseSensoryModule):
       device_io_adapter: BaseDeviceIOAdapter
   ):
     self.device_io_adapter = device_io_adapter
+    self.name = "proximity module"
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
     return {'proximity_measurements': self.device_io_adapter.get_measurements()}
