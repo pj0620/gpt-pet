@@ -57,7 +57,7 @@ class GPTPet:
           f'new task: task={new_task.task}, reasoning={new_task.reasoning}'
         )
         
-        task_result = self.executor_module.execute(context, new_task)
+        context.task_result = self.executor_module.execute(context, new_task)
         
         self.conscious_module.report_task_result(new_task, task_result)
   

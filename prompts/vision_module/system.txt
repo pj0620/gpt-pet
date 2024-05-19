@@ -13,9 +13,10 @@ can see with the following keys; color = color of the x noting this passageway, 
 of where this passageway leads to. If the passageway is too small for the robot to pass through note that in your
 response.
 
-objects_descriptions - For objects in your view to which you can traverse without going around obstacles, and that are close to you.
+objects_descriptions - For objects in your view to which you can traverse to without going around obstacles, and that are close to you.
 Give a description of the object based on what you can see with the following keys; description = couple sentence description of the object, horz_location = integer representing horizontal
 location of the object using the horizontal scale below the image, name = short name of the object. In your description note if an object is too high up to reach.
+Only describe objects that you can clearly identify and name(Examples to avoid: Yellow blob, Some type of pole).
 
 Example 1:
 {
