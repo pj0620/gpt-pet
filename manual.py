@@ -38,9 +38,9 @@ test_env = 'physical'
 
 # setup vectordb
 context = GPTPetContext()
-context.vectordb_adapter = VectorDBAdapterService()
-context.visual_llm_adapter = VisualLLMAdapterService()
 context.analytics_service = AnalyticsService()
+context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
+context.visual_llm_adapter = VisualLLMAdapterService()
 
 if test_env == 'local':
   sim_adapter = SimAdapter()
