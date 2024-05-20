@@ -121,11 +121,11 @@ class PhysicalMotorService(BaseMotorAdapter):
     print("calculating after average depth")
     after_avg_depth = self._calc_average_dist()
     
-    if action == MOVE_AHEAD and (after_avg_depth >= before_avg_depth):
+    if action == MOVE_AHEAD and (after_avg_depth <= before_avg_depth):
       error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
       self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
-    elif action == MOVE_BACK and (before_avg_depth >= after_avg_depth):
+    elif action == MOVE_BACK and (before_avg_depth <= after_avg_depth):
       error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
       self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
