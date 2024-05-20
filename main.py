@@ -29,7 +29,7 @@ context.analytics_service.new_text("finished initializing analytics")
 
 # setup vectordb
 context.analytics_service.new_text("initializing vectordb adapter")
-context.vectordb_adapter = VectorDBAdapterService()
+context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
 
 context.analytics_service.new_text("initializing vision llm adapter")
 context.visual_llm_adapter = VisualLLMAdapterService()

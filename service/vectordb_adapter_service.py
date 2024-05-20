@@ -9,18 +9,18 @@ from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
 from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
-from gptpet_context import GPTPetContext
 from model.conscious import TaskDefinition
 from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
 from model.vision import CreatePetViewModel
+from service.analytics_service import AnalyticsService
 from utils.env_utils import check_env_flag, get_env_var
 from langchain_community.vectorstores import Weaviate
 
 
 class VectorDBAdapterService:
-  def __init__(self, context: GPTPetContext):
-    self.context = context
+  def __init__(self, analytics_service: AnalyticsService):
+    self.analytics_service = analytics_service
     weaviate_vector_db_url = get_env_var("WEAVIATE_VECTOR_DB_URL")
     assert "OPENAI_API_KEY" in os.environ.keys(), "error: please set OPENAI_API_KEY, or switch embedding model"
     for try_count in range(10):
@@ -85,7 +85,7 @@ class VectorDBAdapterService:
         data_object=asdict(new_pet_view)
       )
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to create petview id from connection error")
+      self.analytics_service.new_text("error: failed to create petview id from connection error")
       print(e)
       return None
       
@@ -99,7 +99,7 @@ class VectorDBAdapterService:
         uuid=pet_view_id
       )
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to delete petview id from connection error")
+      self.analytics_service.new_text("error: failed to delete petview id from connection error")
       print(e)
       return None
     
@@ -118,7 +118,7 @@ class VectorDBAdapterService:
         ).with_additional(["distance", "id"])
         .with_limit(1).do())
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to get_similar_pet_views from connection error")
+      self.analytics_service.new_text("error: failed to get_similar_pet_views from connection error")
       print(e)
       return []
     
@@ -140,7 +140,7 @@ class VectorDBAdapterService:
       )
       print(f"found {len(raw_response)} skills that match the task `{task_definition.task}`")
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to get_similar_skill from connection error")
+      self.analytics_service.new_text("error: failed to get_similar_skill from connection error")
       print(e)
       return []
     
@@ -162,7 +162,7 @@ class VectorDBAdapterService:
       )
       print(f'successfully created new skill with id: {new_skill_id}')
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to create_skill from connection error")
+      self.analytics_service.new_text("error: failed to create_skill from connection error")
       print(e)
       return None
     return new_skill_id
@@ -178,7 +178,7 @@ class VectorDBAdapterService:
         }
       )
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to delete_skill from connection error")
+      self.analytics_service.new_text("error: failed to delete_skill from connection error")
       print(e)
       return None
     print(f'successfully deleted skills with id: {deleted_pet_view_id}')
@@ -194,7 +194,7 @@ class VectorDBAdapterService:
       self.vectordb_client.batch.create_objects()
       print(f'successfully created new {len(objects)} objects')
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to create_objects from connection error")
+      self.analytics_service.new_text("error: failed to create_objects from connection error")
       print(e)
   
   def get_similar_object(
@@ -208,7 +208,7 @@ class VectorDBAdapterService:
       )
       print(f"found {len(raw_response)} objects that match the object `{object.name}`")
     except ConnectionError as e:
-      self.context.analytics_service.new_text("error: failed to get_similar_object from connection error")
+      self.analytics_service.new_text("error: failed to get_similar_object from connection error")
       print(e)
       return
     
