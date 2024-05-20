@@ -62,6 +62,8 @@ class AgentConsciousModule(BaseConsciousModule):
     )
     
     response_str = self.chain.predict(human_input=human_input)
+    
+    # TODO: gracefully handle parsing errors
     response = self.output_parser.parse(text=response_str)
     
     return task_response_mapper(conscious_inputs_str, response)

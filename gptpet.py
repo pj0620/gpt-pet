@@ -64,4 +64,6 @@ class GPTPet:
         context.analytics_service.new_text(
           f'task_result: {context.task_result}'
         )
+        
+        sleep(0.5)
       
