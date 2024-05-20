@@ -1,7 +1,3 @@
-import asyncio
-import concurrent.futures
-
-import aiohttp
 import numpy as np
 import requests
 
@@ -12,28 +8,26 @@ from utils.prompt_utils import encode_image_array
 class AnalyticsService:
   def __init__(self):
     self.base_url = get_env_var('ANALYTICS_SERVER_ENDPOINT')
-    self.loop = asyncio.get_event_loop()
-    self.executor = concurrent.futures.ThreadPoolExecutor(max_workers=1)
   
-  async def _make_request(self, endpoint: str, data=None):
+  def _make_request(self, endpoint: str, data=None):
     """
-    A shared method to make POST requests to the analytics server asynchronously.
+    A shared method to make POST requests to the analytics server.
     :param endpoint: The API endpoint (e.g., '/text', '/image')
     :param data: The JSON payload for the request
+    :param files: The files payload for the request
     :return: Response from the server or error message
     """
     url = f"{self.base_url}{endpoint}"
-    async with aiohttp.ClientSession() as session:
-      try:
-        async with session.post(url, json=data, timeout=5) as response:
-          response.raise_for_status()  # Raises an HTTPError if the response was an error
-          return await response.json()
-      except aiohttp.ClientConnectionError as e:
-        print('Connection error. Unable to connect to the analytics server.', e)
-      except asyncio.TimeoutError as e:
-        print('Request timed out. The analytics server did not respond in time.', e)
-      except aiohttp.ClientError as e:
-        print(f'An error occurred:', e)
+    try:
+      response = requests.post(url, json=data, timeout=5)  # 5 seconds timeout
+      response.raise_for_status()  # Raises an HTTPError if the response was an error
+      return response.json()
+    except requests.ConnectionError:
+      print('Connection error. Unable to connect to the analytics server.')
+    except requests.Timeout:
+      print('Request timed out. The analytics server did not respond in time.')
+    except requests.RequestException as e:
+      print(f'An error occurred:', e)
   
   def new_text(self, text: str):
     """
@@ -42,8 +36,7 @@ class AnalyticsService:
     :return: Response from the analytics server or error message
     """
     payload = {'text': text}
-    print(text)
-    return self.loop.run_in_executor(self.executor, asyncio.run, self._make_request('/text', data=payload))
+    self._make_request('/text', data=payload)
   
   def new_image(self, image: str):
     """
@@ -52,7 +45,7 @@ class AnalyticsService:
     :return: Response from the analytics server or error message
     """
     payload = {'image': f'data:image/jpeg;base64,{image}'}
-    return self.loop.run_in_executor(self.executor, asyncio.run, self._make_request('/image', data=payload))
+    self._make_request('/image', data=payload)
   
   def new_image_from_arr(self, image_arr: np.array):
     """
@@ -60,5 +53,4 @@ class AnalyticsService:
     :param image_arr: image array to log
     :return: Response from the analytics server or error message
     """
-    image = encode_image_array(image_arr)
-    return self.new_image(image)
+    self.new_image(encode_image_array(image_arr))
