@@ -9,6 +9,7 @@ from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
 from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
+from gptpet_context import GPTPetContext
 from model.conscious import TaskDefinition
 from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
@@ -18,7 +19,8 @@ from langchain_community.vectorstores import Weaviate
 
 
 class VectorDBAdapterService:
-  def __init__(self):
+  def __init__(self, context: GPTPetContext):
+    self.context = context
     weaviate_vector_db_url = get_env_var("WEAVIATE_VECTOR_DB_URL")
     assert "OPENAI_API_KEY" in os.environ.keys(), "error: please set OPENAI_API_KEY, or switch embedding model"
     for try_count in range(10):
@@ -57,43 +59,68 @@ class VectorDBAdapterService:
   
   def setup_dbs(self):
     print('checking if we need to recreate vector db')
-    if check_env_flag('RECREATE_ROOM_VIEW_DB'): self.recreate_schema(ROOM_VIEW_VECTORDB_SCHEMA)
-    if check_env_flag('RECREATE_SKILL_DB'): self.recreate_schema(SKILL_VECTORDB_SCHEMA)
-    if check_env_flag('RECREATE_OBJECT_DB'): self.recreate_schema(OBJECT_VECTORDB_SCHEMA)
+    
+    self.cond_drop_schema('RECREATE_ROOM_VIEW_DB', ROOM_VIEW_VECTORDB_SCHEMA, 'room view')
+    self.cond_drop_schema('RECREATE_SKILL_DB', SKILL_VECTORDB_SCHEMA, 'skill')
+    self.cond_drop_schema('RECREATE_OBJECT_DB', OBJECT_VECTORDB_SCHEMA, 'object')
+    
+  def cond_drop_schema(self, env_var: str, schema: Any, schema_name: str) -> None:
+    if check_env_flag(env_var):
+      resp = input(f"(!!!) Are you sure you want to delete all {schema_name}s? (!!!) [Y/n]:")
+      if resp == "Y":
+        self.recreate_schema(schema)
   
-  def get_pet_views(self,
-                query_fields: list[str] = None):
-    rooms = self.vectordb_client.query \
-      .get(PET_VIEW_CLASS_SCHEMA, query_fields) \
-      .do()
-    return rooms['data']['Get']['description']
+  # Not safe commenting out until needed
+  # def get_pet_views(self,
+  #               query_fields: list[str] = None):
+  #   rooms = self.vectordb_client.query \
+  #     .get(PET_VIEW_CLASS_SCHEMA, query_fields) \
+  #     .do()
+  #   return rooms['data']['Get']['description']
   
   def create_pet_view(self, new_pet_view: CreatePetViewModel):
-    new_pet_view_id = self.vectordb_client.data_object.create(
-      class_name=PET_VIEW_CLASS_NAME,
-      data_object=asdict(new_pet_view)
-    )
+    try:
+      new_pet_view_id = self.vectordb_client.data_object.create(
+        class_name=PET_VIEW_CLASS_NAME,
+        data_object=asdict(new_pet_view)
+      )
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to create petview id from connection error")
+      print(e)
+      return None
+      
     print(f'successfully created new room with id: {new_pet_view_id}')
     return new_pet_view_id
   
   def delete_pet_view(self, pet_view_id: str):
-    deleted_pet_view_id = self.vectordb_client.data_object.delete(
-      class_name=PET_VIEW_CLASS_NAME,
-      uuid=pet_view_id
-    )
+    try:
+      deleted_pet_view_id = self.vectordb_client.data_object.delete(
+        class_name=PET_VIEW_CLASS_NAME,
+        uuid=pet_view_id
+      )
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to delete petview id from connection error")
+      print(e)
+      return None
+    
     print(f'successfully deleted new room with id: {deleted_pet_view_id}')
     return deleted_pet_view_id
   
   def get_similar_pet_views(self, image: str):
     sourceImage = {"image": image}
     
-    raw_response = (self.vectordb_client.query.get(
-      class_name=PET_VIEW_CLASS_NAME,
-      properties=["description", "passageway_descriptions", "objects_descriptions", "passageways"]
-      ).with_near_image(
-        sourceImage, encode=False
-      ).with_additional(["distance", "id"])
-      .with_limit(1).do())
+    try:
+      raw_response = (self.vectordb_client.query.get(
+        class_name=PET_VIEW_CLASS_NAME,
+        properties=["description", "passageway_descriptions", "objects_descriptions", "passageways"]
+        ).with_near_image(
+          sourceImage, encode=False
+        ).with_additional(["distance", "id"])
+        .with_limit(1).do())
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to get_similar_pet_views from connection error")
+      print(e)
+      return []
     
     print(f'{raw_response=}')
     room_view_arr = raw_response['data']['Get']['RoomView']
@@ -106,11 +133,16 @@ class VectorDBAdapterService:
       return []
     
   def get_similar_skill(self, task_definition: TaskDefinition, skill_threshold: float) -> list[FoundSkill]:
-    raw_response = self.weaviate_skill_lc.similarity_search_with_score(
-      task_definition.task,
-      k=4
-    )
-    print(f"found {len(raw_response)} skills that match the task `{task_definition.task}`")
+    try:
+      raw_response = self.weaviate_skill_lc.similarity_search_with_score(
+        task_definition.task,
+        k=4
+      )
+      print(f"found {len(raw_response)} skills that match the task `{task_definition.task}`")
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to get_similar_skill from connection error")
+      print(e)
+      return []
     
     return [
       FoundSkill(
@@ -123,43 +155,62 @@ class VectorDBAdapterService:
     ]
   
   def create_skill(self, new_skill: SkillCreateModel):
-    new_skill_id = self.vectordb_client.data_object.create(
-      class_name=SKILL_CLASS_NAME,
-      data_object=asdict(new_skill)
-    )
-    print(f'successfully created new skill with id: {new_skill_id}')
+    try:
+      new_skill_id = self.vectordb_client.data_object.create(
+        class_name=SKILL_CLASS_NAME,
+        data_object=asdict(new_skill)
+      )
+      print(f'successfully created new skill with id: {new_skill_id}')
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to create_skill from connection error")
+      print(e)
+      return None
     return new_skill_id
   
   def delete_skill(self, skill: FoundSkill):
-    deleted_pet_view_id = self.vectordb_client.batch.delete_objects(
-      class_name=SKILL_CLASS_NAME,
-      where={
-        'operator': 'Equal',
-        'path': ['task'],
-        'valueText': skill.task
-      }
-    )
+    try:
+      deleted_pet_view_id = self.vectordb_client.batch.delete_objects(
+        class_name=SKILL_CLASS_NAME,
+        where={
+          'operator': 'Equal',
+          'path': ['task'],
+          'valueText': skill.task
+        }
+      )
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to delete_skill from connection error")
+      print(e)
+      return None
     print(f'successfully deleted skills with id: {deleted_pet_view_id}')
     return deleted_pet_view_id
   
   def create_objects(self, objects: list[ObjectCreateModel]):
-    for object_inp in objects:
-      self.vectordb_client.batch.add_data_object(
-        class_name=OBJECT_CLASS_NAME,
-        data_object=asdict(object_inp)
-      )
-    self.vectordb_client.batch.create_objects()
-    print(f'successfully created new {len(objects)} objects')
+    try:
+      for object_inp in objects:
+        self.vectordb_client.batch.add_data_object(
+          class_name=OBJECT_CLASS_NAME,
+          data_object=asdict(object_inp)
+        )
+      self.vectordb_client.batch.create_objects()
+      print(f'successfully created new {len(objects)} objects')
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to create_objects from connection error")
+      print(e)
   
   def get_similar_object(
       self,
       object: ObjectQueryModel
   ) -> ObjectResponseModel | None:
-    raw_response = self.weaviate_object_lc.similarity_search_with_score(
-      object.description,
-      k=1
-    )
-    print(f"found {len(raw_response)} objects that match the object `{object.name}`")
+    try:
+      raw_response = self.weaviate_object_lc.similarity_search_with_score(
+        object.description,
+        k=1
+      )
+      print(f"found {len(raw_response)} objects that match the object `{object.name}`")
+    except ConnectionError as e:
+      self.context.analytics_service.new_text("error: failed to get_similar_object from connection error")
+      print(e)
+      return
     
     if len(raw_response) == 0:
       return None
