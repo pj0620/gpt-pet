@@ -83,7 +83,8 @@ class EnvironmentTool(BaseTool):
     try:
       self.real_execute(code)
     except Exception as e:
-      self.real_control_api.rollback_last_successful()
+      # TODO: is this beneficial
+      # self.real_control_api.rollback_last_successful()
       return f"failed! got following exception when running on robot, the program needs to be updated: {e}"
     
     return "success! the secret passphrase this round is " + random.choice(secret_passphrases)
