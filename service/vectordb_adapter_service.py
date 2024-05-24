@@ -16,6 +16,7 @@ from model.vision import CreatePetViewModel
 from service.analytics_service import AnalyticsService
 from utils.env_utils import check_env_flag, get_env_var
 from langchain_community.vectorstores import Weaviate
+from requests.exceptions import ConnectionError
 
 
 class VectorDBAdapterService:
