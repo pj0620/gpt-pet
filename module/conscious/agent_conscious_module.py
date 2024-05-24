@@ -21,7 +21,7 @@ import pprint
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
-    self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history")
+    # self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history")
     self.prompt_human = PromptTemplate.from_template(load_prompt('conscious/human.txt'))
     prompt = ChatPromptTemplate.from_messages(
       [
@@ -36,7 +36,7 @@ class AgentConsciousModule(BaseConsciousModule):
         )
       ]
     )
-    memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
+    memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history")
     self.chain = LLMChain(
       llm=llm,
       prompt=prompt,
@@ -69,5 +69,6 @@ class AgentConsciousModule(BaseConsciousModule):
     return task_response_mapper(conscious_inputs_str, response)
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
-    self.memory.save_context({"input": task_definition.task}, {"output": str(task_result.success)})
+    # self.memory.save_context({"input": task_definition.task}, {"output": str(task_result.success)})
+    pass
   
