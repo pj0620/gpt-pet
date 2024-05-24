@@ -1,5 +1,6 @@
 import os
 from datetime import datetime
+from json import JSONDecodeError
 
 import cv2
 import numpy as np
@@ -16,6 +17,7 @@ from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
+import json
 
 from utils.serialization import serialize_dataclasses, deserialize_dataclasses, serialize_dataclasses_dict
 from utils.vision_utils import label_passageways, add_horizontal_guide_encode
@@ -51,22 +53,29 @@ class VisionModule(BaseSubconsciousInputModule):
     if len(vectordb_resp) == 0:
       return None, None, None
     resp = vectordb_resp[0]
-    description = resp['description']
-    passageways = deserialize_dataclasses(resp['passageways'], PhysicalPassagewayInfo)
-    passageway_descriptions = resp['passageway_descriptions']
-    objects_descriptions = resp['objects_descriptions']
-    objects = deserialize_dataclasses(objects_descriptions, Object)
-    objects_mini = [
-      dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
-      for obj in objects
-    ]
     vectordb_petview_id = resp['_additional']['id']
-    context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
-    return dict(
-      current_view_description=description,
-      passageway_descriptions=passageway_descriptions,
-      objects_descriptions=str(objects_mini)
-    ), passageways, objects
+    try:
+      description = resp['description']
+      passageways = deserialize_dataclasses(resp['passageways'], PhysicalPassagewayInfo)
+      passageway_descriptions = resp['passageway_descriptions']
+      objects_descriptions = resp['objects_descriptions']
+      objects = deserialize_dataclasses(objects_descriptions, Object)
+      objects_mini = [
+        dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
+        for obj in objects
+      ]
+      context.analytics_service.new_text(f'found existing view in vectordb with id={vectordb_petview_id}')
+      return dict(
+        current_view_description=description,
+        passageway_descriptions=passageway_descriptions,
+        objects_descriptions=str(objects_mini)
+      ), passageways, objects
+    except JSONDecodeError as e:
+      context.analytics_service.new_text(f'failed to parse existing view in vectordb with id={vectordb_petview_id}, '
+                                         f'deleting and calling llm')
+      print(e)
+      vectordb_adapter.delete_pet_view(vectordb_petview_id)
+      return None, None, None
   
   
   def get_description_llm(
@@ -122,11 +131,21 @@ class VisionModule(BaseSubconsciousInputModule):
       )
       print(f'creating following view in vectordb, {pet_view_description=} {xs_info=}')
       context.analytics_service.new_text(f'creating pet view in vectordb')
+      objects_dict = [
+        dict(
+          horizontal_angle=obj.horizontal_angle,
+          object_distance=obj.object_distance,
+          description=obj.description,
+          name=obj.name,
+          seen_before=obj.seen_before
+        )
+        for obj in objects
+      ]
       vectordb_petview_id = context.vectordb_adapter.create_pet_view(
         CreatePetViewModel(
           description=pet_view_description['description'],
-          passageway_descriptions=str(pet_view_description['passageway_descriptions']),
-          objects_descriptions=str(pet_view_description["objects_descriptions"]),
+          passageway_descriptions=json.dumps(pet_view_description['passageway_descriptions']),
+          objects_descriptions=json.dumps(objects_dict),
           passageways=serialize_dataclasses(xs_info),
           image=base64_image
         )
