@@ -5,6 +5,7 @@ from service.motor.base_motor_adapter import BaseMotorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
 import warnings
 
+
 class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorAdapter
   proximity_sensor_adapter: BaseDeviceIOAdapter
