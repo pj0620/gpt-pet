@@ -39,6 +39,7 @@ class AnalyticsService:
     :param text: Text to log
     :return: Response from the analytics server or error message
     """
+    print("[analytics]", text)
     payload = {'text': text}
     self._make_request('/text', data=payload)
   
