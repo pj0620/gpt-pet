@@ -87,7 +87,7 @@ class RealControlAPI(BaseControlAPI):
     matching_passageways = [p for p in self.passageways if p.color == passageway_color]
     if len(matching_passageways) == 0:
       raise Exception(f"failed to move down {passageway_color} passageway. Does not exist. The only valid passageways "
-                      f"are {self.passageways}")
+                      f"are {[p.color for p in self.passageways]}")
     elif len(matching_passageways) > 1:
       warnings.warn(f"found multiple passageways with the same color {passageway_color} choosing first")
     passageway = matching_passageways[0]
