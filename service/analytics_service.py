@@ -1,15 +1,19 @@
 import numpy as np
 import requests
 
-from utils.env_utils import get_env_var
+from utils.env_utils import get_env_var, check_env_flag
 from utils.prompt_utils import encode_image_array
 
 
 class AnalyticsService:
   def __init__(self):
     self.base_url = get_env_var('ANALYTICS_SERVER_ENDPOINT')
+    self.disabled_analytics = check_env_flag('DISABLE_ANALYTICS')
   
   def _make_request(self, endpoint: str, data=None):
+    if self.disabled_analytics:
+      return
+    
     """
     A shared method to make POST requests to the analytics server.
     :param endpoint: The API endpoint (e.g., '/text', '/image')
