@@ -1,12 +1,12 @@
-from langchain.agents import create_json_chat_agent, AgentExecutor
-from langchain.chains import ConversationChain, LLMChain
+import pprint
+from datetime import datetime
+from typing import Tuple
+
+from langchain.chains.llm import LLMChain
+from langchain.memory import ConversationEntityMemory
 from langchain.output_parsers import YamlOutputParser
-from langchain.memory import ConversationBufferWindowMemory, ConversationBufferMemory
-from langchain_community.chat_message_histories import ChatMessageHistory
 from langchain_core.messages import SystemMessage
-from langchain_core.output_parsers import StrOutputParser, JsonOutputParser
-from langchain_core.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
-  HumanMessagePromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate
 from langchain_openai import ChatOpenAI
 
 from gptpet_context import GPTPetContext
@@ -14,33 +14,37 @@ from model.conscious import NewTaskResponse, TaskDefinition, TaskResult
 from module.conscious.base_conscious_module import BaseConsciousModule
 from utils.conscious import task_response_mapper
 from utils.prompt_utils import load_prompt
-from datetime import datetime
-import pprint
 
 
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
     llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
-    self.prompt_human = PromptTemplate.from_template(load_prompt('conscious/human.txt'))
+    self.prompt_human = PromptTemplate.from_template(
+      load_prompt('conscious/human.txt')
+    )
+    self.tasks_history: list[Tuple[TaskDefinition, TaskResult]] = []
     prompt = ChatPromptTemplate.from_messages(
       [
         SystemMessage(
           content=load_prompt('conscious/system.txt')
         ),
-        MessagesPlaceholder(
-          variable_name="chat_history"
-        ),
         HumanMessagePromptTemplate.from_template(
-          "{human_input}"
+          "{human_input}",
+          input_varaibles=['human_input']
         )
-      ]
+      ],
     )
-    self.memory = ConversationBufferWindowMemory(k=2, memory_key="chat_history")
+    self.entity_memory = ConversationEntityMemory(
+      llm=llm,
+      memory_key="entity_history",
+      input_key="human_input",
+      return_messages=True
+    )
     self.chain = LLMChain(
       llm=llm,
       prompt=prompt,
       verbose=True,
-      memory=self.memory
+      memory=self.entity_memory
     )
     self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
   
@@ -55,12 +59,20 @@ class AgentConsciousModule(BaseConsciousModule):
       for inp in context.conscious_inputs
     ]})
     
+    previous_tasks = [
+      f"{{task=`{task_definition.task}` reasoning=`{task_definition.reasoning}` successful=`{task_result.success}`}}"
+      for (task_definition, task_result) in self.tasks_history
+    ]
     human_input = self.prompt_human.format(
       subconscious_info=conscious_inputs_str,
-      time=str(datetime.now())
+      time=str(datetime.now()),
+      previous_tasks=previous_tasks,
+      entity_history=str(self.chain.memory.entity_store.store)
     )
-    
-    response_str = self.chain.predict(human_input=human_input)
+  
+    response_str = self.chain.predict(
+      human_input=human_input
+    )
     
     # TODO: gracefully handle parsing errors
     response = self.output_parser.parse(text=response_str)
@@ -68,6 +80,7 @@ class AgentConsciousModule(BaseConsciousModule):
     return task_response_mapper(conscious_inputs_str, response)
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
-    self.memory.save_context({"input": task_definition.task}, {"output": str(task_result.success)})
-    pass
+    self.tasks_history.append((task_definition, task_result))
+    if len(self.tasks_history) > 5:
+      self.tasks_history.pop(0)
   

@@ -6,8 +6,10 @@ You are also given a list of objects GPTPet is seeing which include a name, desc
 
 I will give you the following information:
 ...
-Subconscious Info: JSON list of things robot has noticed
-Time: ...
+Subconscious Info: ...JSON list of things robot has noticed
+Time: ...Current Time
+List of Previous Tasks: ...List of previously executed tasks, reasoning behind those tasks, and whether each was successful
+Summary of Previous Entities: ...List of previously seen entities
 
 You must follow the following criteria:
 1) You should act as a mentor and guide me to the next task based on my current learning progress.

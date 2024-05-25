@@ -1,2 +1,8 @@
 Subconscious Info: {subconscious_info}
 Time: {time}
+
+List of Previous Tasks:
+{previous_tasks}
+
+Summary of Previous Entities:
+{entity_history}
