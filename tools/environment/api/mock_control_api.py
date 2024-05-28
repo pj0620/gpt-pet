@@ -101,7 +101,7 @@ class MockControlAPI(BaseControlAPI):
   
   def goto_object(self, object_name: str) -> str:
     print(f"MockControlAPI: going to object `{object_name}`")
-    matching_objects = [p for p in self.objects if p.name == object_name]
+    matching_objects = [p for p in self.objects if p.name.lower() == object_name.lower()]
     if len(matching_objects) == 0:
       raise Exception(f"failed to move toward object `{object_name}`. Does not exist. The only valid objects "
                       f"are {self.objects}")
