@@ -34,12 +34,16 @@ class AgentConsciousModule(BaseConsciousModule):
         )
       ],
     )
+    summary_prompt = PromptTemplate(
+      input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
+    )
     self.entity_memory = ConversationSummaryMemory(
       llm=llm,
       memory_key="entity_history",
       input_key="human_input",
       return_messages=True,
-      max_token_limit=50
+      max_token_limit=50,
+      prompt=summary_prompt
     )
     self.chain = LLMChain(
       llm=llm,
