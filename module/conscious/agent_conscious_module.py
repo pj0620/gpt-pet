@@ -29,8 +29,8 @@ class AgentConsciousModule(BaseConsciousModule):
           content=load_prompt('conscious/system.txt')
         ),
         HumanMessagePromptTemplate.from_template(
-          "{human_input}",
-          input_varaibles=['human_input']
+          "{human_input} \nSummary of current session: \n{entity_history}",
+          input_varaibles=['human_input', 'entity_history']
         )
       ],
     )
@@ -68,7 +68,7 @@ class AgentConsciousModule(BaseConsciousModule):
       subconscious_info=conscious_inputs_str,
       time=str(datetime.now()),
       previous_tasks=previous_tasks,
-      entity_history=str(self.chain.memory.entity_store.store)
+      # entity_history=str(self.chain.memory.memory_variables)
     )
   
     response_str = self.chain.predict(
