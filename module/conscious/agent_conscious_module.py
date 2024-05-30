@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Tuple
 
 from langchain.chains.llm import LLMChain
-from langchain.memory import ConversationEntityMemory
+from langchain.memory import ConversationEntityMemory, ConversationSummaryBufferMemory
 from langchain.output_parsers import YamlOutputParser
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate
@@ -34,11 +34,12 @@ class AgentConsciousModule(BaseConsciousModule):
         )
       ],
     )
-    self.entity_memory = ConversationEntityMemory(
+    self.entity_memory = ConversationSummaryBufferMemory(
       llm=llm,
       memory_key="entity_history",
       input_key="human_input",
-      return_messages=True
+      return_messages=True,
+      max_token_limit=50
     )
     self.chain = LLMChain(
       llm=llm,
