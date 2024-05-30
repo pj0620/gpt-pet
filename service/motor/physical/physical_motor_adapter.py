@@ -168,6 +168,10 @@ class PhysicalMotorService(BaseMotorAdapter):
   ) -> MovementResult:
     assert action in ROTATE_ACTIONS, f'invalid rotate action {action}'
     
+    if abs(degrees) > 45:
+      degrees = min(45., degrees)
+      degrees = max(-45., degrees)
+    
     fixed_action = action
     fixed_degrees = degrees
     if degrees < 0:

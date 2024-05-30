@@ -26,6 +26,7 @@ class VectorDBAdapterService:
     assert "OPENAI_API_KEY" in os.environ.keys(), "error: please set OPENAI_API_KEY, or switch embedding model"
     for try_count in range(10):
       print(f'trying to connect to weaviate attempt number: {try_count}')
+      self.vectordb_client = None
       try:
         self.vectordb_client = weaviate.Client(
           weaviate_vector_db_url,

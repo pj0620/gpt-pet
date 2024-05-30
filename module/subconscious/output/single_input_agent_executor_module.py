@@ -24,7 +24,7 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
+    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0,)
     # llm = ChatAnthropic(
     #   temperature=0,
     #   model_name="claude-3-opus-20240229"
@@ -60,9 +60,11 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     system_validation_prompt = load_prompt('executor_single_input/skill_validation_system.txt')
     human_validation_prompt = load_prompt('executor_single_input/skill_validation_human.txt')
     validation_prompt = ChatPromptTemplate.from_messages([
-      SystemMessagePromptTemplate(prompt=PromptTemplate(input_variables=['programs'], template=system_validation_prompt)),
+      SystemMessagePromptTemplate(
+        prompt=PromptTemplate(input_variables=['programs'], template=system_validation_prompt)),
       MessagesPlaceholder(variable_name='chat_history', optional=True),
-      HumanMessagePromptTemplate(prompt=PromptTemplate(input_variables=['skill', 'task'], template=human_validation_prompt))
+      HumanMessagePromptTemplate(
+        prompt=PromptTemplate(input_variables=['skill', 'task'], template=human_validation_prompt))
     ])
     validation_prompt = validation_prompt.partial(
       programs=self.get_programs()
@@ -88,7 +90,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       context: GPTPetContext,
       vectordb_adapter: VectorDBAdapterService,
       new_task: TaskDefinition
-  ) -> Tuple[str|None, bool]:
+  ) -> Tuple[str | None, bool]:
     """
     :param vectordb_adapter: VectorDBAdapter
     :return: the skill, and if skill was executed successfully using the skil in the skill library?
@@ -109,8 +111,9 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
         task=new_task.task
       ))
       if not valid:
-        context.analytics_service.new_text(f"validation chain found previously existing skill `{skill}` does NOT complete "
-                                           f"the task `{new_task.task}` rejecting")
+        context.analytics_service.new_text(
+          f"validation chain found previously existing skill `{skill}` does NOT complete "
+          f"the task `{new_task.task}` rejecting")
         return None, False
     
     print(f'executing code from skill manager')
@@ -119,11 +122,11 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       return skill.code, True
     except Exception as e:
       print('got exception while executing skill manager code, deleting from skill library', e)
-      context.analytics_service.new_text(f"got exception while executing skill manager code, deleting from skill library")
+      context.analytics_service.new_text(
+        f"got exception while executing skill manager code, deleting from skill library")
       vectordb_adapter.delete_skill(skill)
       return skill.code, False
-    
-    
+  
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     self.environment_tool.update_passageways(context.passageways)
     self.environment_tool.update_objects(context.objects_in_view)
@@ -164,4 +167,3 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       task=task.task,
       code=task_result.final_code
     ))
-  

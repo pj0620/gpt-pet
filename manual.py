@@ -1,14 +1,12 @@
 import base64
-
-import cv2
-import numpy as np
-from PIL import Image
-import io
-import base64
 import pickle
 import zlib
 
+import cv2
+import numpy as np
 from dotenv import load_dotenv
+from flask import Flask, jsonify, abort, request
+from flask_cors import CORS
 
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
@@ -21,10 +19,6 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
-
-from flask import Flask, jsonify, abort, request
-from flask_cors import CORS
-
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
