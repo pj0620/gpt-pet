@@ -83,8 +83,8 @@ class AgentConsciousModule(BaseConsciousModule):
   
   
   def build_entity_memory_def(self, task_definition: TaskDefinition, task_result: TaskResult):
-    task_input = f"{{ task=`{task_definition.task}`, reasoning=`{task_definition.reasoning}` }}"
-    task_output = f"successfully_executed=`{task_result.success}`"
+    task_input = f"`{task_definition.input}`"
+    task_output = f"{{ task=`{task_definition.task}`, reasoning=`{task_definition.reasoning}` }}"
     return task_input, task_output
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
