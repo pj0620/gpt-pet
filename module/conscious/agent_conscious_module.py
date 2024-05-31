@@ -29,8 +29,8 @@ class AgentConsciousModule(BaseConsciousModule):
           content=load_prompt('conscious/system.txt')
         ),
         HumanMessagePromptTemplate.from_template(
-          "{human_input} \nSummary of current session: \n{entity_history}",
-          input_varaibles=['human_input', 'entity_history']
+          "{human_input}",
+          input_varaibles=['human_input']
         )
       ],
     )
