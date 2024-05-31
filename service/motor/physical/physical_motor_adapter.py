@@ -216,7 +216,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       cycle_on=ROT_CYCLE_ON,
       duration=duration,
       direction=None,
-      stop_after=degrees > 20
+      stop_after=False
     )
     
     return MovementResult(
