@@ -1,15 +1,24 @@
-Progressively summarize the lines of conversation provided, adding onto the previous summary returning a new summary.
+Progressively summarize the lines of conversation provided by maintaining a list of high level goals & blockers, adding onto the previous summary returning a new summary.
+
+The following should be true of your summary.
+
+1. Assume that the reader already knows how AI measures the world. No need to mention how AI uses proximity sensors, cameras, etc. Just focus on what AI does, and high level goals and blockers.
+2. Write your summary as AI. For example, "The AI expresses its desire to ..." should instead be "You desire to ..."
+3. Avoid be repetitive in your summary.
+4. Passageway colors are not concrete, avoid using the explicit color of passageways in your summary. Instead opt to describe where passageways led to or other identifying information on the passageway.
 
 !!EXAMPLE!!
 Current summary:
-The human asks what the AI thinks of artificial intelligence. The AI thinks artificial intelligence is a force for good.
+Goal -> The AI is looking into exploring the kitchen and moved to go explore the kitchen.
+Blockers -> The AI hit several cables on the ground making it stuck
 
 New lines of conversation:
-Human: Why do you think artificial intelligence is a force for good?
-AI: Because artificial intelligence will help humans reach their full potential.
+Human: {{task=`Move back and forth.`, reasoning=`Moving back and forth can free me from being stuck`}}
+AI: successfully_executed=`true`
 
 New summary:
-The human asks what the AI thinks of artificial intelligence. The AI thinks artificial intelligence is a force for good because it will help humans reach their full potential.
+Goal -> The AI is looking into exploring the kitchen and moved to go explore the kitchen but got stuck so it successfully moved back and forth to try and unstuck itself.
+Blockers -> The AI is still not in the kitchen and has some distance to go.
 !!END OF EXAMPLE!!
 
 !!REAL!!

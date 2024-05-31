@@ -39,17 +39,14 @@ class AgentConsciousModule(BaseConsciousModule):
     )
     self.entity_memory = ConversationSummaryMemory(
       llm=llm,
-      memory_key="entity_history",
-      input_key="human_input",
-      return_messages=True,
+      # return_messages=True,
       max_token_limit=50,
       prompt=summary_prompt
     )
     self.chain = LLMChain(
       llm=llm,
       prompt=prompt,
-      verbose=True,
-      memory=self.entity_memory
+      verbose=True
     )
     self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
   
@@ -72,7 +69,7 @@ class AgentConsciousModule(BaseConsciousModule):
       subconscious_info=conscious_inputs_str,
       time=str(datetime.now()),
       previous_tasks=previous_tasks,
-      # entity_history=str(self.chain.memory.memory_variables)
+      history_summary=self.entity_memory.buffer
     )
   
     response_str = self.chain.predict(
@@ -84,7 +81,15 @@ class AgentConsciousModule(BaseConsciousModule):
     
     return task_response_mapper(conscious_inputs_str, response)
   
+  
+  def build_entity_memory_def(self, task_definition: TaskDefinition, task_result: TaskResult):
+    task_input = f"{{ task=`{task_definition.task}`, reasoning=`{task_definition.reasoning}` }}"
+    task_output = f"successfully_executed=`{task_result.success}`"
+    return task_input, task_output
+  
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
+    task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
+    self.entity_memory.save_context({"input": task_input}, {"output": task_output})
     self.tasks_history.append((task_definition, task_result))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
