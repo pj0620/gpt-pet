@@ -24,7 +24,7 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0,)
+    llm = ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0)
     # llm = ChatAnthropic(
     #   temperature=0,
     #   model_name="claude-3-opus-20240229"

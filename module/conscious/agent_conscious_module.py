@@ -38,7 +38,7 @@ class AgentConsciousModule(BaseConsciousModule):
       input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
     )
     self.entity_memory = ConversationSummaryMemory(
-      llm=llm,
+      llm=ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2),
       # return_messages=True,
       max_token_limit=50,
       prompt=summary_prompt,
