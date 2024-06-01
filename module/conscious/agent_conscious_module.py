@@ -41,7 +41,8 @@ class AgentConsciousModule(BaseConsciousModule):
       llm=llm,
       # return_messages=True,
       max_token_limit=50,
-      prompt=summary_prompt
+      prompt=summary_prompt,
+      ai_prefix='GPTPet'
     )
     self.chain = LLMChain(
       llm=llm,

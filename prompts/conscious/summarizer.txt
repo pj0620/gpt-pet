@@ -1,25 +1,25 @@
-Progressively summarize the lines of conversation provided by maintaining a list of high level goals & blockers, adding onto the previous summary returning a new summary.
+Progressively update the summary of Goals/Blockers of GPTPet, adding onto the previous Goals/Blockers returning a new summary of Goals/Blockers.
 
-The following should be true of your summary.
+The following should be true of your Goals/Blockers summaries.
 
-1. Assume that the reader already knows how AI measures the world. No need to mention how AI uses proximity sensors, cameras, etc. Just focus on what AI does, and high level goals and blockers.
-2. Write your summary as AI. For example, "The AI expresses its desire to ..." should instead be "You desire to ..."
+1. Assume that the reader already knows how GPTPet measures the world. No need to mention how GPTPet uses proximity sensors, cameras, etc. Just focus on what GPTPet does, and high level goals and blockers.
+2. Write your Goals/Blockers as GPTPet. For example, "The GPTPet expresses its desire to ..." should instead be "You desire to ..."
 3. Avoid be repetitive in your summary.
-4. Passageway colors change every round, avoid using the color of passageways in your summary. Instead describe passageways based on their descriptions from the passageway_descriptions in the human message based on the color.
+4. Do NOT mention passageway colors in Goals/Blockers. Passageway colors change every round. Instead describe passageways based on their descriptions from the passageway_descriptions in the human message based on the color.
 
 !!EXAMPLE!!
 Current summary:
-Goal -> The AI is looking into exploring the kitchen and moved to go explore the kitchen.
-Blockers -> The AI is still trying to find the kitchen
+Goal -> The GPTPet is looking into exploring the kitchen and moved to go explore the kitchen.
+Blockers -> The GPTPet is still trying to find the kitchen
 
 New lines of conversation:
 Human: `Subconscious Info: [{{'description': "Summary of GPTPet's vision.", 'value': {{'current_view_description': 'I see a soft-looking surface that might be a bed, close to ground level and approachable for resting.', 'passageway_descriptions': '[{{"color": "red", "description": "This passageway leads to another part of the room, but it appears too high for me to climb up."}}]', 'objects_descriptions': '[{{\'description\': "A fluffy white pillow at the edge of a bed or a sofa, it\'s low enough for me to sniff or rest my head on.", \'name\': \'Pillow\', \'seen_before\': True}}]', 'seen_before': 'true'}}, 'schema': {{'current_view_description': 'a text description of what gptpet is currently seeing', 'passageway_descriptions': "list of descriptions for all passageways in gptpet's view", 'objects_descriptions': "summary of all objects in GPTPet's view", 'seen_before': 'has gptpet seen this view before. This should can be used to decide if this area should be explored.'}}}}, {{'description': 'Summary of Proximity Sensors on GPTPet which reports approximate distance in meters to the nearest obstacle in each direction', 'value': {{'ahead': '1.29', 'back': '0.22', 'right': '0.16', 'left': '0.33'}}, 'schema': {{'right': 'distance to the right', 'ahead': 'distance to the ahead', 'left': 'distance to the left', 'back': 'distance to the back'}}}}]
 Time: 2024-05-30 21:05:18.301974`
-AI: {{task=`Go to red passageway`, reasoning=`=I want to explore the red passageway since there is something new to discover in that direction`}}
+GPTPet: {{task=`Go to red passageway`, reasoning=`=I want to explore the red passageway since there is something new to discover in that direction`}}
 
 New summary:
-Goal -> The AI is looking into exploring the kitchen and found another passageway which may lead to the kitchen so it is going to go down it.
-Blockers -> The AI is still not in the kitchen and has some distance to go.
+Goal -> The GPTPet is looking into exploring the kitchen and found another passageway which may lead to the kitchen so it is going to go down it.
+Blockers -> The GPTPet is still not in the kitchen and has some distance to go.
 !!END OF EXAMPLE!!
 
 !!REAL!!
