@@ -47,9 +47,9 @@ class GPTPet:
           context.analytics_service.new_text("invoking " + subconscious_input_module.__class__.__name__)
           context.conscious_inputs.append(subconscious_input_module.build_conscious_input(context))
         
-        context.analytics_service.new_text(
-          f'conscious_inputs: {context.conscious_inputs}'
-        )
+        # context.analytics_service.new_text(
+        #   f'conscious_inputs: {context.conscious_inputs}'
+        # )
         
         new_task = self.conscious_module.generate_new_task(context)
         

@@ -71,6 +71,8 @@ class AgentConsciousModule(BaseConsciousModule):
       previous_tasks=previous_tasks,
       history_summary=self.entity_memory.buffer
     )
+    
+    context.analytics_service.new_text(f"calling conscious change with: {human_input}")
   
     response_str = self.chain.predict(
       human_input=human_input
