@@ -5,7 +5,7 @@ The following should be true of your summary.
 1. Assume that the reader already knows how AI measures the world. No need to mention how AI uses proximity sensors, cameras, etc. Just focus on what AI does, and high level goals and blockers.
 2. Write your summary as AI. For example, "The AI expresses its desire to ..." should instead be "You desire to ..."
 3. Avoid be repetitive in your summary.
-4. Passageway colors change every round, avoid using the color of passageways in your summary. Instead describe where passageways led to or other identifying information on the passageway to identify them.
+4. Passageway colors change every round, avoid using the color of passageways in your summary. Instead describe passageways based on their descriptions from the passageway_descriptions in the human message based on the color.
 
 !!EXAMPLE!!
 Current summary:
