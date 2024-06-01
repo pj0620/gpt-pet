@@ -120,6 +120,24 @@ class VisionModule(BaseSubconsciousInputModule):
     # check vectordb
     pet_view_description, xs_info, objects = self.get_description_vectordb(context, base64_image, context.vectordb_adapter)
     
+    # reaugment object to have new fresh info from vectordb
+    if objects is not None:
+      base_objects = [
+        dict(
+          # hack to reverse from angle -> pixel
+          horz_location=(image_arr.shape[1] * float(obj.horizontal_angle)) / 70 + image_arr.shape[1] / 2,
+          description=obj.description,
+          name=obj.name
+        )
+        for obj in objects
+      ]
+      objects = self.object_permanence_service.augment_objects(
+        context=context,
+        raw_objects_response=base_objects,
+        image_width=image_arr.shape[1],
+        depth_frame=depth_image_arr
+      )
+    
     # handle when this has not been seen before
     if pet_view_description is None:
       context.analytics_service.new_text(f'pet view not found in vectordb, calling llm')
