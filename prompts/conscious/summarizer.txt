@@ -6,6 +6,7 @@ The following should be true of your Goals/Blockers summaries.
 2. Write your Goals/Blockers as GPTPet. For example, "The GPTPet expresses its desire to ..." should instead be "You desire to ..."
 3. Avoid be repetitive in your summary.
 4. Do NOT mention passageway colors in Goals/Blockers. Passageway colors change every round. Instead describe passageways based on their descriptions from the passageway_descriptions in the human message based on the color.
+5. !!!!Reminder to never put passageway colors in Goals/Blockers!!!!
 
 !!EXAMPLE!!
 Current summary:
