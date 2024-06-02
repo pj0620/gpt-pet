@@ -208,7 +208,6 @@ class VectorDBAdapterService:
         object.description,
         k=1
       )
-      print(f"found {len(raw_response)} objects that match the object `{object.name}`")
     except ConnectionError as e:
       self.analytics_service.new_text("error: failed to get_similar_object from connection error")
       print(e)
@@ -218,12 +217,15 @@ class VectorDBAdapterService:
       return None
     
     raw_object = raw_response[0]
+    self.analytics_service.new_text(f"found following object that matches the object most similarly `{object.name}` "
+                                    f"with a score of {raw_object[1]} checking against threshold of "
+                                    f"{OBJECT_SIMILARITY_THRESHOLD}")
     if raw_object[1] < OBJECT_SIMILARITY_THRESHOLD:
       return None
     
     return ObjectResponseModel(
-      name = raw_object[0].metadata['object_name'],
-      description = raw_object[0].page_content
+      name=raw_object[0].metadata['object_name'],
+      description=raw_object[0].page_content
     )
   
   def recreate_schema(self, schema: Any) -> None:

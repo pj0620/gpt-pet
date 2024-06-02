@@ -71,6 +71,9 @@ class EnvironmentTool(BaseTool):
   ) -> str:
     print(f"EnvironmentTool running `{code}`")
     
+    if len(code) > 500:
+      return "failed! code is greater than 500 characters"
+    
     if self.contains_while_loop(code):
       return "failed! code contains a while loop which is not allowed!"
     

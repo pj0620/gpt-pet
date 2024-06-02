@@ -112,6 +112,7 @@ class VisionModule(BaseSubconsciousInputModule):
       for p_des in passageway_descriptions_pydantic
     ]
     passageways = merge_passageways(
+      context=context,
       passageway_descriptions=passageway_descriptions,
       physical_passageways=physical_passageways
     )
@@ -131,11 +132,6 @@ class VisionModule(BaseSubconsciousInputModule):
       image_width=image_arr.shape[1],
       depth_frame=depth_image_arr
     )
-    objects_mini = [
-      dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
-      for obj in augmented_objects
-    ]
-    parsed_response.objects_descriptions = str(objects_mini)
     
     return parsed_response.dict(), passageways, augmented_objects
   
@@ -151,7 +147,9 @@ class VisionModule(BaseSubconsciousInputModule):
     pet_view_description, passageways, objects = self.get_description_vectordb(context, base64_image,
                                                                            context.vectordb_adapter)
     # re-augment object to have new fresh info from vectordb
+    set_obj_from_db = False
     if objects is not None:
+      qa = True
       base_objects = [
         ObjectDescription(
           # hack to reverse from angle -> pixel
@@ -207,6 +205,13 @@ class VisionModule(BaseSubconsciousInputModule):
       context.analytics_service.new_image(base64_image)
       # mark that this is has been seen before
       pet_view_description["seen_before"] = "true"
+      
+    # only send needed fields to conscious inputs
+    objects_mini = [
+      dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
+      for obj in objects
+    ]
+    pet_view_description["objects_descriptions"] = str(objects_mini)
     
     return pet_view_description, passageways, objects
   

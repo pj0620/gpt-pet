@@ -19,7 +19,7 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context
 class AgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
+    llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0)
     print('context.motor_service: ', context.motor_adapter)
     self.environment_tool = EnvironmentTool(
       motor_adapter=context.motor_adapter,

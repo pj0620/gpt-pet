@@ -18,7 +18,7 @@ from utils.prompt_utils import load_prompt
 
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
+    llm = ChatOpenAI(model="gpt-4-turbo", temperature=0.1)
     self.prompt_human = PromptTemplate.from_template(
       load_prompt('conscious/human.txt')
     )
@@ -34,16 +34,16 @@ class AgentConsciousModule(BaseConsciousModule):
         )
       ],
     )
-    summary_prompt = PromptTemplate(
-      input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
-    )
-    self.entity_memory = ConversationSummaryMemory(
-      llm=ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2),
-      # return_messages=True,
-      max_token_limit=50,
-      prompt=summary_prompt,
-      ai_prefix='GPTPet'
-    )
+    # summary_prompt = PromptTemplate(
+    #   input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
+    # )
+    # self.entity_memory = ConversationSummaryMemory(
+    #   llm=ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2),
+    #   # return_messages=True,
+    #   max_token_limit=50,
+    #   prompt=summary_prompt,
+    #   ai_prefix='GPTPet'
+    # )
     self.chain = LLMChain(
       llm=llm,
       prompt=prompt,
