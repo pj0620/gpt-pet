@@ -87,16 +87,10 @@ class MockControlAPI(BaseControlAPI):
     return 100.0
   
   def goto_passageway(
-      self, passageway_color: str
+      self, passageway_name: str
   ) -> str:
-    print(f"MockControlAPI: going down '{passageway_color}' passageway")
-    matching_passageways = [p for p in self.passageways if p.color == passageway_color]
-    if len(matching_passageways) == 0:
-      raise Exception(f"failed to move down {passageway_color} passageway. Does not exist. The only valid passageways "
-                      f"are {self.passageways}")
-    elif len(matching_passageways) > 1:
-      warnings.warn(f"found multiple passageways with the same color {passageway_color} choosing first")
-      
+    print(f"MockControlAPI: going down '{passageway_name}' passageway")
+    self.get_passageway(passageway_name)
     return "success!"
   
   def goto_object(self, object_name: str) -> str:

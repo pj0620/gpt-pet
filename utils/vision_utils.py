@@ -11,7 +11,7 @@ from constants.vision import FIELD_OF_VIEW
 
 import numpy as np
 
-from model.vision import PhysicalPassagewayInfo
+from model.passageway import PhysicalPassagewayInfo, PassagewayDescriptionPydantic, Passageway
 
 
 def draw_line(img, start, end, color, thickness):
@@ -262,3 +262,4 @@ def np_img_to_base64(np_array: np.array):
   
   # Convert bytes to a string for easier handling/storage/transmission
   return base64_bytes.decode('utf-8')
+

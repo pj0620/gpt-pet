@@ -63,7 +63,7 @@ class VisualLLMAdapterService:
               "content": human_content,
             }
           ],
-          max_tokens=300,
+          max_tokens=600,
         )
       except Exception as e:
         print(f'failed {try_count + 1} times to call visual llm', e)

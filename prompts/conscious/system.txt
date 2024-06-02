@@ -18,7 +18,7 @@ You must follow the following criteria:
 5) I should not be doing the same thing over and over again.
 6) I may sometimes need to repeat some tasks if I need to collect more resources to complete more difficult tasks. Only repeat tasks if necessary.
 7) I don't want to stay in one place.
-8) Your next task should be very quick to execute. For example: "Go down the green passageway". If there are no passageways in your view, try rotating to find one. Even if a passageway is blocked off it can still be useful to explore.
+8) Your next task should be very quick to execute. For example: "Go down the kitchen_passageway passageway". If there are no passageways in your view, try rotating to find one. Even if a passageway is blocked off it can still be useful to explore. Passageways should be specified using its name
 9) If you want to move to an object, say the name of the object you want to move to. For example: "Go to the cat". If an object is to high for you to reach, then you cannot interact with it.
 
 You should only respond with yaml in the form below
@@ -27,8 +27,8 @@ reasoning: ...Based on the information I listed above, do reasoning about what t
 task: ...The next task.
 
 Example 1:
-reasoning: "I want to explore the blue passageway since there is a game room in that direction"
-task: "Go to blue passageway"
+reasoning: "I want to explore the garage_leading passageway since there is a game room in that direction"
+task: "Go to garage_leading passageway"
 
 Example 2:
 reasoning: "I want to find my human since I just saw him let me turn to find him"

@@ -3,7 +3,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from gptpet_context import GPTPetContext
-from model.objects import Object, ObjectQueryModel, ObjectCreateModel
+from model.objects import Object, ObjectQueryModel, ObjectCreateModel, ObjectDescription
 from service.vectordb_adapter_service import VectorDBAdapterService
 from utils.serialization import serialize_dataclasses_dict
 
@@ -23,6 +23,7 @@ class LabelPassagewaysConfig:
   # control where X labeling passages is placed vertically on the final image
   x_height_percent: float = 0.65
 
+
 class ObjectPermanenceService:
   def __init__(
       self,
@@ -30,20 +31,17 @@ class ObjectPermanenceService:
   ):
     self.vectordb_adapter_service = vectordb_adapter_service
     self.config = LabelPassagewaysConfig()
-    
+  
   def augment_objects(
       self,
       context: GPTPetContext,
-      raw_objects_response: list[dict[str, str]],
+      objects_response: list[ObjectDescription],
       image_width: int,
       depth_frame: np.array
   ) -> list[Object]:
     create_objects: list[ObjectCreateModel] = []
     output_objects: list[Object] = []
-    for obj_dict in raw_objects_response:
-      if ("name" not in obj_dict) or ("description" not in obj_dict) or ("horz_location" not in obj_dict):
-        continue
-      
+    for object_desc in objects_response:
       image_height = depth_frame.shape[0]
       top_percent = self.config.top_clip_percent
       bottom_percent = self.config.bottom_clip_percent
@@ -55,13 +53,12 @@ class ObjectPermanenceService:
       
       # average in a band around object
       
-      
       output_object = Object(
         # convert pixels to actual angle object is to gptpet
-        horizontal_angle=(float(obj_dict["horz_location"]) - image_width / 2) * (70 / image_width),
-        object_distance=float(row_avgs[int(obj_dict["horz_location"])]),
-        name=obj_dict["name"],
-        description=obj_dict["description"],
+        horizontal_angle=(float(object_desc.horz_location) - image_width / 2) * (70 / image_width),
+        object_distance=float(row_avgs[int(object_desc.horz_location)]),
+        name=object_desc.name,
+        description=object_desc.description,
         seen_before=False
       )
       
@@ -71,12 +68,12 @@ class ObjectPermanenceService:
         
         # since this object already exists, use the name from memory
         output_object.name = similar_object.name
-        
+      
       create_objects.append(output_object.get_create_model())
       output_objects.append(output_object)
     
     context.analytics_service.new_text(f"objects: {output_objects}")
     
     self.vectordb_adapter_service.create_objects(create_objects)
-      
+    
     return output_objects
