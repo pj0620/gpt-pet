@@ -70,7 +70,7 @@ class AgentConsciousModule(BaseConsciousModule):
       subconscious_info=conscious_inputs_str,
       time=str(datetime.now()),
       previous_tasks=previous_tasks,
-      history_summary=self.entity_memory.buffer
+      # history_summary=self.entity_memory.buffer
     )
     
     context.analytics_service.new_text(f"calling conscious change with: {human_input}")
@@ -91,8 +91,9 @@ class AgentConsciousModule(BaseConsciousModule):
     return task_input, task_output
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
-    task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
-    self.entity_memory.save_context({"input": task_input}, {"output": task_output})
+    # Not needed; no summary
+    # task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
+    # self.entity_memory.save_context({"input": task_input}, {"output": task_output})
     self.tasks_history.append((task_definition, task_result))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)

@@ -151,10 +151,10 @@ class BaseControlAPI(ABC):
     :param passageway_name: name of passageway to get
     :return: matching passageway, if not found throws an error
     """
-    matching_passageways = [p for p in self.passageways if p.passageway_description.name == passageway_name]
+    matching_passageways = [p for p in self.passageways if p.name == passageway_name]
     if len(matching_passageways) == 0:
       raise Exception(f"failed to move down `{passageway_name}` passageway. Does not exist. The only valid passageways "
-                      f"are {[p.passageway_description.name for p in self.passageways]}")
+                      f"are {[p.name for p in self.passageways]}")
     elif len(matching_passageways) > 1:
       warnings.warn(f"found multiple passageways with the same color {passageway_name} choosing first")
   

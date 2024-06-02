@@ -35,9 +35,8 @@ class PassagewayDescriptionPydantic(BaseModel):
 
 
 @dataclass
-class Passageway:
-  physical_passageway: PhysicalPassagewayInfo
-  passageway_description: PassagewayDescription
+class Passageway(PassagewayDescription, PhysicalPassagewayInfo):
+  pass
   
   
 @dataclass

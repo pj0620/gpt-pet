@@ -6,13 +6,15 @@ def merge_passageways(
   physical_passageways: list[PhysicalPassagewayInfo]
 ) -> list[Passageway]:
   color_to_physical = {
-    physical_passageway.color : physical_passageway
+    physical_passageway.color: physical_passageway
     for physical_passageway in physical_passageways
   }
   passageways = [
     Passageway(
-      physical_passageway=color_to_physical[passageway_description.color],
-      passageway_description=passageway_description
+      color=passageway_description.color,
+      description=passageway_description.description,
+      name=passageway_description.name,
+      turn_degrees=color_to_physical[passageway_description.color].turn_degrees
     )
     for passageway_description in passageway_descriptions
   ]

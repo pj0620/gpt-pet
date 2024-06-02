@@ -7,7 +7,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from gptpet_context import GPTPetContext
 from model.objects import Object, ObjectDescription
-from model.passageway import Passageway, PassagewayDescription
+from model.passageway import Passageway, PassagewayDescription, PhysicalPassagewayInfo
 from model.subconscious import ConsciousInput
 from model.vision import CreatePetViewModel, PetViewDescription
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
@@ -117,8 +117,8 @@ class VisionModule(BaseSubconsciousInputModule):
     )
     parsed_response.passageway_descriptions = [
       dict(
-        name=passageway.passageway_description.name,
-        description=passageway.passageway_description.description
+        name=passageway.name,
+        description=passageway.description
       )
       for passageway in passageways
     ]
