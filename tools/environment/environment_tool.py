@@ -12,7 +12,7 @@ from langchain_core.callbacks import CallbackManagerForToolRun
 from constants.motor import ALL_MOTOR_ACTIONS
 from gptpet_context import GPTPetContext
 from model.objects import Object
-from model.vision import PhysicalPassagewayInfo
+from model.passageway import PhysicalPassagewayInfo, Passageway
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
@@ -41,7 +41,7 @@ class EnvironmentTool(BaseTool):
       real_control_api=real_control_api
     )
     
-  def update_passageways(self, passageways: list[PhysicalPassagewayInfo]):
+  def update_passageways(self, passageways: list[Passageway]):
     self.mock_control_api.update_passageways(passageways)
     self.real_control_api.update_passageways(passageways)
     
@@ -70,6 +70,9 @@ class EnvironmentTool(BaseTool):
       self, code: str, run_manager: Optional[CallbackManagerForToolRun] = None
   ) -> str:
     print(f"EnvironmentTool running `{code}`")
+    
+    if len(code) > 500:
+      return "failed! code is greater than 500 characters"
     
     if self.contains_while_loop(code):
       return "failed! code contains a while loop which is not allowed!"

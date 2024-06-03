@@ -1,8 +1,9 @@
+import warnings
 from abc import ABC, abstractmethod
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from model.objects import Object
-from model.vision import PhysicalPassagewayInfo
+from model.passageway import Passageway
 
 
 class BaseControlAPI(ABC):
@@ -10,10 +11,10 @@ class BaseControlAPI(ABC):
   
   def __init__(self):
     self.last_steps = []
-    self.passageways: list[PhysicalPassagewayInfo] = []
+    self.passageways: list[Passageway] = []
     self.objects: list[Object] = []
     
-  def update_passageways(self, new_passageways: list[PhysicalPassagewayInfo]):
+  def update_passageways(self, new_passageways: list[Passageway]):
     self.passageways = new_passageways
     
   def update_objects(self, new_objects: list[Object]):
@@ -140,10 +141,24 @@ class BaseControlAPI(ABC):
     pass
   
   @abstractmethod
-  def goto_passageway(self, passageway_color: str) -> None:
+  def goto_passageway(self, passageway_name: str) -> None:
     """
-    :param passageway_color: color of passageway to move into
+    :param passageway_name: color of passageway to move into
     """
+    
+  def get_passageway(self, passageway_name: str) -> Passageway:
+    """
+    :param passageway_name: name of passageway to get
+    :return: matching passageway, if not found throws an error
+    """
+    matching_passageways = [p for p in self.passageways if p.name == passageway_name]
+    if len(matching_passageways) == 0:
+      raise Exception(f"failed to move down `{passageway_name}` passageway. Does not exist. The only valid passageways "
+                      f"are {[p.name for p in self.passageways]}")
+    elif len(matching_passageways) > 1:
+      warnings.warn(f"found multiple passageways with the same color {passageway_name} choosing first")
+  
+    return matching_passageways[0]
   
   @abstractmethod
   def goto_object(self, object_name: str) -> None:

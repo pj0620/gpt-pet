@@ -3,20 +3,9 @@ from dataclasses import dataclass
 import numpy as np
 from pydantic.v1 import BaseModel, Field
 
+from model.objects import ObjectDescription
+from model.passageway import PassagewayDescriptionPydantic
 
-@dataclass
-class PhysicalPassagewayInfo:
-  color: str
-  turn_degrees: float
-
-
-@dataclass
-class LabelPassagewaysResponse:
-  # final image including Xs in passageways
-  final_image: np.array
-  
-  # color of each x
-  xs_info: list[PhysicalPassagewayInfo]
 
 @dataclass(frozen=True)
 class CreatePetViewModel:
@@ -27,15 +16,13 @@ class CreatePetViewModel:
   passageways: str
 
 
-class PassagewayDescription(BaseModel):
-  color: str = Field(description="color of x denoting this passageway")
-  description: str = Field(description="a text of what this passageway leads too")
-
-
 class PetViewDescription(BaseModel):
   description: str = Field(description="a text description of what gptpet is currently seeing")
-  passageway_descriptions: list[PassagewayDescription] = (
+  passageway_descriptions: list[PassagewayDescriptionPydantic] = (
     Field(description="list of descriptions for all passageways in gptpet's view"))
+  objects_descriptions: list[ObjectDescription] = (
+    Field(description="list of descriptions for all objects in gptpet's view"))
+
 
 class NewTaskResponse(BaseModel):
   reasoning: str = Field(description="a text description of what gptpet is currently seeing")

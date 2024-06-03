@@ -1,1 +1,1 @@
-control_api.goto_object('Apple') # moves robot to the Apple
+control_api.goto_object('apple') # moves robot to the object named apple

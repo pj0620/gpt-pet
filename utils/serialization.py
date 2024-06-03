@@ -5,6 +5,7 @@ from typing import List, Type, TypeVar
 
 T = TypeVar('T')
 
+
 def serialize_dataclasses(instances: List[T]) -> str:
   print('serializing ', instances)
   if len(instances) == 0:
@@ -12,6 +13,7 @@ def serialize_dataclasses(instances: List[T]) -> str:
   if not instances or not all(is_dataclass(instance) for instance in instances):
     raise ValueError("All instances must be dataclasses.")
   return json.dumps([asdict(instance) for instance in instances])
+
 
 def serialize_dataclasses_dict(instances: List[T]) -> list[dict[str, str]]:
   print('serializing ', instances)
@@ -21,8 +23,8 @@ def serialize_dataclasses_dict(instances: List[T]) -> list[dict[str, str]]:
     raise ValueError("All instances must be dataclasses.")
   return [asdict(instance) for instance in instances]
 
+
 # Deserialization function with type hints
 def deserialize_dataclasses(json_str: str, cls: Type[T]) -> List[T]:
   dicts = json.loads(json_str)
   return [cls(**dict_) for dict_ in dicts]
-

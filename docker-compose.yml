@@ -14,7 +14,7 @@ services:
     - 5000:5000
     - 50051:50051
     volumes:
-    - vector_db_data:/var/lib/vector_db
+    - vector_db_data2:/var/lib/vector_db
     restart: on-failure:0
     environment:
       CONTEXTIONARY_URL: contextionary:9999
@@ -23,8 +23,16 @@ services:
       AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'true'
       PERSISTENCE_DATA_PATH: '/var/lib/vector_db'
       DEFAULT_VECTORIZER_MODULE: 'text2vec-openai'
-      ENABLE_MODULES: 'text2vec-openai,img2vec-neural'
+      ENABLE_MODULES: 'backup-s3,text2vec-openai,img2vec-neural'
       CLUSTER_HOSTNAME: 'node1'
+
+      # s3 backup settings
+      BACKUP_S3_BUCKET: 'gpt-pet'
+      BACKUP_S3_PATH: '${BACKUP_S3_PATH}'
+      AWS_ACCESS_KEY_ID: '${AWS_BACKUP_ACCESS_KEY}'
+      AWS_SECRET_ACCESS_KEY: '${AWS_BACKUP_SECRET_KEY}'
+      AWS_REGION: '${AWS_BACKUP_REGION}'
+
 #    depends_on:
 #      i2v-neural:
 #        condition: service_healthy
@@ -49,4 +57,4 @@ services:
 #      retries: 5
 #      start_period: 10s
 volumes:
-  vector_db_data:
+  vector_db_data2:

@@ -3,6 +3,3 @@ Time: {time}
 
 List of Previous Tasks:
 {previous_tasks}
-
-Summary of Goals & Blockers:
-{history_summary}

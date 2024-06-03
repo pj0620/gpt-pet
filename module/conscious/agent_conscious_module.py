@@ -18,7 +18,7 @@ from utils.prompt_utils import load_prompt
 
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
-    llm = ChatOpenAI(model="gpt-3.5-turbo-1106")
+    llm = ChatOpenAI(model="gpt-4-turbo", temperature=0.1)
     self.prompt_human = PromptTemplate.from_template(
       load_prompt('conscious/human.txt')
     )
@@ -34,16 +34,16 @@ class AgentConsciousModule(BaseConsciousModule):
         )
       ],
     )
-    summary_prompt = PromptTemplate(
-      input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
-    )
-    self.entity_memory = ConversationSummaryMemory(
-      llm=ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2),
-      # return_messages=True,
-      max_token_limit=50,
-      prompt=summary_prompt,
-      ai_prefix='GPTPet'
-    )
+    # summary_prompt = PromptTemplate(
+    #   input_variables=["summary", "new_lines"], template=load_prompt('conscious/summarizer.txt')
+    # )
+    # self.entity_memory = ConversationSummaryMemory(
+    #   llm=ChatOpenAI(model="gpt-3.5-turbo-1106", temperature=0.2),
+    #   # return_messages=True,
+    #   max_token_limit=50,
+    #   prompt=summary_prompt,
+    #   ai_prefix='GPTPet'
+    # )
     self.chain = LLMChain(
       llm=llm,
       prompt=prompt,
@@ -70,7 +70,7 @@ class AgentConsciousModule(BaseConsciousModule):
       subconscious_info=conscious_inputs_str,
       time=str(datetime.now()),
       previous_tasks=previous_tasks,
-      history_summary=self.entity_memory.buffer
+      # history_summary=self.entity_memory.buffer
     )
     
     context.analytics_service.new_text(f"calling conscious change with: {human_input}")
@@ -91,8 +91,9 @@ class AgentConsciousModule(BaseConsciousModule):
     return task_input, task_output
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
-    task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
-    self.entity_memory.save_context({"input": task_input}, {"output": task_output})
+    # Not needed; no summary
+    # task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
+    # self.entity_memory.save_context({"input": task_input}, {"output": task_output})
     self.tasks_history.append((task_definition, task_result))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
