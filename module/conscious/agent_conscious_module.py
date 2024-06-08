@@ -105,7 +105,8 @@ class AgentConsciousModule(BaseConsciousModule):
     # Not needed; no summary
     # task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
     # self.entity_memory.save_context({"input": task_input}, {"output": task_output})
-    self.tasks_history.append(dict(task=task_definition.__dict__, result=task_result.success))
+    self.tasks_history.append(dict(task=task_definition.task, reasoning=task_definition.reasoning,
+                                   task_succeded=task_result.success))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
       
