@@ -1,12 +1,14 @@
 import pprint
 from datetime import datetime
 from typing import Tuple
+import yaml
 
 from langchain.chains.llm import LLMChain
 from langchain.memory import ConversationEntityMemory, ConversationSummaryBufferMemory, ConversationSummaryMemory
 from langchain.output_parsers import YamlOutputParser
 from langchain_core.messages import SystemMessage
-from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate, \
+  SystemMessagePromptTemplate
 from langchain_openai import ChatOpenAI
 
 from gptpet_context import GPTPetContext
@@ -22,11 +24,15 @@ class AgentConsciousModule(BaseConsciousModule):
     self.prompt_human = PromptTemplate.from_template(
       load_prompt('conscious/human.txt')
     )
+    self.prompt_system = PromptTemplate.from_template(
+      load_prompt('conscious/system.txt')
+    )
     self.tasks_history: list[Tuple[TaskDefinition, TaskResult]] = []
     prompt = ChatPromptTemplate.from_messages(
       [
-        SystemMessage(
-          content=load_prompt('conscious/system.txt')
+        SystemMessagePromptTemplate.from_template(
+          '{system_input}',
+          input_variables=['system_input']
         ),
         HumanMessagePromptTemplate.from_template(
           "{human_input}",
@@ -52,13 +58,20 @@ class AgentConsciousModule(BaseConsciousModule):
     self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
   
   def generate_new_task(self, context: GPTPetContext) -> TaskDefinition:
-    conscious_inputs_str = str([
-      inp.__dict__
+    # todo: do we need to give the high level description of the input?
+    # -> inp.description
+    conscious_inputs_schema_str = {
+      inp.name: inp.schema.__dict__
       for inp in context.conscious_inputs
-    ])
+    }
+    
+    conscious_inputs_value_str = {
+      inp.name: inp.value.__dict__
+      for inp in context.conscious_inputs
+    }
     
     pprint.pprint({"conscious_inputs":  [
-      inp.__dict__
+      inp.value.__dict__
       for inp in context.conscious_inputs
     ]})
     
@@ -67,22 +80,26 @@ class AgentConsciousModule(BaseConsciousModule):
       for (task_definition, task_result) in self.tasks_history
     ]
     human_input = self.prompt_human.format(
-      subconscious_info=conscious_inputs_str,
+      subconscious_info=self.get_yaml(conscious_inputs_value_str),
       time=str(datetime.now()),
       previous_tasks=previous_tasks,
       # history_summary=self.entity_memory.buffer
+    )
+    system_input = self.prompt_system.format(
+      subconscious_schema=self.get_yaml(conscious_inputs_schema_str, True)
     )
     
     context.analytics_service.new_text(f"calling conscious change with: {human_input}")
   
     response_str = self.chain.predict(
-      human_input=human_input
+      human_input=human_input,
+      system_input=system_input
     )
     
     # TODO: gracefully handle parsing errors
     response = self.output_parser.parse(text=response_str)
     
-    return task_response_mapper(conscious_inputs_str, response)
+    return task_response_mapper(str(conscious_inputs_value_str), response)
   
   
   def build_entity_memory_def(self, task_definition: TaskDefinition, task_result: TaskResult):
@@ -97,4 +114,11 @@ class AgentConsciousModule(BaseConsciousModule):
     self.tasks_history.append((task_definition, task_result))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
+      
+  def get_yaml(self, data: dict, leading_tab=False):
+    yaml_str = yaml.dump(data, default_flow_style=False, indent=2)
+    if leading_tab:
+      return '\n'.join(['  ' + line for line in yaml_str.split('\n')])
+    else:
+      return yaml_str
   
