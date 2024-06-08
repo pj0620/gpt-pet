@@ -2,6 +2,7 @@ import json
 from json import JSONDecodeError
 
 import numpy as np
+from langchain.output_parsers import YamlOutputParser
 from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
 from langchain_core.prompts import ChatPromptTemplate
 
@@ -37,7 +38,7 @@ class VisionModule(BaseSubconsciousInputModule):
     self.system_prompt = load_prompt('vision_module/system.txt')
     human_prompt_str = load_prompt('vision_module/human.txt')
     self.human_prompt = ChatPromptTemplate.from_template(human_prompt_str)
-    self.json_parser = PydanticOutputParser(pydantic_object=PetViewDescription)
+    self.yaml_parser = YamlOutputParser(pydantic_object=PetViewDescription)
     self.object_permanence_service = ObjectPermanenceService(vectordb_adapter_service)
   
   def get_description_vectordb(
@@ -99,7 +100,7 @@ class VisionModule(BaseSubconsciousInputModule):
       encoded_image_prompt=base64_image
     )
     print("called LLM and found text_description = ", response_str)
-    parsed_response: PetViewDescription = self.json_parser.parse(response_str)
+    parsed_response: PetViewDescription = self.yaml_parser.parse(response_str)
     
     # setup passageways
     passageway_descriptions_pydantic = parsed_response.passageway_descriptions
