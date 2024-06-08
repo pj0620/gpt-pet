@@ -18,7 +18,7 @@ from utils.prompt_utils import load_prompt
 
 class AgentConsciousModule(BaseConsciousModule):
   def __init__(self):
-    llm = ChatOpenAI(model="gpt-4-turbo", temperature=0.1)
+    llm = ChatOpenAI(model="gpt-4o", temperature=0.1)
     self.prompt_human = PromptTemplate.from_template(
       load_prompt('conscious/human.txt')
     )
