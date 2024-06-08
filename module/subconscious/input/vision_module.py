@@ -147,9 +147,7 @@ class VisionModule(BaseSubconsciousInputModule):
     pet_view_description, passageways, objects = self.get_description_vectordb(context, base64_image,
                                                                            context.vectordb_adapter)
     # re-augment object to have new fresh info from vectordb
-    set_obj_from_db = False
     if objects is not None:
-      qa = True
       base_objects = [
         ObjectDescription(
           # hack to reverse from angle -> pixel
