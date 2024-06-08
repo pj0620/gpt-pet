@@ -72,7 +72,7 @@ class VisionModule(BaseSubconsciousInputModule):
         passageway_descriptions=passageway_descriptions,
         objects_descriptions=objects_mini
       ), passageways, objects
-    except JSONDecodeError | TypeError as e:
+    except (JSONDecodeError, TypeError) as e:
       context.analytics_service.new_text(f'failed to parse existing view in vectordb with id={vectordb_petview_id}, '
                                          f'deleting and calling llm')
       print(e)
