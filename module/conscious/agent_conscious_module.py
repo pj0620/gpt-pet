@@ -1,12 +1,10 @@
+import json
 import pprint
 from datetime import datetime
-from typing import Tuple
-import yaml
 
+import yaml
 from langchain.chains.llm import LLMChain
-from langchain.memory import ConversationEntityMemory, ConversationSummaryBufferMemory, ConversationSummaryMemory
 from langchain.output_parsers import YamlOutputParser
-from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate, \
   SystemMessagePromptTemplate
 from langchain_openai import ChatOpenAI
@@ -27,7 +25,7 @@ class AgentConsciousModule(BaseConsciousModule):
     self.prompt_system = PromptTemplate.from_template(
       load_prompt('conscious/system.txt')
     )
-    self.tasks_history: list[Tuple[TaskDefinition, TaskResult]] = []
+    self.tasks_history: list[dict] = []
     prompt = ChatPromptTemplate.from_messages(
       [
         SystemMessagePromptTemplate.from_template(
@@ -61,28 +59,25 @@ class AgentConsciousModule(BaseConsciousModule):
     # todo: do we need to give the high level description of the input?
     # -> inp.description
     conscious_inputs_schema_str = {
-      inp.name: inp.schema.__dict__
+      inp.name: inp.schema
       for inp in context.conscious_inputs
     }
     
     conscious_inputs_value_str = {
-      inp.name: inp.value.__dict__
+      # inp.name: self.expand_json_lists(inp.value)
+      inp.name: inp.value
       for inp in context.conscious_inputs
     }
     
-    pprint.pprint({"conscious_inputs":  [
-      inp.value.__dict__
+    pprint.pprint({"conscious_inputs": [
+      inp.value
       for inp in context.conscious_inputs
     ]})
     
-    previous_tasks = [
-      f"{{task=`{task_definition.task}` reasoning=`{task_definition.reasoning}` successful=`{task_result.success}`}}"
-      for (task_definition, task_result) in self.tasks_history
-    ]
     human_input = self.prompt_human.format(
-      subconscious_info=self.get_yaml(conscious_inputs_value_str),
+      subconscious_info=self.get_yaml(conscious_inputs_value_str, True),
       time=str(datetime.now()),
-      previous_tasks=previous_tasks,
+      previous_tasks=self.get_yaml(self.tasks_history, True),
       # history_summary=self.entity_memory.buffer
     )
     system_input = self.prompt_system.format(
@@ -90,7 +85,7 @@ class AgentConsciousModule(BaseConsciousModule):
     )
     
     context.analytics_service.new_text(f"calling conscious change with: {human_input}")
-  
+    
     response_str = self.chain.predict(
       human_input=human_input,
       system_input=system_input
@@ -101,24 +96,29 @@ class AgentConsciousModule(BaseConsciousModule):
     
     return task_response_mapper(str(conscious_inputs_value_str), response)
   
-  
-  def build_entity_memory_def(self, task_definition: TaskDefinition, task_result: TaskResult):
-    task_input = f"`{task_definition.input}`"
-    task_output = f"{{ task=`{task_definition.task}`, reasoning=`{task_definition.reasoning}` }}"
-    return task_input, task_output
+  # def build_entity_memory_def(self, task_definition: TaskDefinition, task_result: TaskResult):
+  #   task_input = f"`{task_definition.input}`"
+  #   task_output = f"{{ task=`{task_definition.task}`, reasoning=`{task_definition.reasoning}` }}"
+  #   return task_input, task_output
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
     # Not needed; no summary
     # task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
     # self.entity_memory.save_context({"input": task_input}, {"output": task_output})
-    self.tasks_history.append((task_definition, task_result))
+    self.tasks_history.append(dict(task=task_definition.__dict__, result=task_result.success))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
       
-  def get_yaml(self, data: dict, leading_tab=False):
+  def expand_json_lists(self, possible_list: str):
+    if possible_list[0] == '[':
+      corrected_string_data = possible_list.replace("''", '"')
+      return json.loads(corrected_string_data)
+    else:
+      return possible_list
+  
+  def get_yaml(self, data: dict | list, leading_tab=False):
     yaml_str = yaml.dump(data, default_flow_style=False, indent=2)
     if leading_tab:
       return '\n'.join(['  ' + line for line in yaml_str.split('\n')])
     else:
       return yaml_str
-  

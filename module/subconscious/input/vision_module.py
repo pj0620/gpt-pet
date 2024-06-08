@@ -23,7 +23,7 @@ VISION_MODULE_SCHEMA = {
   "current_view_description": "a text description of what gptpet is currently seeing",
   "passageway_descriptions": "list of descriptions for all passageways in gptpet's view",
   "objects_descriptions": "summary of all objects in GPTPet's view",
-  "seen_before": "has gptpet seen this view before. This should can be used to decide if this area should be explored."
+  "seen_before": "has gptpet seen this view before. This can be used to decide if this area should be explored."
 }
 
 VISION_MODULE_DESCRIPTION = "Summary of GPTPet's vision."
@@ -55,7 +55,7 @@ class VisionModule(BaseSubconsciousInputModule):
       description = resp['description']
       
       passageways = deserialize_dataclasses(resp['passageways'], Passageway)
-      passageway_descriptions = resp['passageway_descriptions']
+      passageway_descriptions = json.loads(resp['passageway_descriptions'])
       
       objects_descriptions = resp['objects_descriptions']
       objects = deserialize_dataclasses(objects_descriptions, Object)
@@ -69,7 +69,7 @@ class VisionModule(BaseSubconsciousInputModule):
       return dict(
         current_view_description=description,
         passageway_descriptions=passageway_descriptions,
-        objects_descriptions=str(objects_mini)
+        objects_descriptions=objects_mini
       ), passageways, objects
     except JSONDecodeError as e:
       context.analytics_service.new_text(f'failed to parse existing view in vectordb with id={vectordb_petview_id}, '
@@ -209,7 +209,7 @@ class VisionModule(BaseSubconsciousInputModule):
       dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)
       for obj in objects
     ]
-    pet_view_description["objects_descriptions"] = str(objects_mini)
+    pet_view_description["objects_descriptions"] = objects_mini
     
     return pet_view_description, passageways, objects
   
