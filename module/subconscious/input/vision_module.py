@@ -229,5 +229,6 @@ class VisionModule(BaseSubconsciousInputModule):
     return ConsciousInput(
       value=view_description,
       schema=VISION_MODULE_SCHEMA,
-      description=VISION_MODULE_DESCRIPTION
+      description=VISION_MODULE_DESCRIPTION,
+      name="vision_module"
     )

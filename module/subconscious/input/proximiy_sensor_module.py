@@ -21,5 +21,6 @@ class ProximitySensorModule(BaseSubconsciousInputModule):
     return ConsciousInput(
       value=context.device_io_adapter.get_measurements(),
       schema=PROXIMITY_SENSOR_MODULE_SCHEMA,
-      description=PROXIMITY_SENSOR_MODULE_DESCRIPTION
+      description=PROXIMITY_SENSOR_MODULE_DESCRIPTION,
+      name="proximity_sensor_module"
     )
