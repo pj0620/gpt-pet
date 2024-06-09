@@ -7,7 +7,7 @@ from langchain_openai import OpenAIEmbeddings
 
 from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
-from constants.schema.task_schema import TASK_VECTORDB_SCHEMA
+from constants.schema.task_schema import TASK_VECTORDB_SCHEMA, TASK_CLASS_SCHEMA, TASK_CLASS_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
 from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
 from model.conscious import TaskDefinition, SavedTask
@@ -202,6 +202,7 @@ class VectorDBAdapterService:
       print(e)
   
   def create_task(self, task: SavedTask) -> str | None:
+    print(f"calling create_task with {task}")
     try:
       new_task_id = self.vectordb_client.data_object.create(
         class_name=SKILL_CLASS_NAME,
@@ -215,11 +216,11 @@ class VectorDBAdapterService:
     return new_task_id
     
   def get_task(self, pet_view_id: str) -> SavedTask | None:
-    self.analytics_service.new_text(f"error: searching for saved task for pet_view_id = {pet_view_id}")
+    self.analytics_service.new_text(f"searching for saved task for pet_view_id = {pet_view_id}")
     try:
       result = (
         self.vectordb_client.query
-        .get("Task", ["task", "pet_view_id", "reasoning"])
+        .get(class_name=TASK_CLASS_NAME, properties=["task", "reasoning"])
         .with_where({
           "path": ["pet_view_id"],
           "operator": "Equal",
