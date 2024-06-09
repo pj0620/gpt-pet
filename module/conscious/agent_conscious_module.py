@@ -56,7 +56,7 @@ class AgentConsciousModule(BaseConsciousModule):
       verbose=True
     )
     self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponse)
-    
+  
   def generate_new_task_cache(self, context) -> TaskDefinition | None:
     # last task failed, avoid usin cache to try and figure out how to fix it
     if (len(self.tasks_history) > 0) and (not self.tasks_history[-1]['task_succeeded']):
@@ -72,18 +72,17 @@ class AgentConsciousModule(BaseConsciousModule):
     if last_pet_view.newly_created:
       context.analytics_service.new_text("not using previous task since this is a new view")
       return None
-
+    
     task = context.vectordb_adapter.get_task(last_pet_view.pet_view_id)
     if task is None:
       context.analytics_service.new_text("could not find task for pet_view, using llm to create task")
       return None
-
+    
     return TaskDefinition(
-      task=task,
+      task=task.task,
       reasoning=task.reasoning,
       input='unknown'
     )
-    
   
   def generate_new_task_llm(self, context: GPTPetContext, conscious_inputs: list[ConsciousInput]) -> TaskDefinition:
     # todo: do we need to give the high level description of the input?
@@ -159,7 +158,7 @@ class AgentConsciousModule(BaseConsciousModule):
                                    task_succeeded=task_result.success))
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
-      
+  
   def expand_json_lists(self, possible_list: str):
     if possible_list[0] == '[':
       corrected_string_data = possible_list.replace("''", '"')
