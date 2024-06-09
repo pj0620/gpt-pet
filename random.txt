@@ -1,0 +1,39 @@
+{
+    '_additional': {'distance': 0.13253886, 'id': '9b7c623c-5256-4ed7-a0dc-59159c5517dc'},
+    'description': 'I see a cozy living room with a large white couch and a small table.',
+    'objects_descriptions': '[
+        {
+            "horizontal_angle": -24.0625,
+            "object_distance": 0.5334843749999995,
+            "description": "A small white table with a bottle on it. The table is too high for me to reach.",
+            "name": "small_white_table",
+            "seen_before": false
+        },
+        {
+            "horizontal_angle": 8.75,
+            "object_distance": 0.4873859374999996,
+            "description": "A large white couch with cushions. It looks comfortable and inviting to rest on.",
+            "name": "white_couch",
+            "seen_before": false
+        }
+   ]',
+   'passageway_descriptions': '[
+        {
+            "name": "open_door_passageway",
+            "description": "This passageway leads to another room with an open door."
+        }
+   ]',
+   'passageways': '[
+        {
+            "physical_passageway": {
+                "color": "red",
+                "turn_degrees": -1.553993872928368
+            },
+            "passageway_description": {
+                "color": "red",
+                "description": "This passageway leads to another room with an open door.",
+                "name": "open_door_passageway"
+            }
+        }
+   ]'
+}

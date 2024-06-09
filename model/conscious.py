@@ -19,3 +19,11 @@ class TaskDefinition:
 class TaskResult:
   success: bool
   final_code: str
+  
+  
+@dataclass
+class SavedTask:
+  task: str
+  reasoning: str
+  pet_view_id: str
+  

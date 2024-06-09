@@ -10,7 +10,7 @@ from gptpet_context import GPTPetContext
 from model.objects import Object, ObjectDescription
 from model.passageway import Passageway, PassagewayDescription, PhysicalPassagewayInfo
 from model.subconscious import ConsciousInput
-from model.vision import CreatePetViewModel, PetViewDescription
+from model.vision import CreatePetViewModel, PetViewDescription, PetViewSource
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from service.object_permanence_service import ObjectPermanenceService
 from service.vectordb_adapter_service import VectorDBAdapterService
@@ -46,10 +46,11 @@ class VisionModule(BaseSubconsciousInputModule):
       context: GPTPetContext,
       base64_image: str,
       vectordb_adapter: VectorDBAdapterService
-  ) -> tuple[None, None, None] | tuple[dict[str, str], list[Passageway], list[Object]]:
+  ) -> tuple[None, None, None, -1] | tuple[dict[str, str], list[Passageway], list[Object], str]:
     vectordb_resp = vectordb_adapter.get_similar_pet_views(base64_image)
     if len(vectordb_resp) == 0:
-      return None, None, None
+      context.last_pet_view_id = None
+      return None, None, None, -1
     resp = vectordb_resp[0]
     vectordb_petview_id = resp['_additional']['id']
     try:
@@ -71,13 +72,13 @@ class VisionModule(BaseSubconsciousInputModule):
         current_view_description=description,
         passageway_descriptions=passageway_descriptions,
         objects_descriptions=objects_mini
-      ), passageways, objects
+      ), passageways, objects, vectordb_petview_id
     except (JSONDecodeError, TypeError) as e:
       context.analytics_service.new_text(f'failed to parse existing view in vectordb with id={vectordb_petview_id}, '
                                          f'deleting and calling llm')
       print(e)
       vectordb_adapter.delete_pet_view(vectordb_petview_id)
-      return None, None, None
+      return None, None, None, -1
   
   def get_description_llm(
       self,
@@ -145,8 +146,8 @@ class VisionModule(BaseSubconsciousInputModule):
     base64_image = encode_image_array(image_arr).decode('utf-8')
     
     # check vectordb
-    pet_view_description, passageways, objects = self.get_description_vectordb(context, base64_image,
-                                                                           context.vectordb_adapter)
+    pet_view_description, passageways, objects, pet_view_id = self.get_description_vectordb(context, base64_image,
+                                                                                            context.vectordb_adapter)
     # re-augment object to have new fresh info from vectordb
     if objects is not None:
       base_objects = [
@@ -195,6 +196,10 @@ class VisionModule(BaseSubconsciousInputModule):
           image=base64_image
         )
       )
+      context.last_pet_view = PetViewSource(
+        pet_view_id=vectordb_petview_id,
+        newly_created=True
+      )
       context.analytics_service.new_text(f'created petview with id = {vectordb_petview_id}')
       
       # mark that this is the first time we have seen this view before
@@ -204,7 +209,11 @@ class VisionModule(BaseSubconsciousInputModule):
       context.analytics_service.new_image(base64_image)
       # mark that this is has been seen before
       pet_view_description["seen_before"] = "true"
-      
+      context.last_pet_view = PetViewSource(
+        pet_view_id=pet_view_id,
+        newly_created=True
+      )
+    
     # only send needed fields to conscious inputs
     objects_mini = [
       dict(description=obj.description, name=obj.name, seen_before=obj.seen_before)

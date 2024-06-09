@@ -27,3 +27,8 @@ class PetViewDescription(BaseModel):
 class NewTaskResponse(BaseModel):
   reasoning: str = Field(description="a text description of what gptpet is currently seeing")
   task: str = Field(description="task to execute")
+
+@dataclass
+class PetViewSource:
+  pet_view_id: str
+  newly_created: bool
