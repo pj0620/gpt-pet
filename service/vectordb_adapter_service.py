@@ -205,7 +205,7 @@ class VectorDBAdapterService:
     print(f"calling create_task with {task}")
     try:
       new_task_id = self.vectordb_client.data_object.create(
-        class_name=SKILL_CLASS_NAME,
+        class_name=TASK_CLASS_NAME,
         data_object=asdict(task)
       )
       print(f'successfully created new task with id: {new_task_id}')
@@ -217,7 +217,7 @@ class VectorDBAdapterService:
     
   def get_task(self, pet_view_id: str) -> SavedTask | None:
     self.analytics_service.new_text(f"searching for saved task for pet_view_id = {pet_view_id}")
-    try:
+    try: #b015678e-d28e-45c9-b891-ea6cda1638b9
       result = (
         self.vectordb_client.query
         .get(class_name=TASK_CLASS_NAME, properties=["task", "reasoning"])
