@@ -211,7 +211,7 @@ class VisionModule(BaseSubconsciousInputModule):
       pet_view_description["seen_before"] = "true"
       context.last_pet_view = PetViewSource(
         pet_view_id=pet_view_id,
-        newly_created=True
+        newly_created=False
       )
     
     # only send needed fields to conscious inputs
