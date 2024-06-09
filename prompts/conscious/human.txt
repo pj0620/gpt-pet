@@ -1,5 +1,5 @@
-Subconscious Info: {subconscious_info}
+Subconscious Info:
+{subconscious_info}
 Time: {time}
-
 List of Previous Tasks:
 {previous_tasks}

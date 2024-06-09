@@ -6,3 +6,4 @@ class ConsciousInput:
   description: str
   value: dict[str, Any]
   schema: dict[str, Any]
+  name: str

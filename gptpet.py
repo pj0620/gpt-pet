@@ -3,6 +3,7 @@ import json
 from langchain_core.tracers.context import tracing_v2_enabled
 
 from gptpet_context import GPTPetContext
+from model.subconscious import ConsciousInput
 from module.conscious.base_conscious_module import BaseConsciousModule
 from module.sensory.base_sensory_module import BaseSensoryModule
 

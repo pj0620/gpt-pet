@@ -92,6 +92,8 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       new_task: TaskDefinition
   ) -> Tuple[str | None, bool]:
     """
+    :param context:
+    :param new_task:
     :param vectordb_adapter: VectorDBAdapter
     :return: the skill, and if skill was executed successfully using the skil in the skill library?
     """

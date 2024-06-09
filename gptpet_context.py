@@ -4,6 +4,7 @@ from model.conscious import TaskResult
 from model.objects import Object
 from model.passageway import Passageway
 from model.subconscious import ConsciousInput
+from model.vision import PetViewSource
 from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
@@ -22,3 +23,6 @@ class GPTPetContext:
   sensory_outputs: dict[str, Any]
   conscious_inputs: list[ConsciousInput]
   task_result: TaskResult
+  
+  # if a cached pet view was used this value is populated with its id
+  last_pet_view: PetViewSource

@@ -20,8 +20,13 @@ class SimAdapter:
     self.controller = Controller(
       agentMode="locobot",
       
+      # OG
       # scene="FloorPlan2",
-      scene="FloorPlan13",
+      
+      # tiny kitchen
+      # scene="FloorPlan13",
+      
+      scene="FloorPlan14",
       gridSize=0.01,
       rotateStepDegrees=90,
       # camera properties

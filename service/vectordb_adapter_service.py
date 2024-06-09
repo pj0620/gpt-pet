@@ -7,9 +7,10 @@ from langchain_openai import OpenAIEmbeddings
 
 from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
+from constants.schema.task_schema import TASK_VECTORDB_SCHEMA, TASK_CLASS_SCHEMA, TASK_CLASS_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
 from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
-from model.conscious import TaskDefinition
+from model.conscious import TaskDefinition, SavedTask
 from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
 from model.vision import CreatePetViewModel
@@ -65,6 +66,7 @@ class VectorDBAdapterService:
     self.cond_drop_schema('RECREATE_ROOM_VIEW_DB', ROOM_VIEW_VECTORDB_SCHEMA, 'room view')
     self.cond_drop_schema('RECREATE_SKILL_DB', SKILL_VECTORDB_SCHEMA, 'skill')
     self.cond_drop_schema('RECREATE_OBJECT_DB', OBJECT_VECTORDB_SCHEMA, 'object')
+    self.cond_drop_schema('RECREATE_TASK_DB', TASK_VECTORDB_SCHEMA, 'task')
     
   def cond_drop_schema(self, env_var: str, schema: Any, schema_name: str) -> None:
     if check_env_flag(env_var):
@@ -198,6 +200,48 @@ class VectorDBAdapterService:
     except ConnectionError as e:
       self.analytics_service.new_text("error: failed to create_objects from connection error")
       print(e)
+  
+  def create_task(self, task: SavedTask) -> str | None:
+    print(f"calling create_task with {task}")
+    try:
+      new_task_id = self.vectordb_client.data_object.create(
+        class_name=TASK_CLASS_NAME,
+        data_object=asdict(task)
+      )
+      print(f'successfully created new task with id: {new_task_id}')
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to create_task from connection error")
+      print(e)
+      return None
+    return new_task_id
+    
+  def get_task(self, pet_view_id: str) -> SavedTask | None:
+    self.analytics_service.new_text(f"searching for saved task for pet_view_id = {pet_view_id}")
+    try: #b015678e-d28e-45c9-b891-ea6cda1638b9
+      result = (
+        self.vectordb_client.query
+        .get(class_name=TASK_CLASS_NAME, properties=["task", "reasoning", "pet_view_id"])
+        .with_where({
+          "path": ["pet_view_id"],
+          "operator": "Equal",
+          "valueString": pet_view_id
+        })
+        .do()
+      )
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to get_task from connection error")
+      print(e)
+      return None
+    
+    task_data = result['data']['Get']['Task']
+    if task_data:
+      self.analytics_service.new_text(f"found previous saved task: {task_data[0]}")
+      task_data = task_data[0]  # Assuming only one result
+      saved_task = SavedTask(task=task_data["task"], reasoning=task_data["reasoning"],
+                             pet_view_id=task_data["pet_view_id"])
+      return saved_task
+    else:
+      self.analytics_service.new_text("No task found with the given pet_view_id.")
   
   def get_similar_object(
       self,
