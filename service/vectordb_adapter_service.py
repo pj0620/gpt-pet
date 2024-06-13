@@ -5,6 +5,7 @@ from typing import Any
 import weaviate
 from langchain_openai import OpenAIEmbeddings
 
+from constants.schema.memories import MEMORY_VECTORDB_SCHEMA, MEMORY_CLASS_NAME
 from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
 from constants.schema.task_schema import TASK_VECTORDB_SCHEMA, TASK_CLASS_SCHEMA, TASK_CLASS_NAME
@@ -59,6 +60,13 @@ class VectorDBAdapterService:
       embedding=OpenAIEmbeddings(),
       attributes=["object_name"]
     )
+    self.weaviate_memory_lc = Weaviate(
+      self.vectordb_client,
+      index_name=MEMORY_CLASS_NAME,
+      text_key="memory",
+      embedding=OpenAIEmbeddings(),
+      # attributes=["object_name"]
+    )
   
   def setup_dbs(self):
     print('checking if we need to recreate vector db')
@@ -67,6 +75,7 @@ class VectorDBAdapterService:
     self.cond_drop_schema('RECREATE_SKILL_DB', SKILL_VECTORDB_SCHEMA, 'skill')
     self.cond_drop_schema('RECREATE_OBJECT_DB', OBJECT_VECTORDB_SCHEMA, 'object')
     self.cond_drop_schema('RECREATE_TASK_DB', TASK_VECTORDB_SCHEMA, 'task')
+    self.cond_drop_schema('RECREATE_MEMORY_DB', MEMORY_VECTORDB_SCHEMA, 'memory')
     
   def cond_drop_schema(self, env_var: str, schema: Any, schema_name: str) -> None:
     if check_env_flag(env_var):

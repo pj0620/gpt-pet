@@ -26,9 +26,8 @@ VISION_MODULE_SCHEMA = {
   "objects_descriptions": "summary of all objects in GPTPet's view",
   "seen_before": "has gptpet seen this view before. This can be used to decide if this area should be explored."
 }
-
 VISION_MODULE_DESCRIPTION = "Summary of GPTPet's vision."
-
+VISION_MODULE_NAME = "vision_module"
 
 class VisionModule(BaseSubconsciousInputModule):
   def __init__(
@@ -240,5 +239,5 @@ class VisionModule(BaseSubconsciousInputModule):
       value=view_description,
       schema=VISION_MODULE_SCHEMA,
       description=VISION_MODULE_DESCRIPTION,
-      name="vision_module"
+      name=VISION_MODULE_NAME
     )
