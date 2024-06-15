@@ -4,7 +4,8 @@ import numpy as np
 
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
-from module.conscious.agent_conscious_module import AgentConsciousModule
+from module.conscious.chain_conscious_module import ChainConsciousModule
+from module.conscious.generative_agent_conscious_module import GenerativeAgentConsciousModule
 from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -33,7 +34,6 @@ context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
 
 context.analytics_service.new_text("initializing vision llm adapter")
 context.visual_llm_adapter = VisualLLMAdapterService()
-
 
 gptpet_env = get_env_var('GPTPET_ENV')
 if gptpet_env == 'local':
@@ -71,8 +71,9 @@ elif gptpet_env == 'physical':
     PhysicalDepthCameraModule()
   ]
 else:
-  raise Exception(f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
-  
+  raise Exception(
+    f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
+
 context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))
 
@@ -86,10 +87,10 @@ if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
   subconscious_input_modules.append(ProximitySensorModule())
 
 context.analytics_service.new_text("initializing conscious module")
-conscious_module=AgentConsciousModule()
+conscious_module = GenerativeAgentConsciousModule(context.vectordb_adapter)
 
 context.analytics_service.new_text("initializing executor module")
-executor_module=SingleInputAgentExecutorModule(context)
+executor_module = SingleInputAgentExecutorModule(context)
 
 context.analytics_service.new_text("initializing GPTPet instance")
 gptpet = GPTPet(
