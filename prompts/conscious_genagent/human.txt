@@ -1,0 +1,5 @@
+Subconscious Info:
+{subconscious_info}
+Time: {time}
+Relevant Memory:
+{relevant_memory}

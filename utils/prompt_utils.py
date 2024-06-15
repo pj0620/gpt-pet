@@ -3,6 +3,7 @@ import collections
 import os
 from io import BytesIO
 
+import yaml
 from PIL import Image
 
 
@@ -69,3 +70,11 @@ def load_control_primitives_context(primitive_names):
     for primitive_name in primitive_names
   ]
   return primitives
+
+
+def get_yaml(data: dict | list, leading_tab=False):
+  yaml_str = yaml.dump(data, default_flow_style=False, indent=2)
+  if leading_tab:
+    return '\n'.join(['  ' + line for line in yaml_str.split('\n')])
+  else:
+    return yaml_str
