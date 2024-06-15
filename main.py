@@ -10,6 +10,7 @@ from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
+from module.subconscious.input.stdin_speech_module import StdinAudioModule
 from module.subconscious.input.vision_module import VisionModule
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
@@ -78,7 +79,8 @@ sensory_modules.append(ProximityModule(context.device_io_adapter))
 
 context.analytics_service.new_text("initializing vision module")
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule(context.vectordb_adapter)
+  VisionModule(context.vectordb_adapter),
+  StdinAudioModule()
 ]
 
 if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
