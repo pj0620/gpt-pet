@@ -1,5 +1,6 @@
 from typing import Any
 
+from mixin.goal.base_goal_mixin import BaseGoalMixin
 from model.conscious import TaskResult
 from model.objects import Object
 from model.passageway import Passageway
@@ -26,3 +27,6 @@ class GPTPetContext:
   
   # if a cached pet view was used this value is populated with its id
   last_pet_view: PetViewSource
+  
+  # additional mixins
+  goal_mixin: BaseGoalMixin

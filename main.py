@@ -4,8 +4,10 @@ import numpy as np
 
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
+from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
 from module.conscious.chain_conscious_module import ChainConsciousModule
 from module.conscious.generative_agent_conscious_module import GenerativeAgentConsciousModule
+from module.conscious.goal_aware_chain_conscious_module import GoalAwareChainConsciousModule
 from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -35,6 +37,7 @@ context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
 
 context.analytics_service.new_text("initializing vision llm adapter")
 context.visual_llm_adapter = VisualLLMAdapterService()
+context.goal_mixin = SimpleChainGoalMixin(context.analytics_service)
 
 gptpet_env = get_env_var('GPTPET_ENV')
 if gptpet_env == 'local':
@@ -89,7 +92,8 @@ if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
   subconscious_input_modules.append(ProximitySensorModule())
 
 context.analytics_service.new_text("initializing conscious module")
-conscious_module = GenerativeAgentConsciousModule(context.vectordb_adapter)
+# conscious_module = GenerativeAgentConsciousModule(context.vectordb_adapter)
+conscious_module = GoalAwareChainConsciousModule()
 
 context.analytics_service.new_text("initializing executor module")
 executor_module = SingleInputAgentExecutorModule(context)

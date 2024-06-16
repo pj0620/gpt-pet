@@ -6,6 +6,11 @@ from pydantic.v1 import Field, BaseModel
 class NewTaskResponse(BaseModel):
   reasoning: str = Field(description="description of why this task should be executed")
   task: str = Field(description="task to execute")
+  
+  
+class NewTaskResponseGoalIncluded(NewTaskResponse):
+  next_goal: str = Field(description="next goal for gptpet")
+  previous_goal_completed: bool = Field(description="was previous goal completed")
 
 
 @dataclass

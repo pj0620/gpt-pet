@@ -5,11 +5,11 @@ from module.subconscious.input.base_subconscious_input_module import BaseSubcons
 from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 
-STDIN_AUDIO_MODULE_SCHEMA = {
+AUDIO_MODULE_SCHEMA = {
   "heard_text": "text of audio gptpet heard from its microphone"
 }
-STDIN_AUDIO_MODULE_DESCRIPTION = "Capture of text GPTPet heard from its microphone as text"
-STDIN_AUDIO_AUDIO_MODULE_NAME = "audio_module"
+AUDIO_MODULE_DESCRIPTION = "Capture of text GPTPet heard from its microphone as text"
+AUDIO_MODULE_NAME = "audio_module"
 
 
 class StdinAudioModule(BaseSubconsciousInputModule):
@@ -19,7 +19,7 @@ class StdinAudioModule(BaseSubconsciousInputModule):
     
     return ConsciousInput(
       value=dict(heard_text=heard_text),
-      schema=STDIN_AUDIO_MODULE_SCHEMA,
-      description=STDIN_AUDIO_MODULE_DESCRIPTION,
-      name=STDIN_AUDIO_AUDIO_MODULE_NAME
+      schema=AUDIO_MODULE_SCHEMA,
+      description=AUDIO_MODULE_DESCRIPTION,
+      name=AUDIO_MODULE_NAME
     )
