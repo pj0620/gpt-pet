@@ -2,6 +2,7 @@ from langchain_core.prompts import ChatPromptTemplate
 
 from model.conscious import NewTaskResponse, TaskDefinition
 from model.subconscious import ConsciousInput
+from module.subconscious.input.stdin_speech_module import AUDIO_MODULE_NAME
 from module.subconscious.input.vision_module import VISION_MODULE_NAME
 
 
@@ -24,21 +25,22 @@ def simple_subconscious_observation_summarizer(conscious_inputs: list[ConsciousI
   passageway_descriptions_str = None
   objects_count = -1
   objects_descriptions_str = None
+  heard_text = None
   for conscious_input in conscious_inputs:
-    if conscious_input.name != VISION_MODULE_NAME:
-      continue
-    
-    current_view_description = None
-    if "current_view_description" in conscious_input.value:
-      current_view_description = conscious_input.value["current_view_description"]
-    elif "description" in conscious_input.value:
-      current_view_description = conscious_input.value["description"]
-    passageway_descriptions = conscious_input.value["passageway_descriptions"]
-    passageways_count = len(passageway_descriptions)
-    passageway_descriptions_str = ".".join([p["description"] for p in passageway_descriptions])
-    objects_descriptions = conscious_input.value["objects_descriptions"]
-    objects_count = len(objects_descriptions)
-    objects_descriptions_str = ".".join([o["description"] for o in objects_descriptions])
+    if conscious_input.name == VISION_MODULE_NAME:
+      current_view_description = None
+      if "current_view_description" in conscious_input.value:
+        current_view_description = conscious_input.value["current_view_description"]
+      elif "description" in conscious_input.value:
+        current_view_description = conscious_input.value["description"]
+      passageway_descriptions = conscious_input.value["passageway_descriptions"]
+      passageways_count = len(passageway_descriptions)
+      passageway_descriptions_str = ".".join([p["description"] for p in passageway_descriptions])
+      objects_descriptions = conscious_input.value["objects_descriptions"]
+      objects_count = len(objects_descriptions)
+      objects_descriptions_str = ".".join([o["description"] for o in objects_descriptions])
+    elif conscious_input.name == AUDIO_MODULE_NAME:
+      heard_audio = conscious_input.value['heard_text']
     
   summary = current_view_description
   
