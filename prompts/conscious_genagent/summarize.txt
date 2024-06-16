@@ -1,0 +1,3 @@
+shorten the following into a short 1-2 sentence concise summary. Only respond with the summary and nothing else.
+
+{observation}
