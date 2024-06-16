@@ -83,9 +83,11 @@ sensory_modules.append(ProximityModule(context.device_io_adapter))
 
 context.analytics_service.new_text("initializing vision module")
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule(context.vectordb_adapter),
-  StdinAudioModule()
+  VisionModule(context.vectordb_adapter)
 ]
+
+if gptpet_env == 'local':
+  subconscious_input_modules.append(StdinAudioModule())
 
 if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
   context.analytics_service.new_text("initializing subconscious proximity sensor module")
