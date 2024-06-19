@@ -4,7 +4,7 @@ from openai import OpenAI
 class VisualLLMAdapterService:
   def __init__(self):
     self.client = OpenAI()
-    
+  
   def call_visual_llm(
       self,
       text_prompt: str,
@@ -45,7 +45,7 @@ class VisualLLMAdapterService:
       }
     }]
     if human_prompt is None:
-      human_content.append({ "type": "text", "text": human_prompt })
+      human_content.append({"type": "text", "text": human_prompt})
     response = None
     for try_count in range(5):
       try:
@@ -70,5 +70,3 @@ class VisualLLMAdapterService:
     if response is None:
       raise Exception("Cannot connect to vision llm")
     return response.choices[0].message.content
-  
-  

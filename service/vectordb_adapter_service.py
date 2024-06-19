@@ -1,6 +1,6 @@
 import os
 from dataclasses import asdict
-from typing import Any
+from typing import Any, Tuple
 
 import weaviate
 from langchain_openai import OpenAIEmbeddings
@@ -9,12 +9,15 @@ from constants.schema.memories import MEMORY_VECTORDB_SCHEMA, MEMORY_CLASS_NAME
 from constants.schema.object_schema import OBJECT_VECTORDB_SCHEMA, OBJECT_CLASS_NAME
 from constants.schema.skill_schema import SKILL_VECTORDB_SCHEMA, SKILL_CLASS_NAME
 from constants.schema.task_schema import TASK_VECTORDB_SCHEMA, TASK_CLASS_SCHEMA, TASK_CLASS_NAME
+from constants.schema.vision_goal_schema import ROOM_VIEW_WITH_GOAL_VECTORDB_SCHEMA, GOAL_CLASS_NAME, \
+  PET_VIEW_WITH_GOAL_CLASS_NAME
 from constants.schema.vision_schema import PET_VIEW_CLASS_SCHEMA, PET_VIEW_CLASS_NAME, ROOM_VIEW_VECTORDB_SCHEMA
-from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD
+from constants.vectordb import OBJECT_SIMILARITY_THRESHOLD, GOAL_SIMILARITY_THRESHOLD
 from model.conscious import TaskDefinition, SavedTask
+from model.goal import Goal
 from model.objects import ObjectCreateModel, ObjectQueryModel, ObjectResponseModel
 from model.skill_library import SkillCreateModel, FoundSkill
-from model.vision import CreatePetViewModel
+from model.vision import CreatePetViewModel, CreatePetViewWithGoalModel
 from service.analytics_service import AnalyticsService
 from utils.env_utils import check_env_flag, get_env_var
 from langchain_community.vectorstores import Weaviate
@@ -72,6 +75,7 @@ class VectorDBAdapterService:
     print('checking if we need to recreate vector db')
     
     self.cond_drop_schema('RECREATE_ROOM_VIEW_DB', ROOM_VIEW_VECTORDB_SCHEMA, 'room view')
+    self.cond_drop_schema('RECREATE_ROOM_VIEW_WITH_GOAL_DB', ROOM_VIEW_WITH_GOAL_VECTORDB_SCHEMA, 'room view with goal')
     self.cond_drop_schema('RECREATE_SKILL_DB', SKILL_VECTORDB_SCHEMA, 'skill')
     self.cond_drop_schema('RECREATE_OBJECT_DB', OBJECT_VECTORDB_SCHEMA, 'object')
     self.cond_drop_schema('RECREATE_TASK_DB', TASK_VECTORDB_SCHEMA, 'task')
@@ -120,14 +124,14 @@ class VectorDBAdapterService:
     return deleted_pet_view_id
   
   def get_similar_pet_views(self, image: str):
-    sourceImage = {"image": image}
+    query_obj = dict(image=image)
     
     try:
       raw_response = (self.vectordb_client.query.get(
         class_name=PET_VIEW_CLASS_NAME,
         properties=["description", "passageway_descriptions", "objects_descriptions", "passageways"]
         ).with_near_image(
-          sourceImage, encode=False
+          query_obj, encode=False
         ).with_additional(["distance", "id"])
         .with_limit(1).do())
     except ConnectionError as e:
@@ -144,7 +148,115 @@ class VectorDBAdapterService:
       return room_view_arr
     else:
       return []
+  
+  def get_similar_goal(
+      self,
+      goal_str: str
+  ) -> Goal | None:
+    goal_query_obj = {
+      "concepts": [goal_str],
+      "distance": GOAL_SIMILARITY_THRESHOLD
+    }
     
+    try:
+      # Retrieve goals that are similar to the goal_str
+      goal_response = (self.vectordb_client.query.get(
+        class_name=GOAL_CLASS_NAME,
+        properties=["goal_text", "completed"]
+      ).with_near_text(
+        goal_query_obj
+      ).with_additional(["id"])
+                       .with_limit(1).do())  # Adjust the limit as needed
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to get_similar_goal from connection error")
+      print(e)
+      return None
+    
+    print(f'{goal_response=}')
+    goal_arr = goal_response['data']['Get'][GOAL_CLASS_NAME]
+    if len(goal_arr) == 0:
+      return None
+    
+    similar_goal = goal_arr[0]
+    return Goal(
+      description=similar_goal["goal_text"],
+      goal_id=similar_goal["_additional"]["id"],
+      completed=similar_goal["completed"]
+    )
+  
+  def create_goal(self, goal_text: str) -> Goal | None:
+    try:
+      new_goal_id = self.vectordb_client.data_object.create(
+        class_name=GOAL_CLASS_NAME,
+        data_object=dict(goal_text=goal_text, completed=False)
+      )
+      print(f'successfully created new goal with id: {new_goal_id}')
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to create_goal from connection error")
+      print(e)
+      return None
+    return Goal(
+      goal_id=new_goal_id,
+      description=goal_text,
+      completed=False
+    )
+  
+  def set_goal_completed(self, goal_id: str, goal_completed: bool) -> None:
+    try:
+      self.vectordb_client.data_object.update(
+        uuid=goal_id,
+        class_name=GOAL_CLASS_NAME,
+        data_object=dict(completed=goal_completed)
+      )
+      print(f'successfully updated goal with id={goal_id} to completed={goal_completed}')
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to set_goal_completed from connection error")
+      print(e)
+  
+  def get_similar_pet_views_with_goal(self, image: str, goal_id: str) -> dict[str, Any] | None:
+    query_obj = dict(image=image)
+    
+    try:
+      raw_response = (self.vectordb_client.query.get(
+        class_name=PET_VIEW_WITH_GOAL_CLASS_NAME,
+        properties=["description", "passageway_descriptions", "objects_descriptions", "passageways"]
+      ).with_where({
+        "path": ["goal_id"],
+        "operator": "Equal",
+        "valueText": goal_id
+      }).with_near_image(
+        query_obj, encode=False
+      ).with_additional(["distance", "id"])
+                      .with_limit(1).do())
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to get_similar_pet_views_with_goal from connection error")
+      print(e)
+      return None
+    
+    print(f'{raw_response=}')
+    room_view_arr = raw_response['data']['Get'][PET_VIEW_WITH_GOAL_CLASS_NAME]
+    if len(room_view_arr) == 0:
+      return None
+    
+    if room_view_arr[0]['_additional']['distance'] < 0.15:
+      return room_view_arr[0]
+    else:
+      return None
+  
+  def create_pet_view_with_goal(self, new_pet_view: CreatePetViewWithGoalModel) -> str | None:
+    try:
+      new_pet_view_id = self.vectordb_client.data_object.create(
+        class_name=PET_VIEW_WITH_GOAL_CLASS_NAME,
+        data_object=asdict(new_pet_view)
+      )
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to create_pet_view_with_goal id from connection error")
+      print(e)
+      return None
+    
+    print(f'successfully created new create_pet_view_with_goal with id: {new_pet_view_id}, and associated with goal {new_pet_view.goal_id}')
+    return new_pet_view_id
+  
   def get_similar_skill(self, task_definition: TaskDefinition, skill_threshold: float) -> list[FoundSkill]:
     try:
       raw_response = self.weaviate_skill_lc.similarity_search_with_score(

@@ -22,6 +22,8 @@ You must follow the following criteria:
 8) Your next task should be very quick to execute. For example: "Go down the kitchen_passageway passageway". Even if a passageway is blocked off it can still be useful to explore. Passageways should be specified using its name verbatim from "passageway_descriptions"
 9) If you want to move to an object, say the name of the object you want to move to. For example: "Go to the cat". If an object is to high for you to reach, then you cannot interact with it. Objects should be specified using its name verbatim from "objects_descriptions"
 10) if "passageway_descriptions" is empty that means there are no passageways in your view, feel free to turn to find a new passageway. Same for "objects_descriptions"
+11) Only say a goal is completed if you have fully completed the goal. This will most likely take many steps. For example, exploring is only done when you have found another goal that is interesting most likely from a result of exploring.
+12) If you say a goal is completed, make sure to provide a new goal. Do not provide the same next_goal, with previous_goal_completed=True
 
 You should only respond with yaml in the form below
 RESPONSE FORMAT:
@@ -33,13 +35,13 @@ previous_goal_completed: ...True/False answer if previous goal was completed
 Example 1:
 reasoning: "I want to explore the garage_leading passageway since there is a game room in that direction"
 task: "Go to garage_leading passageway"
-next_goal: explore the game room
+next_goal: explore the game room since I am looking for a game
 previous_goal_completed: False
 
 Example 2:
-reasoning: "I want to find my human since he just called for me. I will turn to find him"
+reasoning: "My human just called me and told me to come to the couch. I will go find the couch."
 task: "Turn left"
-next_goal: find human
+next_goal: find the couch since I was called to the couch
 previous_goal_completed: False
 
 Example 3:

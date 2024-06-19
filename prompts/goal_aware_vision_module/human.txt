@@ -1,0 +1,1 @@
+Current Goal: {current_goal}

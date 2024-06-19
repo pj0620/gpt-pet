@@ -15,6 +15,7 @@ from module.subconscious.input.base_subconscious_input_module import BaseSubcons
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.stdin_speech_module import StdinAudioModule
 from module.subconscious.input.vision_module import VisionModule
+from module.subconscious.input.vision_module_with_goals import VisionModuleWithGoals
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
@@ -37,7 +38,7 @@ context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
 
 context.analytics_service.new_text("initializing vision llm adapter")
 context.visual_llm_adapter = VisualLLMAdapterService()
-context.goal_mixin = SimpleChainGoalMixin(context.analytics_service)
+context.goal_mixin = SimpleChainGoalMixin(context.analytics_service, context.vectordb_adapter)
 
 gptpet_env = get_env_var('GPTPET_ENV')
 if gptpet_env == 'local':
@@ -83,7 +84,8 @@ sensory_modules.append(ProximityModule(context.device_io_adapter))
 
 context.analytics_service.new_text("initializing vision module")
 subconscious_input_modules: list[BaseSubconsciousInputModule] = [
-  VisionModule(context.vectordb_adapter)
+  # VisionModule(context.vectordb_adapter)
+  VisionModuleWithGoals(context.vectordb_adapter)
 ]
 
 if gptpet_env == 'local':
@@ -94,7 +96,7 @@ if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
   subconscious_input_modules.append(ProximitySensorModule())
 
 context.analytics_service.new_text("initializing conscious module")
-# conscious_module = GenerativeAgentConsciousModule(context.vectordb_adapter)
+# conscious_module = GenerativeAgentConsciousModule(context.vectordb_adapter, context.analytics_service)
 conscious_module = GoalAwareChainConsciousModule()
 
 context.analytics_service.new_text("initializing executor module")

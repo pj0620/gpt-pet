@@ -3,6 +3,7 @@ from dataclasses import dataclass
 
 @dataclass
 class Goal:
-  description: str | None
+  description: str
   completed: bool
+  goal_id: str
   
