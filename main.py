@@ -23,7 +23,7 @@ from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapt
 from service.sim_adapter import SimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
-from utils.env_utils import get_env_var
+from utils.env_utils import get_env_var, check_env_flag
 
 np.set_printoptions(precision=3, suppress=True)
 
@@ -88,10 +88,10 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModuleWithGoals(context.vectordb_adapter)
 ]
 
-if gptpet_env == 'local':
+if check_env_flag('MANUAL_AUDIO_INPUT'):
   subconscious_input_modules.append(StdinAudioModule())
 
-if os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') != 'true':
+if not check_env_flag('SIM_SKIP_PROXIMITY_SENSOR'):
   context.analytics_service.new_text("initializing subconscious proximity sensor module")
   subconscious_input_modules.append(ProximitySensorModule())
 
