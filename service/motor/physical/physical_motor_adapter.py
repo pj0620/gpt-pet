@@ -24,6 +24,7 @@ GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
+
 class PhysicalMotorService(BaseMotorAdapter):
   def __init__(
       self,
@@ -122,7 +123,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     after_avg_depth = self._calc_average_dist()
     
     perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
-    if (action == MOVE_AHEAD or action == MOVE_BACK) and (perc_change_depth < 0.02):
+    if (action == MOVE_AHEAD or action == MOVE_BACK) and (perc_change_depth < 0.05):
       error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
       self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
@@ -147,7 +148,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in all_pins:
       GPIO.output(p, GPIO.LOW)
-      
+    
     GPIO.cleanup()
   
   def setup_motors(self):
@@ -225,7 +226,6 @@ class PhysicalMotorService(BaseMotorAdapter):
       degrees=degrees
     )
   
-  
   def _do_action(
       self,
       on_pins: list[int],
@@ -257,7 +257,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     for p in on_pins:
       GPIO.output(p, GPIO.LOW)
-      
+    
     # go backwards momentarily to stop robot
     if stop_after:
       for p in off_pins:
@@ -268,7 +268,7 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
-    
+  
   def _calc_average_dist(self):
     print("calculating avergae depth from depth sensor")
     
