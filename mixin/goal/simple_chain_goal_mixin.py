@@ -38,10 +38,10 @@ class SimpleChainGoalMixin(BaseGoalMixin):
     if self.goal is None:
       self.analytics_service.new_text(f"found no matching new_goal=`{new_goal}`, creating new goal")
       self.goal = self.vectordb_adapter.create_goal(new_goal)
-      self.analytics_service.new_text(f"created goal: {self.goal}")
+      self.analytics_service.new_text(f"goal is now: {self.goal}")
       # TODO: how to handle error
     else:
-      self.analytics_service.new_text(f"found matching goal to new_goal=`{new_goal}`: {self.goal}")
+      self.analytics_service.new_text(f"found matching goal for new_goal=`{new_goal}` goal is now: {self.goal}")
   
   def get_current_goal(self) -> Goal:
     return self.goal

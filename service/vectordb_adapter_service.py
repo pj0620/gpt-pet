@@ -155,7 +155,7 @@ class VectorDBAdapterService:
   ) -> Goal | None:
     goal_query_obj = {
       "concepts": [goal_str],
-      "distance": GOAL_SIMILARITY_THRESHOLD
+      "certainty": GOAL_SIMILARITY_THRESHOLD
     }
     
     try:

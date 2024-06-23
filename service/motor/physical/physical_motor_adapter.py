@@ -270,7 +270,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     GPIO.cleanup()
   
   def _calc_average_dist(self):
-    print("calculating avergae depth from depth sensor")
+    print("calculating average depth from depth sensor")
     
     depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
     
