@@ -7,6 +7,7 @@ class PhysicalTiltService(BaseTiltService):
     self.pending_tilt = False
   
   def body(self, dev, ctx, degrees):
+    print(f"pending_tilt = {self.pending_tilt}")
     if self.pending_tilt:
       self.pending_tilt = False
     else:
