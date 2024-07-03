@@ -11,5 +11,6 @@ class PhysicalCameraModule(BaseSensoryModule):
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
     array, _ = freenect.sync_get_video()
-    array = cv2.cvtColor(array, cv2.COLOR_RGB2BGR)
+    freenect.sync_stop()
+    # array = cv2.cvtColor(array, cv2.COLOR_RGB2BGR)
     return {'last_frame': array}
