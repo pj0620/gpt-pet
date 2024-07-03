@@ -15,6 +15,8 @@ class PhysicalTiltService(BaseTiltService):
       raise freenect.Kill
     print('calling set_tilt_degs')
     freenect.set_tilt_degs(dev, degrees)
+    self.pending_tilt = False
+    raise freenect.Kill
   
   def do_tilt(self, degrees: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
