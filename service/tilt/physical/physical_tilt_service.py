@@ -10,7 +10,9 @@ class PhysicalTiltService(BaseTiltService):
     if self.pending_tilt:
       self.pending_tilt = False
     else:
+      print('calling raise freenect.Kill')
       raise freenect.Kill
+    print('calling set_tilt_degs')
     freenect.set_tilt_degs(dev, degrees)
   
   def do_tilt(self, degrees: int) -> None:
@@ -21,10 +23,13 @@ class PhysicalTiltService(BaseTiltService):
       # ctx = freenect.init()
       # dev = freenect.open_device(ctx, freenect.num_devices(ctx) - 1)
       # freenect.set_tilt_degs(dev, degrees)
+      print('calling stop sync')
       freenect.sync_stop()
       self.pending_tilt = True
       body_func = lambda dev, ctx: self.body(dev, ctx, degrees)
+      print('calling runloop')
       freenect.runloop(body=body_func)
+      print('calling stop sync')
       freenect.sync_stop()
       print(f"Tilt angle set to {degrees} degrees")
     else:
