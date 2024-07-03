@@ -42,6 +42,8 @@ class SimpleChainGoalMixin(BaseGoalMixin):
       # TODO: how to handle error
     else:
       self.analytics_service.new_text(f"found matching goal for new_goal=`{new_goal}`")
+      
+      # required for petview
       self.analytics_service.new_text(f"goal is now: {self.goal}")
   
   def get_current_goal(self) -> Goal:
@@ -56,4 +58,6 @@ class SimpleChainGoalMixin(BaseGoalMixin):
       self.analytics_service.new_text(f"successfully created default goal: {self.goal}")
     else:
       self.analytics_service.new_text(f"found default goal already exists: {self.goal}")
+      
+    # required for petview
     self.analytics_service.new_text(f"goal is now: {self.goal}")
