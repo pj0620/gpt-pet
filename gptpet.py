@@ -68,4 +68,5 @@ class GPTPet:
           f'task_result: {context.task_result}'
         )
         
-        # sleep(0.5)
+        # necessary to make sure robot is still for image
+        sleep(0.5)
