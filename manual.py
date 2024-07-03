@@ -11,7 +11,6 @@ from flask_cors import CORS
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
 from gptpet_context import GPTPetContext
 from model.conscious import TaskDefinition
-from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
@@ -19,6 +18,7 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
+from service.tilt.sim.noop_tilt_service import NoopTiltService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
@@ -28,7 +28,7 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-test_env = 'physical'
+test_env = 'local'
 
 # setup vectordb
 context = GPTPetContext()
@@ -42,16 +42,20 @@ if test_env == 'local':
   camera_module = Ai2ThorCameraModule(sim_adapter)
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
   device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
+  tilt_service = NoopTiltService()
 else:
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
   from module.sensory.physical.physical_camera_module import PhysicalCameraModule
+  from service.tilt.physical.physical_tilt_service import PhysicalTiltService
+  from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
   
   device_io_adapter = PhysicalDeviceIOAdapter()
   camera_module = PhysicalCameraModule()
   depth_camera_module = PhysicalDepthCameraModule()
   motor_adapter = PhysicalMotorService(context=context)
+  tilt_service = PhysicalTiltService()
 
 context.motor_adapter = motor_adapter
 context.device_io_adapter = device_io_adapter
@@ -88,6 +92,17 @@ def rotate(degrees: str):
     abort(400, 'Invalid number of degrees: ' + degrees)
   result = motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
   return jsonify({'moved': result})
+
+
+@app.route('/tilt/<degrees>', methods=['POST'])
+def tilt(degrees: str):
+  print("tilt request: ", degrees)
+  try:
+    num_degrees = int(degrees)
+  except ValueError:
+    abort(400, 'Invalid number of degrees: ' + degrees)
+  tilt_service.do_tilt(num_degrees)
+  return jsonify({'moved': True})
 
 
 @app.route('/proximity-measurements', methods=['GET'])
