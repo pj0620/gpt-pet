@@ -25,6 +25,7 @@ class PhysicalTiltService(BaseTiltService):
       self.pending_tilt = True
       body_func = lambda dev, ctx: self.body(dev, ctx, degrees)
       freenect.runloop(body=body_func)
+      freenect.sync_stop()
       print(f"Tilt angle set to {degrees} degrees")
     else:
       print("Angle out of range. Please enter an angle between -30 and 30 degrees.")
