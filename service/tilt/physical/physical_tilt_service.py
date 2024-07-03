@@ -21,8 +21,7 @@ class PhysicalTiltService(BaseTiltService):
       # ctx = freenect.init()
       # dev = freenect.open_device(ctx, freenect.num_devices(ctx) - 1)
       # freenect.set_tilt_degs(dev, degrees)
-      # freenect.sync_stop()
-      
+      freenect.sync_stop()
       self.pending_tilt = True
       body_func = lambda dev, ctx: self.body(dev, ctx, degrees)
       freenect.runloop(body=body_func)
