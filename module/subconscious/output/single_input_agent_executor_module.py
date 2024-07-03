@@ -152,20 +152,12 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       success=success,
       final_code=result['output']
     )
-    context.vectordb_adapter.create_skill(SkillCreateModel(
-      task=new_task.task,
-      code=task_result.final_code
-    ))
+    if success:
+      skill_create_model = SkillCreateModel(
+        task=new_task.task,
+        code=task_result.final_code
+      )
+      context.analytics_service.new_text(f"creating following skill: {skill_create_model}")
+      context.vectordb_adapter.create_skill(skill_create_model)
     
     return task_result
-  
-  def save_skill(
-      self,
-      vectordb_adapter: VectorDBAdapterService,
-      task: TaskDefinition,
-      task_result: TaskResult
-  ) -> None:
-    vectordb_adapter.create_skill(SkillCreateModel(
-      task=task.task,
-      code=task_result.final_code
-    ))

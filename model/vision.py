@@ -14,6 +14,11 @@ class CreatePetViewModel:
   passageway_descriptions: str
   objects_descriptions: str
   passageways: str
+  
+  
+@dataclass(frozen=True)
+class CreatePetViewWithGoalModel(CreatePetViewModel):
+  goal_id: str
 
 
 class PetViewDescription(BaseModel):

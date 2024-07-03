@@ -68,7 +68,7 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
       subconscious_info=get_yaml(conscious_inputs_value_str, True),
       time=str(datetime.now()),
       previous_tasks=get_yaml(self.tasks_history, True),
-      current_goal=context.goal_mixin.get_current_goal()
+      current_goal=context.goal_mixin.get_current_goal().description
     )
     system_input = self.prompt_system.format(
       subconscious_schema=get_yaml(conscious_inputs_schema_str, True)
@@ -86,7 +86,7 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
     new_task = task_response_mapper(str(conscious_inputs_value_str), response)
     if response.previous_goal_completed:
       context.analytics_service.new_text(f"completed previous goal {context.goal_mixin.get_current_goal()}")
-    context.goal_mixin.update_goal(response.next_goal)
+    context.goal_mixin.update_goal(response.next_goal, response.previous_goal_completed)
     
     return new_task
   

@@ -4,7 +4,7 @@ from model.goal import Goal
 
 
 class BaseGoalMixin(ABC):
-  def update_goal(self, new_goal: str) -> None:
+  def update_goal(self, new_goal: str, last_goal_completed: bool) -> None:
     """ updates goal with text description of what's going on
     """
     pass

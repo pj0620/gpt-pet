@@ -17,16 +17,18 @@ load_dotenv()
 
 
 class GPTPet:
-  def __init__(self,
-     sensory_modules: list[BaseSensoryModule],
-     subconscious_input_modules: list[BaseSubconsciousInputModule],
-     conscious_module: BaseConsciousModule,
-     executor_module: BaseExecutorModule
+  def __init__(
+      self,
+      sensory_modules: list[BaseSensoryModule],
+      subconscious_input_modules: list[BaseSubconsciousInputModule],
+      conscious_module: BaseConsciousModule,
+      executor_module: BaseExecutorModule
   ):
     self.sensory_modules = sensory_modules
     self.subconscious_input_modules = subconscious_input_modules
     self.conscious_module = conscious_module
     self.executor_module = executor_module
+  
   def exist(self, context: GPTPetContext):
     context.analytics_service.new_text("Geworfenheit")
     with tracing_v2_enabled(project_name="gpt-pet"):
@@ -61,10 +63,10 @@ class GPTPet:
         context.task_result = self.executor_module.execute(context, new_task)
         
         self.conscious_module.report_task_result(new_task, context.task_result)
-  
+        
         context.analytics_service.new_text(
           f'task_result: {context.task_result}'
         )
         
+        # necessary to make sure robot is still for image
         sleep(0.5)
-      
