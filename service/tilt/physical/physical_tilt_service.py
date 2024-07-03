@@ -11,6 +11,7 @@ class PhysicalTiltService(BaseTiltService):
       ctx = freenect.init()
       dev = freenect.open_device(ctx, freenect.num_devices(ctx) - 1)
       freenect.set_tilt_degs(dev, degrees)
+      freenect.sync_stop()
       print(f"Tilt angle set to {degrees} degrees")
     else:
       print("Angle out of range. Please enter an angle between -30 and 30 degrees.")
