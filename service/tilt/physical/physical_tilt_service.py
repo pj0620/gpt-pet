@@ -8,11 +8,12 @@ class PhysicalTiltService(BaseTiltService):
   
   def body(self, dev, ctx, degrees):
     print(f"pending_tilt = {self.pending_tilt}")
-    if self.pending_tilt:
-      self.pending_tilt = False
-    else:
+    
+    if not self.pending_tilt:
       print('calling raise freenect.Kill')
       raise freenect.Kill
+    
+    self.pending_tilt = False
     print('calling set_tilt_degs')
     freenect.set_tilt_degs(dev, degrees)
     freenect.set_led(dev, degrees % 7)
