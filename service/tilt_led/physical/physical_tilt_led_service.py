@@ -21,7 +21,8 @@ class PhysicalTiltLedService(BaseTiltLedService):
       freenect.set_led(dev, self._update_led)
       print(f"led mode set to {FREENECT_LED_MODE_DESCIPTIONS[self._update_led]}")
       self._update_led = NOOP_LED_MODE
-    # raise freenect.Kill
+    else:
+      raise freenect.Kill
     
   
   def set_led_mode(self, led_mode: int) -> None:
