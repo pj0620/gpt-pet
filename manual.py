@@ -50,9 +50,6 @@ else:
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
-  from module.sensory.physical.physical_camera_module import PhysicalCameraModule
-  from service.tilt.physical.physical_tilt_service import PhysicalTiltService
-  from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
   from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
   from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
   from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
