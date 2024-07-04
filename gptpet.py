@@ -57,7 +57,6 @@ class GPTPet:
         #   f'conscious_inputs: {context.conscious_inputs}'
         # )
         
-        context.led_service.set_led_mode(FREENECT_LED_RED)
         new_task = self.conscious_module.generate_new_task(context)
         
         context.analytics_service.new_text(
