@@ -9,18 +9,18 @@ NOOP_LED_MODE = -1
 
 class PhysicalTiltLedService(BaseTiltLedService):
   def __init__(self):
-    self.update_led = NOOP_LED_MODE
-    self.update_deg_tilt = NOOP_TILT_DEGREES
+    self._update_led = NOOP_LED_MODE
+    self._update_deg_tilt = NOOP_TILT_DEGREES
   
-  def body(self, dev, ctx):
-    if self.update_deg_tilt != NOOP_TILT_DEGREES:
-      freenect.set_tilt_degs(dev, self.update_deg_tilt)
-      print(f"tilt degrees set to {self.update_deg_tilt}")
-      self.update_deg_tilt = NOOP_TILT_DEGREES
-    elif self.update_led != NOOP_LED_MODE:
-      freenect.set_led(dev, self.update_led)
-      print(f"led mode set to {FREENECT_LED_MODE_DESCIPTIONS[self.update_led]}")
-      self.update_led = NOOP_LED_MODE
+  def _body(self, dev, ctx):
+    if self._update_deg_tilt != NOOP_TILT_DEGREES:
+      freenect.set_tilt_degs(dev, self._update_deg_tilt)
+      print(f"tilt degrees set to {self._update_deg_tilt}")
+      self._update_deg_tilt = NOOP_TILT_DEGREES
+    elif self._update_led != NOOP_LED_MODE:
+      freenect.set_led(dev, self._update_led)
+      print(f"led mode set to {FREENECT_LED_MODE_DESCIPTIONS[self._update_led]}")
+      self._update_led = NOOP_LED_MODE
     raise freenect.Kill
     
   
@@ -31,9 +31,9 @@ class PhysicalTiltLedService(BaseTiltLedService):
       raise Exception(f"invalid led mode: {led_mode}")
     
     print(f'setting led to {FREENECT_LED_MODE_DESCIPTIONS[led_mode]}')
-    self.update_led = led_mode
+    self._update_led = led_mode
     freenect.sync_stop()
-    freenect.runloop(body=self.body, depth=lambda x, y: None)
+    freenect.runloop(body=self._body, depth=lambda x, y: None)
     freenect.sync_stop()
   
   def do_tilt(self, degrees: int) -> None:
@@ -43,7 +43,7 @@ class PhysicalTiltLedService(BaseTiltLedService):
       raise Exception(f"invalid tilt degrees={degrees} must be between -30 and 30")
     
     print(f'setting tilt degrees to {degrees}')
-    self.update_deg_tilt = degrees
+    self._update_deg_tilt = degrees
     freenect.sync_stop()
-    freenect.runloop(body=self.body, depth=lambda x, y: None)
+    freenect.runloop(body=self._body, depth=lambda x, y: None)
     freenect.sync_stop()

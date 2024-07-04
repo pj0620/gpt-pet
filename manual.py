@@ -117,7 +117,7 @@ def set_led_mode(mode: str):
     assert 0 <= num_mode < 6, "mode must be between 0 and 5"
   except ValueError:
     abort(400, 'Invalid mode: ' + mode)
-  tilt_led_service.update_led(num_mode)
+  tilt_led_service.set_led_mode(num_mode)
   return jsonify({'changed_led': True})
 
 
