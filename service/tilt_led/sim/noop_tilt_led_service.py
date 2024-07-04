@@ -1,6 +1,5 @@
 from constants.kinect import FREENECT_LED_MODE_DESCIPTIONS
-from service.tilt_led.base_tilt_led_service import BaseLEDService, BaseTiltLedService
-from service.tilt.base_tilt_service import BaseTiltService
+from service.tilt_led.base_tilt_led_service import BaseTiltLedService
 
 
 class NoopTiltLedService(BaseTiltLedService):
