@@ -7,7 +7,7 @@ NOOP_TILT_DEGREES = -100
 NOOP_LED_MODE = -1
 
 
-class AsyncPhysicalTiltLedService(BaseTiltLedService):
+class AsyncKinectService(BaseTiltLedService):
   def __init__(self):
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
@@ -26,11 +26,10 @@ class AsyncPhysicalTiltLedService(BaseTiltLedService):
       freenect.set_led(dev, self._update_led)
       print(f"led mode set to {FREENECT_LED_MODE_DESCIPTIONS[self._update_led]}")
       self._update_led = NOOP_LED_MODE
-    # else:
-    #   raise freenect.Kill
     
   def _depth_handler(self, dev, data, timestamp):
-    print('_depth_handler called')
+    print('_depth_handler called ', type(data))
+    # self._last_depth =
   
   def _rgb_handler(self, dev, data, timestamp):
     print('_rgb_handler called')
