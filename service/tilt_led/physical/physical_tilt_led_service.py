@@ -39,7 +39,7 @@ class PhysicalTiltLedService(BaseTiltLedService):
   def do_tilt(self, degrees: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
     # The angle should be in the range of -30 to 30 degrees
-    if -30 <= degrees <= 30:
+    if not (-30 <= degrees <= 30):
       raise Exception(f"invalid tilt degrees={degrees} must be between -30 and 30")
     
     print(f'setting tilt degrees to {degrees}')
