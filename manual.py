@@ -108,8 +108,9 @@ def tilt(degrees: str):
   tilt_led_service.do_tilt(num_degrees)
   return jsonify({'moved': True})
 
+
 @app.route('/set-led-mode/<mode>', methods=['POST'])
-def tilt(mode: str):
+def set_led_mode(mode: str):
   print("led mode request: ", mode)
   try:
     num_mode = int(mode)
