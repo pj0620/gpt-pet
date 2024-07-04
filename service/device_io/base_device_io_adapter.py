@@ -12,7 +12,7 @@ class BaseDeviceIOAdapter(ABC):
     :return: measurements from Robot's proximity sensors
     """
   
-  @deprecated
+  # opting to use kinect leds for now
   def set_color(
       self,
       color: str
