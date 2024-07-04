@@ -34,11 +34,9 @@ class AsyncPhysicalKinectService(BaseKinectService):
       self._update_led = NOOP_LED_MODE
     
   def _depth_handler(self, dev, data, timestamp):
-    print('_depth_handler called ', type(data))
     self._last_depth = data
   
   def _rgb_handler(self, dev, data, timestamp):
-    print('_rgb_handler called')
     self._last_rgb = data
   
   def set_led_mode(self, led_mode: int) -> None:
