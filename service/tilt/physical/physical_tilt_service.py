@@ -31,7 +31,7 @@ class PhysicalTiltService(BaseTiltService):
       self.pending_tilt = True
       body_func = lambda dev, ctx: self.body(dev, ctx, degrees)
       print('calling runloop')
-      freenect.runloop(body=body_func)
+      freenect.runloop(body=body_func, depth=lambda x, y: None)
       print('calling stop sync')
       freenect.sync_stop()
       print(f"Tilt angle set to {degrees} degrees")
