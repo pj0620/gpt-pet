@@ -24,9 +24,9 @@ class PhysicalLEDService(BaseLEDService):
       raise Exception(f"invalid led mode: {led_mode}")
     
     print(f'setting led to {FREENECT_LED_MODE_DESCIPTIONS[led_mode]}')
-    freenect.sync_stop()
+    # freenect.sync_stop()
     self.pending_led_change = True
     body_func = lambda dev, ctx: self.body(dev, ctx, led_mode)
     freenect.runloop(body=body_func, depth=lambda x, y: None)
-    freenect.sync_stop()
+    # freenect.sync_stop()
     print(f"led mode set to {FREENECT_LED_MODE_DESCIPTIONS[led_mode]}")
