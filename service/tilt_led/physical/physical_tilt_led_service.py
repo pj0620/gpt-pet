@@ -41,9 +41,9 @@ class PhysicalTiltLedService(BaseTiltLedService):
     
     print(f'setting led to {FREENECT_LED_MODE_DESCIPTIONS[led_mode]}')
     self._update_led = led_mode
-    # freenect.sync_stop()
+    freenect.sync_stop()
     freenect.runloop(body=self._body, depth=lambda x, y: None)
-    # freenect.sync_stop()
+    freenect.sync_stop()
   
   def do_tilt(self, degrees: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
