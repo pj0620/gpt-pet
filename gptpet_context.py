@@ -19,7 +19,7 @@ class GPTPetContext:
   visual_llm_adapter: VisualLLMAdapterService
   motor_adapter: BaseMotorAdapter
   device_io_adapter: BaseDeviceIOAdapter
-  led_service: BaseLEDService
+  led_service: Any
   led_tilt_service: BaseTiltLedService
   passageways: list[Passageway]
   objects_in_view: list[Object]
