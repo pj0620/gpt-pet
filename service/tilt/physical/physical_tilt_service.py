@@ -15,6 +15,7 @@ class PhysicalTiltService(BaseTiltService):
       raise freenect.Kill
     print('calling set_tilt_degs')
     freenect.set_tilt_degs(dev, degrees)
+    freenect.set_led(dev, degrees % 7)
     self.pending_tilt = False
     raise freenect.Kill
   
@@ -22,10 +23,6 @@ class PhysicalTiltService(BaseTiltService):
     """Set the tilt angle of the Kinect sensor."""
     # The angle should be in the range of -30 to 30 degrees
     if -30 <= degrees <= 30:
-      # freenect.sync_stop()
-      # ctx = freenect.init()
-      # dev = freenect.open_device(ctx, freenect.num_devices(ctx) - 1)
-      # freenect.set_tilt_degs(dev, degrees)
       print('calling stop sync')
       freenect.sync_stop()
       self.pending_tilt = True
