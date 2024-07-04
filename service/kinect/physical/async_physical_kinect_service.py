@@ -19,8 +19,8 @@ class AsyncPhysicalKinectService(BaseKinectService):
     
     context = freenect.init()
     device = freenect.open_device(context, 0)
-    freenect.set_depth_mode(device, freenect.FREENECT_RESOLUTION_MEDIUM, freenect.FREENECT_DEPTH_REGISTERED)
-    freenect.set_video_mode(device, freenect.FREENECT_RESOLUTION_MEDIUM, freenect.VIDEO_RGB)
+    freenect.set_depth_mode(device, freenect.RESOLUTION_MEDIUM, freenect.DEPTH_REGISTERED)
+    freenect.set_video_mode(device, freenect.RESOLUTION_MEDIUM, freenect.VIDEO_RGB)
     freenect.runloop(body=self._body, depth=self._depth_handler, video=self._rgb_handler, dev=device)
   
   def _body(self, dev, ctx):
