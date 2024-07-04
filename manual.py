@@ -1,3 +1,4 @@
+import argparse
 import base64
 import pickle
 import zlib
@@ -23,6 +24,7 @@ from service.tilt_led.physical.physical_tilt_led_service import PhysicalTiltLedS
 from service.tilt_led.sim.noop_tilt_led_service import NoopTiltLedService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
+from utils.env_utils import get_env
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
 
 load_dotenv()
@@ -30,15 +32,13 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-test_env = 'local'
-
 # setup vectordb
 context = GPTPetContext()
 context.analytics_service = AnalyticsService()
 context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
 context.visual_llm_adapter = VisualLLMAdapterService()
 
-if test_env == 'local':
+if get_env() == 'local':
   sim_adapter = SimAdapter()
   motor_adapter = Ai2ThorMotorService(sim_adapter)
   camera_module = Ai2ThorCameraModule(sim_adapter)

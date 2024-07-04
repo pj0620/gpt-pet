@@ -1,3 +1,4 @@
+import argparse
 import os
 import subprocess
 import socket
@@ -45,4 +46,15 @@ def check_port_in_use(host, port):
     except socket.error as e:
       return True  # The port is in use
   
+  
+def get_env():
+  parser = argparse.ArgumentParser(description="GPTPet Environment")
+  parser.add_argument(
+      '--env', '-e',
+      choices=['local', 'physical'],
+      required=True,
+      help='Specify the environment: local or physical'
+  )
+  args = parser.parse_args()
+  return args.env
   
