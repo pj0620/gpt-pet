@@ -1,5 +1,7 @@
+import numpy as np
+
 from constants.kinect import FREENECT_LED_MODES, FREENECT_LED_MODE_DESCIPTIONS
-from service.tilt_led.base_tilt_led_service import BaseTiltLedService
+from service.kinect.base_kinect_service import BaseKinectService
 import freenect
 
 
@@ -7,7 +9,7 @@ NOOP_TILT_DEGREES = -100
 NOOP_LED_MODE = -1
 
 
-class SyncPhysicalTiltLedService(BaseTiltLedService):
+class SyncPhysicalKinectService(BaseKinectService):
   
   def set_led_mode(self, led_mode: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
@@ -29,3 +31,11 @@ class SyncPhysicalTiltLedService(BaseTiltLedService):
     freenect.sync_stop()
     freenect.runloop(body=self._body, depth=lambda x, y: None)
     freenect.sync_stop()
+  
+  def get_video(self) -> np.array:
+    return super().get_video()
+  
+  def get_depth(self) -> np.array:
+    return super().get_depth()
+    
+  

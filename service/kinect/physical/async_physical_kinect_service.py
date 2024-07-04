@@ -1,5 +1,7 @@
+import numpy as np
+
 from constants.kinect import FREENECT_LED_MODES, FREENECT_LED_MODE_DESCIPTIONS
-from service.tilt_led.base_tilt_led_service import BaseTiltLedService
+from service.kinect.base_kinect_service import BaseKinectService
 import freenect
 
 
@@ -7,7 +9,7 @@ NOOP_TILT_DEGREES = -100
 NOOP_LED_MODE = -1
 
 
-class AsyncKinectService(BaseTiltLedService):
+class AsyncPhysicalKinectService(BaseKinectService):
   def __init__(self):
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
@@ -15,7 +17,11 @@ class AsyncKinectService(BaseTiltLedService):
     self._last_depth = None
     self._last_rgb = None
     
-    freenect.runloop(body=self._body, depth=self._depth_handler, video=self._rgb_handler)
+    context = freenect.init()
+    device = freenect.open_device(context, 0)
+    freenect.set_depth_mode(device, freenect.FREENECT_RESOLUTION_MEDIUM, freenect.FREENECT_DEPTH_REGISTERED)
+    freenect.set_video_mode(device, freenect.FREENECT_RESOLUTION_MEDIUM, freenect.VIDEO_RGB)
+    freenect.runloop(body=self._body, depth=self._depth_handler, video=self._rgb_handler, dev=device)
   
   def _body(self, dev, ctx):
     if self._update_deg_tilt != NOOP_TILT_DEGREES:
@@ -29,10 +35,11 @@ class AsyncKinectService(BaseTiltLedService):
     
   def _depth_handler(self, dev, data, timestamp):
     print('_depth_handler called ', type(data))
-    # self._last_depth =
+    self._last_depth = data
   
   def _rgb_handler(self, dev, data, timestamp):
     print('_rgb_handler called')
+    self._last_rgb = data
   
   def set_led_mode(self, led_mode: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
@@ -42,9 +49,6 @@ class AsyncKinectService(BaseTiltLedService):
     
     print(f'setting led to {FREENECT_LED_MODE_DESCIPTIONS[led_mode]}')
     self._update_led = led_mode
-    # freenect.sync_stop()
-    # freenect.runloop(body=self._body, depth=self._depth_handler, video=self._rgb_handler)
-    # freenect.sync_stop()
   
   def do_tilt(self, degrees: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
@@ -54,6 +58,11 @@ class AsyncKinectService(BaseTiltLedService):
     
     print(f'setting tilt degrees to {degrees}')
     self._update_deg_tilt = degrees
-    # freenect.sync_stop()
-    # freenect.runloop(body=self._body, depth=lambda x, y: None)
-    # freenect.sync_stop()
+  
+  def get_video(self) -> np.array:
+    return self._last_rgb
+  
+  def get_depth(self) -> np.array:
+    return self._last_depth
+    
+  
