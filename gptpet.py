@@ -48,7 +48,7 @@ class GPTPet:
           f'context.sensory_outputs.keys(): {context.sensory_outputs.keys()}'
         )
         
-        context.led_service.set_led_mode(FREENECT_LED_BLINK_RED_YELLOW)
+        context.led_service.set_led_mode(FREENECT_LED_YELLOW)
         # build input to conscious module from subconscious modules
         context.conscious_inputs = []
         for subconscious_input_module in self.subconscious_input_modules:
@@ -59,7 +59,6 @@ class GPTPet:
         #   f'conscious_inputs: {context.conscious_inputs}'
         # )
         
-        context.led_service.set_led_mode(FREENECT_LED_YELLOW)
         new_task = self.conscious_module.generate_new_task(context)
         
         context.analytics_service.new_text(

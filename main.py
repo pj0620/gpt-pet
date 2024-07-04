@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-from constants.kinect import FREENECT_LED_BLINK_GREEN, FREENECT_LED_BLINK_RED_YELLOW
+from constants.kinect import FREENECT_LED_BLINK_GREEN, FREENECT_LED_BLINK_RED_YELLOW, FREENECT_LED_YELLOW
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
@@ -83,7 +83,7 @@ else:
   raise Exception(
     f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
 
-context.led_service.set_led_mode(FREENECT_LED_BLINK_RED_YELLOW)
+context.led_service.set_led_mode(FREENECT_LED_YELLOW)
 
 context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))
