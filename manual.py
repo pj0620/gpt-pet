@@ -20,7 +20,7 @@ from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapt
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 from service.tilt.sim.noop_tilt_service import NoopTiltService
-from service.tilt_led.physical.physical_tilt_led_service import PhysicalTiltLedService
+from service.tilt_led.physical.async_physical_tilt_led_service import AsyncPhysicalTiltLedService
 from service.tilt_led.sim.noop_tilt_led_service import NoopTiltLedService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
@@ -59,7 +59,7 @@ else:
   depth_camera_module = PhysicalDepthCameraModule()
   motor_adapter = PhysicalMotorService(context=context)
   tilt_service = PhysicalTiltService()
-  tilt_led_service = PhysicalTiltLedService()
+  tilt_led_service = AsyncPhysicalTiltLedService()
 
 context.motor_adapter = motor_adapter
 context.device_io_adapter = device_io_adapter

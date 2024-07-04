@@ -17,7 +17,7 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
-from service.tilt_led.physical.physical_tilt_led_service import PhysicalTiltLedService
+from service.tilt_led.physical.async_physical_tilt_led_service import PhysicalTiltLedService
 from service.tilt_led.sim.noop_tilt_led_service import NoopTiltLedService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
