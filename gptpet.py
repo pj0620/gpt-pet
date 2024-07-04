@@ -2,6 +2,8 @@ import json
 
 from langchain_core.tracers.context import tracing_v2_enabled
 
+from constants.kinect import FREENECT_LED_GREEN, FREENECT_LED_BLINK_GREEN, FREENECT_LED_YELLOW, \
+  FREENECT_LED_BLINK_RED_YELLOW
 from gptpet_context import GPTPetContext
 from model.subconscious import ConsciousInput
 from module.conscious.base_conscious_module import BaseConsciousModule
@@ -30,9 +32,11 @@ class GPTPet:
     self.executor_module = executor_module
   
   def exist(self, context: GPTPetContext):
+    context.led_service.set_led_mode(FREENECT_LED_GREEN)
     context.analytics_service.new_text("Geworfenheit")
     with tracing_v2_enabled(project_name="gpt-pet"):
       while True:
+        context.led_service.set_led_mode(FREENECT_LED_BLINK_GREEN)
         context.analytics_service.new_text("invoking sensory modules")
         # get all sensor outputs from sensory modules
         context.sensory_outputs = {}
@@ -44,6 +48,7 @@ class GPTPet:
           f'context.sensory_outputs.keys(): {context.sensory_outputs.keys()}'
         )
         
+        context.led_service.set_led_mode(FREENECT_LED_BLINK_RED_YELLOW)
         # build input to conscious module from subconscious modules
         context.conscious_inputs = []
         for subconscious_input_module in self.subconscious_input_modules:
@@ -54,12 +59,14 @@ class GPTPet:
         #   f'conscious_inputs: {context.conscious_inputs}'
         # )
         
+        context.led_service.set_led_mode(FREENECT_LED_YELLOW)
         new_task = self.conscious_module.generate_new_task(context)
         
         context.analytics_service.new_text(
           f'new task: task={new_task.task}, reasoning={new_task.reasoning}'
         )
         
+        context.led_service.set_led_mode(FREENECT_LED_GREEN)
         context.task_result = self.executor_module.execute(context, new_task)
         
         self.conscious_module.report_task_result(new_task, context.task_result)

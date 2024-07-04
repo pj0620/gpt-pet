@@ -2,6 +2,7 @@ import os
 
 import numpy as np
 
+from constants.kinect import FREENECT_LED_BLINK_GREEN, FREENECT_LED_BLINK_RED_YELLOW
 from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
@@ -18,6 +19,8 @@ from module.subconscious.input.vision_module import VisionModule
 from module.subconscious.input.vision_module_with_goals import VisionModuleWithGoals
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
+from service.led.physical.physical_led_service import PhysicalLEDService
+from service.led.sim.noop_led_service import NoopLEDService
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.sim_adapter import SimAdapter
@@ -46,6 +49,7 @@ if gptpet_env == 'local':
   
   context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
+  context.led_service = NoopLEDService()
   
   context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
@@ -64,7 +68,7 @@ elif gptpet_env == 'physical':
   
   context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
-  
+  context.led_service = PhysicalLEDService()
   context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = PhysicalMotorService(
     context=context
@@ -78,6 +82,8 @@ elif gptpet_env == 'physical':
 else:
   raise Exception(
     f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
+
+context.led_service.set_led_mode(FREENECT_LED_BLINK_RED_YELLOW)
 
 context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))
