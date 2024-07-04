@@ -53,6 +53,6 @@ class PhysicalTiltLedService(BaseTiltLedService):
     
     print(f'setting tilt degrees to {degrees}')
     self._update_deg_tilt = degrees
-    # freenect.sync_stop()
+    freenect.sync_stop()
     freenect.runloop(body=self._body, depth=lambda x, y: None)
-    # freenect.sync_stop()
+    freenect.sync_stop()
