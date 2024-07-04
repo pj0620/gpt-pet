@@ -19,6 +19,8 @@ from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapt
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 from service.tilt.sim.noop_tilt_service import NoopTiltService
+from service.tilt_led.physical.physical_tilt_led_service import PhysicalTiltLedService
+from service.tilt_led.sim.noop_tilt_led_service import NoopTiltLedService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
@@ -43,6 +45,7 @@ if test_env == 'local':
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
   device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
   tilt_service = NoopTiltService()
+  tilt_led_service = NoopTiltLedService()
 else:
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
@@ -56,6 +59,7 @@ else:
   depth_camera_module = PhysicalDepthCameraModule()
   motor_adapter = PhysicalMotorService(context=context)
   tilt_service = PhysicalTiltService()
+  tilt_led_service = PhysicalTiltLedService()
 
 context.motor_adapter = motor_adapter
 context.device_io_adapter = device_io_adapter
@@ -101,8 +105,19 @@ def tilt(degrees: str):
     num_degrees = int(degrees)
   except ValueError:
     abort(400, 'Invalid number of degrees: ' + degrees)
-  tilt_service.do_tilt(num_degrees)
+  tilt_led_service.do_tilt(num_degrees)
   return jsonify({'moved': True})
+
+@app.route('/set-led-mode/<mode>', methods=['POST'])
+def tilt(mode: str):
+  print("led mode request: ", mode)
+  try:
+    num_mode = int(mode)
+    assert 0 <= num_mode < 6, "mode must be between 0 and 5"
+  except ValueError:
+    abort(400, 'Invalid mode: ' + mode)
+  tilt_led_service.update_led(num_mode)
+  return jsonify({'changed_led': True})
 
 
 @app.route('/proximity-measurements', methods=['GET'])
