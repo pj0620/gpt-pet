@@ -26,10 +26,12 @@ class AnalyticsService:
       response = requests.post(url, json=data, timeout=5)  # 5 seconds timeout
       response.raise_for_status()  # Raises an HTTPError if the response was an error
       return response.json()
-    except requests.ConnectionError:
+    except requests.ConnectionError as e:
       print('Connection error. Unable to connect to the analytics server.')
-    except requests.Timeout:
+      print(e)
+    except requests.Timeout as e:
       print('Request timed out. The analytics server did not respond in time.')
+      print(e)
     except requests.RequestException as e:
       print(f'An error occurred:', e)
   
