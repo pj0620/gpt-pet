@@ -35,7 +35,7 @@ class GPTPet:
     context.analytics_service.new_text("Geworfenheit")
     with tracing_v2_enabled(project_name="gpt-pet"):
       while True:
-        context.led_service.set_led_mode(FREENECT_LED_BLINK_GREEN)
+        context.led_service.set_led_mode(FREENECT_LED_RED)
         context.analytics_service.new_text("invoking sensory modules")
         # get all sensor outputs from sensory modules
         context.sensory_outputs = {}
