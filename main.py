@@ -5,8 +5,6 @@ from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
 from module.conscious.goal_aware_chain_conscious_module import GoalAwareChainConsciousModule
-from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
-from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
 from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -19,7 +17,6 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
-from service.kinect.physical.async_physical_kinect_service import PhysicalTiltLedService, AsyncPhysicalKinectService
 from service.kinect.sim.noop_kinect_service import NoopKinectService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
@@ -61,8 +58,9 @@ elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
-  from module.sensory.physical.physical_camera_module import PhysicalCameraModule
-  from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
+  from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
+  from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
+  from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
   
   context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
