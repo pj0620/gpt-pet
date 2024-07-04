@@ -11,6 +11,9 @@ class PhysicalTiltLedService(BaseTiltLedService):
   def __init__(self):
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
+    
+    self._last_depth = None
+    self._last_rgb = None
   
   def _body(self, dev, ctx):
     if self._update_deg_tilt != NOOP_TILT_DEGREES:
@@ -24,6 +27,11 @@ class PhysicalTiltLedService(BaseTiltLedService):
     else:
       raise freenect.Kill
     
+  def _depth_handler(self, dev, data, timestamp):
+    pass
+  
+  def _rgb_handler(self, dev, data, timestamp):
+    pass
   
   def set_led_mode(self, led_mode: int) -> None:
     """Set the tilt angle of the Kinect sensor."""

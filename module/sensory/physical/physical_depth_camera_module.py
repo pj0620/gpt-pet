@@ -13,8 +13,8 @@ class PhysicalDepthCameraModule(BaseSensoryModule):
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
     # Get depth data from the depth camera
-    depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
     freenect.sync_stop()
+    depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
     
     print(f"raw depth: shape={depth.shape}, min={depth.min()}, max={depth.max()}")
     
