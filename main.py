@@ -5,6 +5,8 @@ from gptpet import GPTPet
 from gptpet_context import GPTPetContext
 from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
 from module.conscious.goal_aware_chain_conscious_module import GoalAwareChainConsciousModule
+from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
+from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
 from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -17,7 +19,7 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
-from service.kinect.physical.async_physical_kinect_service import PhysicalTiltLedService
+from service.kinect.physical.async_physical_kinect_service import PhysicalTiltLedService, AsyncPhysicalKinectService
 from service.kinect.sim.noop_kinect_service import NoopKinectService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
@@ -64,8 +66,9 @@ elif gptpet_env == 'physical':
   
   context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
-  # context.led_service = PhysicalLEDService()
-  context.led_tilt_service = PhysicalTiltLedService()
+  
+  print('setting up AsyncPhysicalKinectService')
+  kinect_service = AsyncPhysicalKinectService()
   
   context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = PhysicalMotorService(
@@ -74,8 +77,8 @@ elif gptpet_env == 'physical':
   
   context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
-    PhysicalCameraModule(),
-    PhysicalDepthCameraModule()
+    AsyncPhysicalCameraModule(kinect_service),
+    AsyncPhysicalDepthCameraModule(kinect_service)
   ]
 else:
   raise Exception(
