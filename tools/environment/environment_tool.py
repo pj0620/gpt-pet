@@ -28,6 +28,7 @@ class EnvironmentTool(BaseTool):
   args_schema: Type[BaseModel] = EnvironmentInput
   mock_control_api: BaseControlAPI
   real_control_api: BaseControlAPI
+  context: GPTPetContext
   
   def __init__(self,
                proximity_sensor_adapter: BaseDeviceIOAdapter,
