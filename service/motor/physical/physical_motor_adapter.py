@@ -49,9 +49,6 @@ class PhysicalMotorService(BaseMotorAdapter):
       self.context.analytics_service.new_text(error_msg)
       raise CollisionError(error_msg)
     
-    print("calculating before average depth")
-    before_avg_depth = self._calc_average_dist()
-    
     move_magnitude = min(move_magnitude, 1.)
     
     duty_cycle_width = HORZ_DUTY_CYCLE_WIDTH
@@ -118,15 +115,6 @@ class PhysicalMotorService(BaseMotorAdapter):
       duration=duration,
       direction=direction
     )
-    
-    print("calculating after average depth")
-    after_avg_depth = self._calc_average_dist()
-    
-    perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
-    if (action == MOVE_AHEAD or action == MOVE_BACK) and (perc_change_depth < 0.05):
-      error_msg = f"Action '{action}' failed: depth sensor measurement indicate that movement failed."
-      self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
-      raise StuckError(error_msg)
     
     return MovementResult(
       successful=True,
@@ -236,6 +224,9 @@ class PhysicalMotorService(BaseMotorAdapter):
       direction: Literal['right', 'ahead', 'left', 'back'] | None,
       stop_after: bool = True
   ):
+    print("calculating before average depth")
+    before_avg_depth = self._calc_average_dist()
+    
     GPIO.setmode(GPIO.BOARD)
     
     for p in off_pins:
@@ -268,6 +259,15 @@ class PhysicalMotorService(BaseMotorAdapter):
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
+    
+    print("calculating after average depth")
+    after_avg_depth = self._calc_average_dist()
+    
+    perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
+    if perc_change_depth < 0.05:
+      error_msg = f"Action failed: depth sensor measurement indicate that movement failed."
+      self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+      raise StuckError(error_msg)
   
   def _calc_average_dist(self):
     print("calculating average depth from depth sensor")
