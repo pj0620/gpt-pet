@@ -272,9 +272,6 @@ class PhysicalMotorService(BaseMotorAdapter):
   def _calc_average_dist(self):
     print("calculating average depth from depth sensor")
     
-    depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
-    
-    # a value of 2047 means invalid measurement set these to zero to filter them from depth average
-    depth[depth == 2047] = 0
-    depth = depth.astype('float64') / 1000.
+    depth = self.context.kinect_service.get_depth()
+    depth = depth.astype('float64')
     return depth.sum() / np.count_nonzero(depth)
