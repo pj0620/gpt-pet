@@ -18,14 +18,15 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
   context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
   context.visual_llm_adapter = VisualLLMAdapterService()
   
-  if get_env() == 'local':
+  gptpet_env = get_env()
+  if gptpet_env == 'local':
     sim_adapter = SimAdapter()
     context.motor_adapter = Ai2ThorMotorService(sim_adapter)
     camera_module = Ai2ThorCameraModule(sim_adapter)
     depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
     context.kinect_service = NoopKinectService()
     context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
-  else:
+  elif gptpet_env == 'physical':
     # keep imports here to avoid GPIO libraries causing issues
     from service.motor.physical.physical_motor_service import PhysicalMotorService
     from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
@@ -49,6 +50,9 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
       device_io_adapter=context.device_io_adapter,
       analytics_service=context.analytics_service
     )
+  else:
+    raise Exception(f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
+    
   # see manual.py before changing this ordering
   sensory_modules = [camera_module, depth_camera_module]
   return context, sensory_modules
