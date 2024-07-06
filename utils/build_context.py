@@ -1,4 +1,5 @@
 from gptpet_context import GPTPetContext
+from mixin.goal.simple_chain_goal_mixin import SimpleChainGoalMixin
 from module.sensory.base_sensory_module import BaseSensoryModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
@@ -15,8 +16,15 @@ from utils.env_utils import get_env
 def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
   context = GPTPetContext()
   context.analytics_service = AnalyticsService()
+  context.analytics_service.new_text("finished initializing analytics")
+  
+  context.analytics_service.new_text("initializing vectordb adapter")
   context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
+  
+  context.analytics_service.new_text("initializing vision llm adapter")
   context.visual_llm_adapter = VisualLLMAdapterService()
+  
+  context.goal_mixin = SimpleChainGoalMixin(context.analytics_service, context.vectordb_adapter)
   
   gptpet_env = get_env()
   if gptpet_env == 'local':
