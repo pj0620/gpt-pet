@@ -9,13 +9,15 @@ import cv2
 # this will fail in local avoid importing unless installed from source
 import freenect
 
+from service.kinect.base_kinect_service import BaseKinectService
 
-class PhysicalDepthCameraModule(BaseSensoryModule):
+
+class AsyncPhysicalDepthCameraModule(BaseSensoryModule):
+  def __init__(self, kinect_service: BaseKinectService):
+    self.kinect_service = kinect_service
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
-    # Get depth data from the depth camera
-    freenect.sync_stop()
-    depth, _ = freenect.sync_get_depth(format=FREENECT_DEPTH_REGISTERED)
+    depth = self.kinect_service.get_depth()
     
     print(f"raw depth: shape={depth.shape}, min={depth.min()}, max={depth.max()}")
     

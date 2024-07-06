@@ -17,8 +17,7 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
-from service.tilt_led.physical.physical_tilt_led_service import PhysicalTiltLedService
-from service.tilt_led.sim.noop_tilt_led_service import NoopTiltLedService
+from service.kinect.sim.noop_kinect_service import NoopKinectService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.env_utils import get_env_var, check_env_flag
@@ -45,7 +44,7 @@ if gptpet_env == 'local':
   context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
   # context.led_service = NoopLEDService()
-  context.led_tilt_service = NoopTiltLedService()
+  context.led_tilt_service = NoopKinectService()
   
   context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
@@ -59,13 +58,15 @@ elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
   from service.motor.physical.physical_motor_adapter import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
-  from module.sensory.physical.physical_camera_module import PhysicalCameraModule
-  from module.sensory.physical.physical_depth_camera_module import PhysicalDepthCameraModule
+  from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
+  from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
+  from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
   
   context.analytics_service.new_text("initializing device io adapter")
   context.device_io_adapter = PhysicalDeviceIOAdapter()
-  # context.led_service = PhysicalLEDService()
-  context.led_tilt_service = PhysicalTiltLedService()
+  
+  print('setting up AsyncPhysicalKinectService')
+  context.kinect_service = AsyncPhysicalKinectService()
   
   context.analytics_service.new_text("initializing motor service")
   context.motor_adapter = PhysicalMotorService(
@@ -74,14 +75,14 @@ elif gptpet_env == 'physical':
   
   context.analytics_service.new_text("initializing camera/depth camera modules")
   sensory_modules = [
-    PhysicalCameraModule(),
-    PhysicalDepthCameraModule()
+    AsyncPhysicalCameraModule(context.kinect_service),
+    AsyncPhysicalDepthCameraModule(context.kinect_service)
   ]
 else:
   raise Exception(
     f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
 
-context.led_tilt_service.set_led_mode(FREENECT_LED_RED)
+context.kinect_service.set_led_mode(FREENECT_LED_RED)
 
 context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))

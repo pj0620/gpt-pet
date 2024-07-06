@@ -5,12 +5,12 @@ import cv2
 import freenect
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
+from service.kinect.base_kinect_service import BaseKinectService
 
 
-class PhysicalCameraModule(BaseSensoryModule):
+class AsyncPhysicalCameraModule(BaseSensoryModule):
+  def __init__(self, kinect_service: BaseKinectService):
+    self.kinect_service = kinect_service
   
   def build_subconscious_input(self, context: GPTPetContext) -> dict[str, Any]:
-    freenect.sync_stop()
-    array, _ = freenect.sync_get_video()
-    # array = cv2.cvtColor(array, cv2.COLOR_RGB2BGR)
-    return {'last_frame': array}
+    return {'last_frame': self.kinect_service.get_video()}

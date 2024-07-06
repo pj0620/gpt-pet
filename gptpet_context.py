@@ -8,7 +8,7 @@ from model.subconscious import ConsciousInput
 from model.vision import PetViewSource
 from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
-from service.tilt_led.base_tilt_led_service import BaseTiltLedService
+from service.kinect.base_kinect_service import BaseKinectService
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
@@ -20,7 +20,7 @@ class GPTPetContext:
   motor_adapter: BaseMotorAdapter
   device_io_adapter: BaseDeviceIOAdapter
   led_service: Any
-  led_tilt_service: BaseTiltLedService
+  kinect_service: BaseKinectService
   passageways: list[Passageway]
   objects_in_view: list[Object]
   analytics_service: AnalyticsService
