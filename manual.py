@@ -17,7 +17,7 @@ from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraMod
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
-from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
+from service.motor.sim.ai2thor_motor_service import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 from service.tilt.sim.noop_tilt_service import NoopTiltService
 from service.kinect.sim.noop_kinect_service import NoopKinectService
@@ -48,7 +48,7 @@ if get_env() == 'local':
 else:
   print('importing stuff')
   # keep imports here to avoid GPIO libraries causing issues
-  from service.motor.physical.physical_motor_adapter import PhysicalMotorService
+  from service.motor.physical.physical_motor_service import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
   from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
   from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule

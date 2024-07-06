@@ -15,7 +15,7 @@ from module.subconscious.input.vision_module_with_goals import VisionModuleWithG
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
 from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
-from service.motor.sim.ai2thor_motor_adapter import Ai2ThorMotorService
+from service.motor.sim.ai2thor_motor_service import Ai2ThorMotorService
 from service.sim_adapter import SimAdapter
 from service.kinect.sim.noop_kinect_service import NoopKinectService
 from service.vectordb_adapter_service import VectorDBAdapterService
@@ -42,6 +42,7 @@ if gptpet_env == 'local':
   sim_adapter = SimAdapter()
   
   context.analytics_service.new_text("initializing motor service")
+  context.kinect_service = NoopKinectService()
   context.motor_adapter = Ai2ThorMotorService(sim_adapter)
   # context.led_service = NoopLEDService()
   context.led_tilt_service = NoopKinectService()
@@ -56,7 +57,7 @@ if gptpet_env == 'local':
   context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
 elif gptpet_env == 'physical':
   # keep imports here to avoid GPIO libraries causing issues
-  from service.motor.physical.physical_motor_adapter import PhysicalMotorService
+  from service.motor.physical.physical_motor_service import PhysicalMotorService
   from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
   from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
   from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule

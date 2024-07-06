@@ -4,7 +4,7 @@ from typing import Any
 from model.motor import MovementResult
 
 
-class BaseMotorAdapter(ABC):
+class BaseMotorService(ABC):
   def do_movement(
       self,
       action: str,
@@ -33,6 +33,6 @@ class BaseMotorAdapter(ABC):
   
   def setup_motors(self):
     """
-    stops all motors
+    setup motors, mostly gpio pinmodes, turn off motors by default
     """
     pass

@@ -10,7 +10,7 @@ from gptpet_context import GPTPetContext
 from model.objects import Object
 from model.passageway import Passageway
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
-from service.motor.base_motor_adapter import BaseMotorAdapter
+from service.motor.base_motor_service import BaseMotorService
 from tools.environment.api.base_control_api import BaseControlAPI
 from tools.environment.api.mock_control_api import MockControlAPI
 from tools.environment.api.real_control_api import RealControlAPI
@@ -32,7 +32,7 @@ class EnvironmentTool(BaseTool):
   
   def __init__(self,
                proximity_sensor_adapter: BaseDeviceIOAdapter,
-               motor_adapter: BaseMotorAdapter,
+               motor_adapter: BaseMotorService,
                context: GPTPetContext):
     real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter, context)
     super(EnvironmentTool, self).__init__(

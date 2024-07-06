@@ -16,7 +16,7 @@ from gptpet_context import GPTPetContext
 from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
-from service.motor.base_motor_adapter import BaseMotorAdapter
+from service.motor.base_motor_service import BaseMotorService
 
 import freenect
 
@@ -25,7 +25,7 @@ with open('constants/gpio/gpio.json', 'r') as file:
   gpio = json.load(file)
 
 
-class PhysicalMotorService(BaseMotorAdapter):
+class PhysicalMotorService(BaseMotorService):
   def __init__(
       self,
       context: GPTPetContext
