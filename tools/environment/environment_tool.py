@@ -1,18 +1,14 @@
 import ast
-import multiprocessing
 import random
-import threading
-from enum import Enum
-from typing import Type, Optional, Any
+from typing import Type, Optional
 
-from langchain.pydantic_v1 import BaseModel, Field
-from langchain.tools import BaseTool, StructuredTool, tool
+from langchain.pydantic_v1 import BaseModel
+from langchain.tools import BaseTool
 from langchain_core.callbacks import CallbackManagerForToolRun
 
-from constants.motor import ALL_MOTOR_ACTIONS
 from gptpet_context import GPTPetContext
 from model.objects import Object
-from model.passageway import PhysicalPassagewayInfo, Passageway
+from model.passageway import Passageway
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.motor.base_motor_adapter import BaseMotorAdapter
 from tools.environment.api.base_control_api import BaseControlAPI
@@ -24,9 +20,11 @@ secret_passphrases = ["apple"]
 TIMEOUT_MESSAGE = "Execution terminated due to timeout."
 SUCCESS_MESSAGE = "Executed successfully."
 
+
 class EnvironmentTool(BaseTool):
   name = "environment_tool"
-  description = ("An expertly crafted environement to verify programs to be run on robots. Used for when you want to write a program that controls a robot to complete a task. The input should be a valid python program")
+  description = ("An expertly crafted environement to verify programs to be run on robots. Used for when you want to "
+                 "write a program that controls a robot to complete a task. The input should be a valid python program")
   args_schema: Type[BaseModel] = EnvironmentInput
   mock_control_api: BaseControlAPI
   real_control_api: BaseControlAPI
@@ -40,6 +38,7 @@ class EnvironmentTool(BaseTool):
       mock_control_api=MockControlAPI(),
       real_control_api=real_control_api
     )
+    self.context = context
     
   def update_passageways(self, passageways: list[Passageway]):
     self.mock_control_api.update_passageways(passageways)
@@ -72,22 +71,28 @@ class EnvironmentTool(BaseTool):
     print(f"EnvironmentTool running `{code}`")
     
     if len(code) > 500:
-      return "failed! code is greater than 500 characters"
+      error_msg = "failed! code is greater than 500 characters"
+      self.context.analytics_service.new_text("environmental_tool: " + error_msg)
+      return error_msg
     
     if self.contains_while_loop(code):
-      return "failed! code contains a while loop which is not allowed!"
+      error_msg = "failed! code contains a while loop which is not allowed!"
+      self.context.analytics_service.new_text("environmental_tool: " + error_msg)
+      return error_msg
     
     try:
       self.mock_execute(code)
     except Exception as e:
-      return f"failed! got following exception when testing in mock, the program needs to be updated: {e}"
+      error_msg = f"failed! got following exception when testing in mock, the program needs to be updated: {e}"
+      self.context.analytics_service.new_text("environmental_tool: " + error_msg)
+      return error_msg
     
     self.real_control_api.clear_last_actions()
     try:
       self.real_execute(code)
     except Exception as e:
-      # TODO: is this beneficial
-      # self.real_control_api.rollback_last_successful()
-      return f"failed! got following exception when running on robot, the program needs to be updated: {e}"
+      error_msg = f"failed! got following exception when running on robot, the program needs to be updated: {e}"
+      self.context.analytics_service.new_text("environmental_tool: " + error_msg)
+      return error_msg
     
     return "success! the secret passphrase this round is " + random.choice(secret_passphrases)
