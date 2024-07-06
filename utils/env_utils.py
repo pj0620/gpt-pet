@@ -8,11 +8,13 @@ def check_env_flag(env_var: str) -> bool:
   val = os.environ.get(env_var)
   return val is not None and val.lower() == 'true'
 
+
 def get_env_var(env_var: str) -> str:
   val = os.environ.get(env_var)
   if val is None:
     raise Exception(f'environment variable {env_var} is not set')
   return val
+
 
 def check_if_process_running(process_search: str) -> bool:
   # Define the command to check for the process
@@ -27,6 +29,7 @@ def check_if_process_running(process_search: str) -> bool:
   
   # Check if the output is non-empty
   return is_running_process
+  
   
 def check_port_in_use(host, port):
   """
@@ -48,12 +51,16 @@ def check_port_in_use(host, port):
   
   
 def get_env():
+  gptpet_env = os.environ.get('GPTPET_ENV')
+  if gptpet_env is not None:
+    return gptpet_env
+  
   parser = argparse.ArgumentParser(description="GPTPet Environment")
   parser.add_argument(
       '--env', '-e',
       choices=['local', 'physical'],
       required=True,
-      help='Specify the environment: local or physical'
+      help='Specify the environment: local or physical, or set GPTPET_ENV environment variable'
   )
   args = parser.parse_args()
   return args.env

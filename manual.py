@@ -1,4 +1,3 @@
-import argparse
 import base64
 import pickle
 import zlib
@@ -10,20 +9,9 @@ from flask import Flask, jsonify, abort, request
 from flask_cors import CORS
 
 from constants.motor import MOVE_AHEAD, MOVE_RIGHT, MOVE_LEFT, MOVE_BACK, ROTATE_LEFT
-from gptpet_context import GPTPetContext
 from model.conscious import TaskDefinition
-from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
-from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from module.subconscious.output.single_input_agent_executor_module import SingleInputAgentExecutorModule
-from service.analytics_service import AnalyticsService
-from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
-from service.motor.sim.ai2thor_motor_service import Ai2ThorMotorService
-from service.sim_adapter import SimAdapter
-from service.tilt.sim.noop_tilt_service import NoopTiltService
-from service.kinect.sim.noop_kinect_service import NoopKinectService
-from service.vectordb_adapter_service import VectorDBAdapterService
-from service.visual_llm_adapter_service import VisualLLMAdapterService
-from utils.env_utils import get_env
+from utils.build_context import build_context
 from utils.vision_utils import add_horizontal_guide_encode, np_img_to_base64, label_passageways
 
 load_dotenv()
@@ -31,51 +19,11 @@ load_dotenv()
 app = Flask(__name__)
 CORS(app)
 
-# setup vectordb
-context = GPTPetContext()
-context.analytics_service = AnalyticsService()
-context.vectordb_adapter = VectorDBAdapterService(context.analytics_service)
-context.visual_llm_adapter = VisualLLMAdapterService()
-
-if get_env() == 'local':
-  sim_adapter = SimAdapter()
-  motor_adapter = Ai2ThorMotorService(sim_adapter)
-  camera_module = Ai2ThorCameraModule(sim_adapter)
-  kinect_service = NoopKinectService()
-  depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-  context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
-  tilt_service = NoopTiltService()
-else:
-  print('importing stuff')
-  # keep imports here to avoid GPIO libraries causing issues
-  from service.motor.physical.physical_motor_service import PhysicalMotorService
-  from service.device_io.physical.physical_device_io_adapter import PhysicalDeviceIOAdapter
-  from service.kinect.physical.async_physical_kinect_service import AsyncPhysicalKinectService
-  from module.sensory.physical.async_physical_camera_module import AsyncPhysicalCameraModule
-  from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
-  
-  print('setting up device_io_adapter')
-  context.device_io_adapter = PhysicalDeviceIOAdapter()
-  
-  print('setting up AsyncPhysicalKinectService')
-  context.kinect_service = AsyncPhysicalKinectService()
-  
-  print('setting up camera/depth camera modules')
-  camera_module = AsyncPhysicalCameraModule(context.kinect_service)
-  depth_camera_module = AsyncPhysicalDepthCameraModule(context.kinect_service)
-  
-  print('setting up motor adapter')
-  motor_adapter = PhysicalMotorService(
-    kinect_service=context.kinect_service,
-    device_io_adapter=context.device_io_adapter,
-    analytics_service=context.analytics_service
-  )
-
-context.motor_adapter = motor_adapter
+context, sensory_modules = build_context()
 
 print('stopping motors')
-motor_adapter.stop()
-motor_adapter.setup_motors()
+context.motor_adapter.stop()
+context.motor_adapter.setup_motors()
 
 executor = SingleInputAgentExecutorModule(context)
 
@@ -86,13 +34,16 @@ ACTION_MAPPING = dict(
   back=MOVE_BACK
 )
 
+camera_module = sensory_modules[0]
+depth_camera_module = sensory_modules[1]
+
 @app.route('/move/<direction>', methods=['POST'])
 def move(direction):
   print("move request: ", direction)
   if direction not in ACTION_MAPPING.keys():
     abort(400, 'Invalid direction')
   action = ACTION_MAPPING[direction]
-  result = motor_adapter.do_movement(action)
+  result = context.motor_adapter.do_movement(action)
   return jsonify({'moved': result, 'direction': direction})
 
 
@@ -103,7 +54,7 @@ def rotate(degrees: str):
     num_degrees = float(degrees)
   except ValueError:
     abort(400, 'Invalid number of degrees: ' + degrees)
-  result = motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
+  result = context.motor_adapter.do_rotate(ROTATE_LEFT, num_degrees)
   return jsonify({'moved': result})
 
 
@@ -114,7 +65,7 @@ def tilt(degrees: str):
     num_degrees = int(degrees)
   except ValueError:
     abort(400, 'Invalid number of degrees: ' + degrees)
-  kinect_service.do_tilt(num_degrees)
+  context.kinect_service.do_tilt(num_degrees)
   return jsonify({'moved': True})
 
 
@@ -126,7 +77,7 @@ def set_led_mode(mode: str):
     assert 0 <= num_mode < 6, "mode must be between 0 and 5"
   except ValueError:
     abort(400, 'Invalid mode: ' + mode)
-  kinect_service.set_led_mode(num_mode)
+  context.kinect_service.set_led_mode(num_mode)
   return jsonify({'changed_led': True})
 
 
