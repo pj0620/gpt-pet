@@ -43,7 +43,7 @@ if get_env() == 'local':
   camera_module = Ai2ThorCameraModule(sim_adapter)
   kinect_service = NoopKinectService()
   depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-  device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
+  context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
   tilt_service = NoopTiltService()
 else:
   print('importing stuff')
@@ -55,7 +55,7 @@ else:
   from module.sensory.physical.async_physical_depth_camera_module import AsyncPhysicalDepthCameraModule
   
   print('setting up device_io_adapter')
-  device_io_adapter = PhysicalDeviceIOAdapter()
+  context.device_io_adapter = PhysicalDeviceIOAdapter()
   
   print('setting up AsyncPhysicalKinectService')
   context.kinect_service = AsyncPhysicalKinectService()
@@ -72,7 +72,6 @@ else:
   )
 
 context.motor_adapter = motor_adapter
-context.device_io_adapter = device_io_adapter
 
 print('stopping motors')
 motor_adapter.stop()
