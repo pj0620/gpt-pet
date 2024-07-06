@@ -37,9 +37,9 @@ class EnvironmentTool(BaseTool):
     real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter, context)
     super(EnvironmentTool, self).__init__(
       mock_control_api=MockControlAPI(),
-      real_control_api=real_control_api
+      real_control_api=real_control_api,
+      context=context
     )
-    self.context = context
     
   def update_passageways(self, passageways: list[Passageway]):
     self.mock_control_api.update_passageways(passageways)
