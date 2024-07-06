@@ -58,14 +58,18 @@ else:
   device_io_adapter = PhysicalDeviceIOAdapter()
   
   print('setting up AsyncPhysicalKinectService')
-  kinect_service = AsyncPhysicalKinectService()
+  context.kinect_service = AsyncPhysicalKinectService()
   
   print('setting up camera/depth camera modules')
-  camera_module = AsyncPhysicalCameraModule(kinect_service)
-  depth_camera_module = AsyncPhysicalDepthCameraModule(kinect_service)
+  camera_module = AsyncPhysicalCameraModule(context.kinect_service)
+  depth_camera_module = AsyncPhysicalDepthCameraModule(context.kinect_service)
   
   print('setting up motor adapter')
-  motor_adapter = PhysicalMotorService(context=context)
+  motor_adapter = PhysicalMotorService(
+    kinect_service=context.kinect_service,
+    device_io_adapter=context.device_io_adapter,
+    analytics_service=context.analytics_service
+  )
 
 context.motor_adapter = motor_adapter
 context.device_io_adapter = device_io_adapter

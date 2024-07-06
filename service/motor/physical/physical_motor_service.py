@@ -12,10 +12,11 @@ from constants.kinect import FREENECT_DEPTH_REGISTERED
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
   ROTATE_LEFT, MIN_WALL_DIST
 from constants.physical_motor import *
-from gptpet_context import GPTPetContext
 from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
+from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
+from service.kinect.base_kinect_service import BaseKinectService
 from service.motor.base_motor_service import BaseMotorService
 
 import freenect
@@ -28,11 +29,15 @@ with open('constants/gpio/gpio.json', 'r') as file:
 class PhysicalMotorService(BaseMotorService):
   def __init__(
       self,
-      context: GPTPetContext
+      kinect_service: BaseKinectService,
+      device_io_adapter: BaseDeviceIOAdapter,
+      analytics_service: AnalyticsService
   ):
     with open('constants/gpio/gpio.json', 'r') as file:
       self.gpio = json.load(file)
-    self.context = context
+    self.kinect_service = kinect_service
+    self.device_io_adapter = device_io_adapter
+    self.analytics_service = analytics_service
   
   def do_movement(
       self,
@@ -42,11 +47,11 @@ class PhysicalMotorService(BaseMotorService):
     assert action in LINEAR_ACTIONS, f'invalid movement action {action}'
     
     direction = ACTION_TO_DIRECTION[action]
-    dist = float(self.context.device_io_adapter.get_measurements()[direction])
+    dist = float(self.device_io_adapter.get_measurements()[direction])
     if dist < MIN_WALL_DIST:
       error_msg = (f"Action '{action}' aborted: moveMagnitude {move_magnitude} exceeds proximity in {direction} "
                    f"({dist}m < minimum {MIN_WALL_DIST}m)")
-      self.context.analytics_service.new_text(error_msg)
+      self.analytics_service.new_text(error_msg)
       raise CollisionError(error_msg)
     
     move_magnitude = min(move_magnitude, 1.)
@@ -266,12 +271,12 @@ class PhysicalMotorService(BaseMotorService):
     perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
     if perc_change_depth < 0.05:
       error_msg = f"Stuck error: depth sensor measurements indicate that you are stuck."
-      self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+      self.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
   
   def _calc_average_dist(self):
     print("calculating average depth from depth sensor")
     
-    depth = self.context.kinect_service.get_depth()
+    depth = self.kinect_service.get_depth()
     depth = depth.astype('float64')
     return depth.sum() / np.count_nonzero(depth)
