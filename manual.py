@@ -133,7 +133,7 @@ def set_led_mode(mode: str):
 @app.route('/proximity-measurements', methods=['GET'])
 def distance():
   print("proximity-measurements request")
-  return jsonify(device_io_adapter.get_measurements())
+  return jsonify(context.device_io_adapter.get_measurements())
 
 
 @app.route('/color', methods=['POST'])
@@ -141,7 +141,7 @@ def set_color():
   print("set_color request")
   # Get the data from the request
   rgb_data = request.data.decode('utf-8').strip()
-  device_io_adapter.set_color(rgb_data)
+  context.device_io_adapter.set_color(rgb_data)
   
   return 'success'
 
@@ -167,7 +167,7 @@ def current_depth_view():
     depth_colored = cv2.applyColorMap(normalized_depth, cv2.COLORMAP_TURBO)
     
     # Convert numpy image to base64 for transmission
-    def np_img_to_base64(img):
+    def np_array_img_to_base64(img):
       # Convert from RGB to BGR
       img_bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
       # Encode the image in PNG format
@@ -175,7 +175,7 @@ def current_depth_view():
       # Convert the buffer to a base64 string
       return base64.b64encode(buffer).decode('utf-8')
 
-    base64_string = np_img_to_base64(depth_colored)
+    base64_string = np_array_img_to_base64(depth_colored)
 
     # Compress and serialize raw image
     serialized_array = pickle.dumps(raw_depth_arr)
