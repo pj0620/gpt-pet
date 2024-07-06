@@ -265,7 +265,7 @@ class PhysicalMotorService(BaseMotorAdapter):
     
     perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
     if perc_change_depth < 0.05:
-      error_msg = f"Action failed: depth sensor measurement indicate that movement failed."
+      error_msg = f"Stuck error: depth sensor measurements indicate that you are stuck."
       self.context.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
   
