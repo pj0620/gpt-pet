@@ -85,7 +85,7 @@ class EnvironmentTool(BaseTool):
     try:
       self.mock_execute(code)
     except Exception as e:
-      error_msg = f"failed! got following exception when testing in mock, the program needs to be updated: {e}"
+      error_msg = f"Failed! Got following exception when testing in mock, the program needs to be updated: {e}"
       self.context.analytics_service.new_text("environmental_tool: " + error_msg)
       return error_msg
     
@@ -93,7 +93,7 @@ class EnvironmentTool(BaseTool):
     try:
       self.real_execute(code)
     except Exception as e:
-      error_msg = f"failed! got following exception when running on robot, the program needs to be updated: {e}"
+      error_msg = f"Something went wrong. Got following exception when running on robot: {e}"
       self.context.analytics_service.new_text("environmental_tool: " + error_msg)
       return error_msg
     
