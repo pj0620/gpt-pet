@@ -13,6 +13,7 @@ The following must be true of the generated programs
 4. Code should never contain a while loop
 5. Code should not contain a main method or if __name__ == "__main__" block
 6. Don't manually write code to go down a passageway. Leverage goto_passageway method from control_api when possible.
+7. If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
 
 Reminder to use environment_tool before giving final answer.
 
