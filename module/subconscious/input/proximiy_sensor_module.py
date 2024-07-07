@@ -6,10 +6,10 @@ from utils.prompt_utils import load_prompt, encode_image_array
 from langchain_core.output_parsers import JsonOutputParser
 
 PROXIMITY_SENSOR_MODULE_SCHEMA = {
-  "right": "distance to the right",
-  "ahead": "distance to the ahead",
-  "left": "distance to the left",
-  "back": "distance to the back"
+  "right": "right ...",
+  "ahead": "ahead proximity sensor measurement",
+  "left": "left ...",
+  "back": "back ..."
 }
 
 PROXIMITY_SENSOR_MODULE_DESCRIPTION = ("Summary of Proximity Sensors on GPTPet which reports approximate distance in "

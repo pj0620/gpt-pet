@@ -1,7 +1,7 @@
-Subconscious Info:
+subconscious_info:
 {subconscious_info}
 current_goal: {current_goal}
 looking_direction: {looking_direction}
-Time: {time}
-List of Previous Tasks:
+time: {time}
+list_of_previous_tasks_newest_to_oldest:
 {previous_tasks}

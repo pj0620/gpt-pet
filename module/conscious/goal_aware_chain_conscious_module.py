@@ -99,6 +99,7 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
     )
     if not task_result.success:
       new_memory["executor_output"] = task_result.executor_output
-    self.tasks_history.append(new_memory)
+    self.tasks_history.insert(0, new_memory)
     if len(self.tasks_history) > 5:
       self.tasks_history.pop(0)
+    
