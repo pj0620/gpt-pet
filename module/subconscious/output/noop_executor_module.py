@@ -7,5 +7,6 @@ class DummyExecutorModule(BaseExecutorModule):
   
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     return TaskResult(
-      success=True
+      success=True,
+      executor_output="dummy output"
     )

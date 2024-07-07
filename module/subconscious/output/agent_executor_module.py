@@ -65,6 +65,7 @@ class AgentExecutorModule(BaseExecutorModule):
     ))
     print(result)
     return TaskResult(
-      success=True
+      success=True,
+      executor_output=str(result)
     )
   

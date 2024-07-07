@@ -23,7 +23,7 @@ class TaskDefinition:
 @dataclass
 class TaskResult:
   success: bool
-  final_code: str
+  executor_output: str
   
   
 @dataclass

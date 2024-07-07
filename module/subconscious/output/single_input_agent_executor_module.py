@@ -138,7 +138,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       context.analytics_service.new_text("task was completed successfuly using skill from skill library")
       return TaskResult(
         success=True,
-        final_code=code
+        executor_output=code
       )
     
     context.analytics_service.new_text(f"no previous skill found matching new task, writing code: {new_task}")
@@ -150,12 +150,12 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     success = 'success!' in result['intermediate_steps'][-1][-1]
     task_result = TaskResult(
       success=success,
-      final_code=result['output']
+      executor_output=result['output']
     )
     if success:
       skill_create_model = SkillCreateModel(
         task=new_task.task,
-        code=task_result.final_code
+        code=task_result.executor_output
       )
       context.analytics_service.new_text(f"creating following skill: {skill_create_model}")
       context.vectordb_adapter.create_skill(skill_create_model)
