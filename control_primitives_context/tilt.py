@@ -1,0 +1,3 @@
+control_api.look_up() # this is used to make gptpet look up with its camera
+control_api.look_straight() # this is used to make gptpet look straight forward with its camera
+control_api.look_down() # etc ...

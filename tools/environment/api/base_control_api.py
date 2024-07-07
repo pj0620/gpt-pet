@@ -166,3 +166,16 @@ class BaseControlAPI(ABC):
     :param object_name: name of object to move towards
     """
   
+  @abstractmethod
+  def look_up(self) -> None:
+    pass
+  
+  @abstractmethod
+  def look_straight(self) -> None:
+    pass
+  
+  @abstractmethod
+  def look_down(self) -> None:
+    pass
+    
+  

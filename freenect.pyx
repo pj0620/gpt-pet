@@ -210,7 +210,7 @@ cdef class StatePtr:
         return int(self._ptr.accelerometer_z)
 
     def _get_tilt_angle(self):
-        return int(self._ptr.tilt_angle)
+        return int(self._ptr._tilt_angle)
 
     def _get_tilt_status(self):
         return int(self._ptr.tilt_status)

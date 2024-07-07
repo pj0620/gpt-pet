@@ -1,7 +1,8 @@
 import numpy as np
 import threading
 
-from constants.kinect import FREENECT_LED_MODES, FREENECT_LED_MODE_DESCIPTIONS
+from constants.kinect import FREENECT_LED_MODES, FREENECT_LED_MODE_DESCIPTIONS, LOOKING_UP, LOOKING_STRAIGHT, \
+  LOOKING_DOWN
 from service.kinect.base_kinect_service import BaseKinectService
 import freenect
 
@@ -11,11 +12,15 @@ NOOP_LED_MODE = -1
 
 class AsyncPhysicalKinectService(BaseKinectService):
   def __init__(self):
+    # set these to signal to thread to update kinect async
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
     
     self._last_depth = None
     self._last_rgb = None
+    
+    # stores current angle
+    self._tilt_angle = 0
     
     self.context = freenect.init()
     self.device = freenect.open_device(self.context, 0)
@@ -61,8 +66,19 @@ class AsyncPhysicalKinectService(BaseKinectService):
     if not (-30 <= degrees <= 30):
       raise Exception(f"invalid tilt degrees={degrees} must be between -30 and 30")
     
+    self._tilt_angle = degrees
     print(f'setting tilt degrees to {degrees}')
     self._update_deg_tilt = degrees
+    
+  def get_current_looking_direction(self) -> str:
+    if self._tilt_angle > 0:
+      looking_direction = LOOKING_UP
+    elif self._tilt_angle == 0:
+      looking_direction = LOOKING_STRAIGHT
+    else:
+      looking_direction = LOOKING_DOWN
+    print(f'[NOOP] call to get_current_looking_direction, returning {looking_direction}')
+    return looking_direction
   
   def get_video(self) -> np.array:
     return self._last_rgb

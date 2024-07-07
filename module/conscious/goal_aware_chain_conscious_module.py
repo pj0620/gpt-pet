@@ -68,7 +68,8 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
       subconscious_info=get_yaml(conscious_inputs_value_str, True),
       time=str(datetime.now()),
       previous_tasks=get_yaml(self.tasks_history, True),
-      current_goal=context.goal_mixin.get_current_goal().description
+      current_goal=context.goal_mixin.get_current_goal().description,
+      looking_direction=context.kinect_service.get_current_looking_direction()
     )
     system_input = self.prompt_system.format(
       subconscious_schema=get_yaml(conscious_inputs_schema_str, True)
@@ -91,9 +92,6 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
     return new_task
   
   def report_task_result(self, task_definition: TaskDefinition, task_result: TaskResult):
-    # Not needed; no summary
-    # task_input, task_output = self.build_entity_memory_def(task_definition, task_result)
-    # self.entity_memory.save_context({"input": task_input}, {"output": task_output})
     new_memory = dict(
       task=task_definition.task,
       reasoning=task_definition.reasoning,

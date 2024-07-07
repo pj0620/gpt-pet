@@ -12,7 +12,6 @@ from gptpet_context import GPTPetContext
 from model.conscious import TaskResult, TaskDefinition
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from tools.environment.environment_tool import EnvironmentTool
-from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 
 
@@ -50,9 +49,11 @@ class AgentExecutorModule(BaseExecutorModule):
     base_skills = [
       "motor_control",
       "proximity_sensor",
-      "passageways"
+      "passageways",
+      "objects",
+      "tilt"
     ]
-    programs = "\n\n".join(load_control_primitives_context(base_skills) + skills)
+    programs = "\n".join(load_control_primitives_context(base_skills) + skills)
     print('programs: ', programs)
     return programs
     

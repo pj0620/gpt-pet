@@ -19,6 +19,15 @@ class RealControlAPI(BaseControlAPI):
     self.motor_adapter = motor_adapter
     self.context = context
   
+  def look_up(self) -> None:
+    self.context.kinect_service.do_tilt(30)
+  
+  def look_straight(self) -> None:
+    self.context.kinect_service.do_tilt(0)
+  
+  def look_down(self) -> None:
+    self.context.kinect_service.do_tilt(-30)
+  
   def move_right(
       self,
       move_magnitude: float = None

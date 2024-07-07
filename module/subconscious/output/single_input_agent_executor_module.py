@@ -17,7 +17,6 @@ from model.skill_library import SkillCreateModel
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from service.vectordb_adapter_service import VectorDBAdapterService
 from tools.environment.environment_tool import EnvironmentTool
-from tools.motor_tool import MotorTool
 from utils.prompt_utils import load_prompt, load_control_primitives_context
 
 
