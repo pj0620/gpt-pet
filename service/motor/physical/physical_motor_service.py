@@ -1,16 +1,14 @@
 import itertools
 import json
 from time import sleep
-from typing import Literal
 
 import RPi.GPIO as GPIO
 import numpy as np
 
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT, \
   MOTOR_CONTROLLERS
-from constants.kinect import FREENECT_DEPTH_REGISTERED
-from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
-  ROTATE_LEFT, MIN_WALL_DIST, DEPTH_SENSOR_STUCK_THRESHOLD, DEPTH_SENSOR_TIME_THRESHOLD
+from constants.motor import LINEAR_ACTIONS, ROTATE_ACTIONS, MIN_WALL_DIST, DEPTH_SENSOR_STUCK_THRESHOLD, \
+  DEPTH_SENSOR_TIME_THRESHOLD
 from constants.physical_motor import *
 from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
@@ -18,8 +16,6 @@ from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.kinect.base_kinect_service import BaseKinectService
 from service.motor.base_motor_service import BaseMotorService
-
-import freenect
 
 GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
@@ -117,8 +113,7 @@ class PhysicalMotorService(BaseMotorService):
       off_pins=off_pins,
       duty_cycle_width=duty_cycle_width,
       cycle_on=cycle_on,
-      duration=duration,
-      direction=direction
+      duration=duration
     )
     
     return MovementResult(
@@ -209,7 +204,6 @@ class PhysicalMotorService(BaseMotorService):
       duty_cycle_width=ROT_DUTY_CYCLE_WIDTH,
       cycle_on=ROT_CYCLE_ON,
       duration=duration,
-      direction=None,
       stop_after=False
     )
     
