@@ -3,6 +3,7 @@ from typing import Tuple
 
 from langchain import hub
 from langchain.output_parsers import BooleanOutputParser
+from langchain_core.agents import AgentAction
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
   HumanMessagePromptTemplate
@@ -146,10 +147,19 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       chat_history=[],
     ))
     # hack to check if environment tool successfully executed
-    success = 'success!' in result['intermediate_steps'][-1][-1]
+    last_step = result['intermediate_steps'][-1]
+    if not isinstance(last_step, tuple) or len(last_step) != 2:
+      raise ValueError("Each intermediate step should be a tuple of (AgentAction, str).")
+    
+    last_step_input, last_env_tool_resp = last_step
+    if not isinstance(last_step_input, AgentAction) or not isinstance(last_env_tool_resp, str):
+      raise ValueError("The last step does not contain a valid AgentAction and response string.")
+  
+    success = 'success!' in last_env_tool_resp
+    executor_output = result['output'] if success else last_env_tool_resp
     task_result = TaskResult(
       success=success,
-      executor_output=result['output']
+      executor_output=executor_output
     )
     if success:
       skill_create_model = SkillCreateModel(

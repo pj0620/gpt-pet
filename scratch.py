@@ -108,3 +108,49 @@ We will now test this code to ensure it works correctly by using the environment
 )
 
 print(chat_completion.choices[0].message.content)
+
+# intermediate steps for time limit reached
+result['intermediate_steps']:  \
+  [
+    (
+      AgentAction(
+        tool='environment_tool',
+        tool_input='control_api.rotate(degrees=-90)',
+        log='```json\n{\n    "action": "environment_tool",\n    "action_input": "control_api.rotate(degrees=-90)"\n}\n```'
+      ),
+      'Something went wrong. Got following exception when running on robot: Stuck error: depth sensor measurements indicate that you are stuck.'
+    ),
+    (
+      AgentAction(
+        tool='environment_tool',
+        tool_input='control_api.rotate(degrees=-90)',
+        log='```json\n{\n    "action": "environment_tool",\n    "action_input": "control_api.rotate(degrees=-90)"\n}\n```'),
+      'Something went wrong. Got following exception when running on robot: Stuck error: depth sensor measurements indicate that you are stuck.'
+    ),
+    (
+      AgentAction(
+        tool='environment_tool',
+        tool_input='control_api.rotate(degrees=-45)',
+        log='```json\n{\n    "action": "environment_tool",\n    "action_input": "control_api.rotate(degrees=-45)"\n}\n```'),
+      'Something went wrong. Got following exception when running on robot: Stuck error: depth sensor measurements indicate that you are stuck.'
+    ),
+    (
+      AgentAction(
+        tool='environment_tool',
+        tool_input='control_api.rotate(degrees=-45)',
+        log='```json\n{\n    "action": "environment_tool",\n    "action_input": "control_api.rotate(degrees=-45)"\n}\n```'),
+      'Something went wrong. Got following exception when running on robot: Stuck error: depth sensor measurements indicate that you are stuck.'
+    )
+]
+
+# success
+[
+  (
+    AgentAction(
+      tool='environment_tool',
+      tool_input="control_api.goto_passageway('tiled_room_passageway')",
+      log='```json\n{\n    "action": "environment_tool",\n    "action_input": "control_api.goto_passageway(\'tiled_room_passageway\')"\n}\n```'),
+    'success! the secret passphrase this round is apple'
+  )
+]
+

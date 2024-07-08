@@ -10,7 +10,7 @@ from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTION
   MOTOR_CONTROLLERS
 from constants.kinect import FREENECT_DEPTH_REGISTERED
 from constants.motor import LINEAR_ACTIONS, MOVE_AHEAD, MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, ROTATE_ACTIONS, ROTATE_RIGHT, \
-  ROTATE_LEFT, MIN_WALL_DIST, DEPTH_SENSOR_STUCK_THRESHOLD
+  ROTATE_LEFT, MIN_WALL_DIST, DEPTH_SENSOR_STUCK_THRESHOLD, DEPTH_SENSOR_TIME_THRESHOLD
 from constants.physical_motor import *
 from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
@@ -226,7 +226,6 @@ class PhysicalMotorService(BaseMotorService):
       duty_cycle_width: int,
       cycle_on: int,
       duration: float,
-      direction: Literal['right', 'ahead', 'left', 'back'] | None,
       stop_after: bool = True
   ):
     print("calculating before average depth")
@@ -269,7 +268,7 @@ class PhysicalMotorService(BaseMotorService):
     after_avg_depth = self._calc_average_dist()
     
     perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
-    if perc_change_depth < DEPTH_SENSOR_STUCK_THRESHOLD:
+    if duration > DEPTH_SENSOR_TIME_THRESHOLD and perc_change_depth < DEPTH_SENSOR_STUCK_THRESHOLD:
       error_msg = f"Stuck error: depth sensor measurements indicate that you are stuck."
       self.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
       raise StuckError(error_msg)
