@@ -25,5 +25,12 @@ ALL_MOTOR_ACTIONS = [
 
 MIN_WALL_DIST = 0.25
 
-DEPTH_SENSOR_TIME_THRESHOLD = 0.25
-DEPTH_SENSOR_STUCK_THRESHOLD = 0.1
+# depth sensor time threshold in seconds.
+#   action with t < DEPTH_SENSOR_TIME_THRESHOLD -> NO depth sensor verification
+#   action with t >= DEPTH_SENSOR_TIME_THRESHOLD -> depth sensor verification
+DEPTH_SENSOR_TIME_THRESHOLD = 0.1
+
+# depth sensor stuck threshold in percent.
+#   percent change in avg depth < DEPTH_SENSOR_STUCK_THRESHOLD -> Stuck detected
+#   percent change in avg depth >= DEPTH_SENSOR_STUCK_THRESHOLD -> NO Stuck detected
+DEPTH_SENSOR_STUCK_THRESHOLD = 0.1# %
