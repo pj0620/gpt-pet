@@ -143,6 +143,7 @@ class VectorDBAdapterService:
     room_view_arr = raw_response['data']['Get']['RoomView']
     if room_view_arr is None:
       self.analytics_service.new_text(f"error: got unexpected response from vectordb: {raw_response}")
+      return []
     elif len(room_view_arr) == 0:
       return []
     
@@ -178,6 +179,7 @@ class VectorDBAdapterService:
     goal_arr = goal_response['data']['Get'][GOAL_CLASS_NAME]
     if goal_arr is None:
       self.analytics_service.new_text(f"error: got unexpected response from vectordb: {goal_response}")
+      return None
     elif len(goal_arr) == 0:
       return None
     
@@ -241,6 +243,7 @@ class VectorDBAdapterService:
     room_view_arr = raw_response['data']['Get'][PET_VIEW_WITH_GOAL_CLASS_NAME]
     if room_view_arr is None:
       self.analytics_service.new_text(f"error: got unexpected response from vectordb: {raw_response}")
+      return None
     elif len(room_view_arr) == 0:
       return None
 
