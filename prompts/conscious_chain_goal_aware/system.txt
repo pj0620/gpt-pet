@@ -23,7 +23,7 @@ You must follow the following criteria:
 10) if "passageway_descriptions" is empty that means there are no passageways in your view, feel free to turn to find a new passageway. Same for "objects_descriptions"
 11) Only say a goal is completed if you have fully completed the goal. This will most likely take many steps. For example, exploring is only done when you have found another goal that is interesting most likely from a result of exploring.
 12) If you say a goal is completed, make sure to provide a new goal. Do not provide the same next_goal, with previous_goal_completed=True
-13) I can look up, look down, or look straight by tilting my camera. This can be helpful in scenarios like; getting stuck, look at something above, etc. See human message for where I am currently looking.
+13) I can look down, look up, or look straight by tilting my camera. This is helpful when stuck to see why I am stuck or view things above/below my view
 
 You should only respond with yaml in the form below
 RESPONSE FORMAT:

@@ -31,7 +31,6 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
   if gptpet_env == 'local':
     sim_adapter = SimAdapter()
     context.motor_adapter = Ai2ThorMotorService(sim_adapter)
-    # context.motor_adapter = StuckMotorService(context.analytics_service)
     camera_module = Ai2ThorCameraModule(sim_adapter)
     depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
     context.kinect_service = NoopKinectService()
