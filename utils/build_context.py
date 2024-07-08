@@ -54,13 +54,14 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
     depth_camera_module = AsyncPhysicalDepthCameraModule(context.kinect_service)
     
     print('setting up motor adapter')
-    context.motor_adapter = PhysicalMotorService(
-      kinect_service=context.kinect_service,
-      device_io_adapter=context.device_io_adapter,
-      analytics_service=context.analytics_service
-    )
+    # context.motor_adapter = PhysicalMotorService(
+    #   kinect_service=context.kinect_service,
+    #   device_io_adapter=context.device_io_adapter,
+    #   analytics_service=context.analytics_service
+    # )
+    context.motor_adapter = StuckMotorService(context.analytics_service)
   else:
-    raise Exception(f"invalid GPTPET_ENV environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
+    raise Exception(f"invalid gptpet environment value of `{gptpet_env}` must be in the list `{['local', 'physical']}`")
     
   # see manual.py before changing this ordering
   sensory_modules = [camera_module, depth_camera_module]
