@@ -4,7 +4,7 @@ from datetime import datetime
 
 import yaml
 from langchain.chains.llm import LLMChain
-from langchain.output_parsers import YamlOutputParser
+from langchain.output_parsers import YamlOutputParser, OutputFixingParser
 from langchain_core.prompts import ChatPromptTemplate, HumanMessagePromptTemplate, PromptTemplate, \
   SystemMessagePromptTemplate
 from langchain_openai import ChatOpenAI
@@ -44,7 +44,10 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
       prompt=prompt,
       verbose=True
     )
-    self.output_parser = YamlOutputParser(pydantic_object=NewTaskResponseGoalIncluded)
+    
+    parser_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    yaml_parser = YamlOutputParser(pydantic_object=NewTaskResponseGoalIncluded)
+    self.output_parser = OutputFixingParser.from_llm(parser=yaml_parser, llm=parser_llm)
   
   def generate_new_task(self, context: GPTPetContext) -> TaskDefinition:
     pprint.pprint({"conscious_inputs": [
@@ -82,7 +85,6 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
       system_input=system_input
     )
     
-    # TODO: gracefully handle parsing errors
     response: NewTaskResponseGoalIncluded = self.output_parser.parse(text=response_str)
     new_task = task_response_mapper(str(conscious_inputs_value_str), response)
     if response.previous_goal_completed:
