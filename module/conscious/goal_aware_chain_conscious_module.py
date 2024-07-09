@@ -85,7 +85,7 @@ class GoalAwareChainConsciousModule(BaseConsciousModule):
       system_input=system_input
     )
     
-    response: NewTaskResponseGoalIncluded = self.output_parser.parse(text=response_str)
+    response: NewTaskResponseGoalIncluded = self.output_parser.parse(response_str)
     new_task = task_response_mapper(str(conscious_inputs_value_str), response)
     if response.previous_goal_completed:
       context.analytics_service.new_text(f"completed previous goal {context.goal_mixin.get_current_goal()}")
