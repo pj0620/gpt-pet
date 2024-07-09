@@ -1,3 +1,5 @@
+import time
+
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT, ROTATE_LEFT
 from gptpet_context import GPTPetContext
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
@@ -95,6 +97,7 @@ class RealControlAPI(BaseControlAPI):
     passageway = self.get_passageway(passageway_name)
     degrees_to_turn = passageway.turn_degrees
     self.rotate(degrees_to_turn)
+    time.sleep(0.5)
     dist = min(self.read_ahead_sensor() * 0.9, self.read_ahead_sensor() - 0.2)
     return self.move_ahead(dist)
   
@@ -109,6 +112,7 @@ class RealControlAPI(BaseControlAPI):
     found_object = matching_objects[0]
     degrees_to_turn = found_object.horizontal_angle
     self.rotate(degrees_to_turn)
+    time.sleep(0.5)
     dist = min(self.read_ahead_sensor() * 0.9, 10)
     return self.move_ahead(dist)
 
