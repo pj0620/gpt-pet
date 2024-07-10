@@ -167,15 +167,15 @@ class BaseControlAPI(ABC):
     """
   
   @abstractmethod
-  def look_up(self) -> None:
+  def tilt_up(self) -> None:
     pass
   
   @abstractmethod
-  def look_straight(self) -> None:
+  def tilt_straight(self) -> None:
     pass
   
   @abstractmethod
-  def look_down(self) -> None:
+  def tilt_down(self) -> None:
     pass
     
   

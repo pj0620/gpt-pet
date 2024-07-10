@@ -1,3 +1,3 @@
-control_api.look_up() # this is used to make gptpet look up with its camera
-control_api.look_straight() # this is used to make gptpet look straight forward with its camera
-control_api.look_down() # etc ...
+control_api.tilt_up() # this is used to make gptpet tilt up with its camera
+control_api.tilt_straight() # this is used to make gptpet tilt straight forward with its camera
+control_api.tilt_down() # etc ...

@@ -7,13 +7,13 @@ from tools.environment.api.base_control_api import BaseControlAPI
 
 
 class MockControlAPI(BaseControlAPI):
-  def look_up(self) -> None:
+  def tilt_up(self) -> None:
     print("MockControlAPI: executing look_up")
     
-  def look_straight(self) -> None:
+  def tilt_straight(self) -> None:
     print("MockControlAPI: executing look_straight")
     
-  def look_down(self) -> None:
+  def tilt_down(self) -> None:
     print("MockControlAPI: executing look_down")
   
   def move_right(
