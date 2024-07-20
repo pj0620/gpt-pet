@@ -61,7 +61,7 @@ def main():
 
         # Transcribe audio
         print('Transcribing audio')
-        result = model.transcribe(tmp_file.name, fp16=torch.cuda.is_available())
+        result = model.transcribe(tmp_file.name)
         text = result["text"]
         print("You said: " + text)
 
