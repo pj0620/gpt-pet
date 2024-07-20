@@ -1,3 +1,4 @@
+import torch
 import whisper
 import pyaudio
 import wave
@@ -60,7 +61,7 @@ def main():
 
         # Transcribe audio
         print('Transcribing audio')
-        result = model.transcribe(tmp_file.name)
+        result = model.transcribe(tmp_file.name, fp16=torch.cuda.is_available())
         text = result["text"]
         print("You said: " + text)
 
