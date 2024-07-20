@@ -19,3 +19,5 @@ python-dotenv==1.0.1
 scipy==1.13.0
 SpeechRecognition==1.2.3
 PyAudio==0.2.14
+openai-whisper==20231117
+certifi==2023.11.17
