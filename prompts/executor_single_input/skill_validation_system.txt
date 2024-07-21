@@ -6,6 +6,9 @@ The skill code will utilize control_api which is a api layer that is used by the
 
 {programs}
 
+Things to keep in minds
+1. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
+
 Skill Code: ... proposed code from memory to execute the task
 Task: ... task to execute
 
