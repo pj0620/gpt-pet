@@ -9,6 +9,7 @@ from module.sensory.proximity_module import ProximityModule
 from module.sensory.sim.ai2thor_camera_module import Ai2ThorCameraModule
 from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
+from module.subconscious.input.firebase_speech_module import FirebaseAudioModule
 from module.subconscious.input.proximiy_sensor_module import ProximitySensorModule
 from module.subconscious.input.stdin_speech_module import StdinAudioModule
 from module.subconscious.input.vision_module_with_goals import VisionModuleWithGoals
@@ -38,8 +39,16 @@ subconscious_input_modules: list[BaseSubconsciousInputModule] = [
   VisionModuleWithGoals(context.vectordb_adapter)
 ]
 
-if check_env_flag('MANUAL_AUDIO_INPUT'):
+# setup audio source
+manual_audio_input: bool = check_env_flag('MANUAL_AUDIO_INPUT')
+firebase_audio_input: bool = check_env_flag('FIREBASE_AUDIO_INPUT')
+if manual_audio_input and firebase_audio_input:
+  raise Exception('Cannot enable both MANUAL_AUDIO_INPUT, and FIREBASE_AUDIO_INPUT! Only one audio source can be used '
+                  'at a time. Only set one of these environment variables to true.')
+elif manual_audio_input:
   subconscious_input_modules.append(StdinAudioModule())
+elif firebase_audio_input:
+  subconscious_input_modules.append(FirebaseAudioModule())
 
 if not check_env_flag('SIM_SKIP_PROXIMITY_SENSOR'):
   context.analytics_service.new_text("initializing subconscious proximity sensor module")
