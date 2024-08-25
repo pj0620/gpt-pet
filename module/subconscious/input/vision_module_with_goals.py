@@ -3,18 +3,20 @@ from json import JSONDecodeError
 
 import numpy as np
 from langchain.output_parsers import YamlOutputParser
-from langchain_core.output_parsers import JsonOutputParser, PydanticOutputParser
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.prompts import PromptTemplate, ChatPromptTemplate
+from langchain_openai import ChatOpenAI
 
 from gptpet_context import GPTPetContext
 from model.objects import Object, ObjectDescription
-from model.passageway import Passageway, PassagewayDescription, PhysicalPassagewayInfo
+from model.passageway import Passageway, PassagewayDescription
 from model.subconscious import ConsciousInput
-from model.vision import CreatePetViewModel, PetViewDescription, PetViewSource, CreatePetViewWithGoalModel
+from model.vision import PetViewDescription, PetViewSource, CreatePetViewWithGoalModel
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from service.object_permanence_service import ObjectPermanenceService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
+from utils.env_utils import check_env_flag
 from utils.passageway_utils import merge_passageways
 from utils.prompt_utils import load_prompt, encode_image_array
 from utils.serialization import serialize_dataclasses, deserialize_dataclasses
@@ -38,8 +40,10 @@ class VisionModuleWithGoals(BaseSubconsciousInputModule):
     self.system_prompt = load_prompt('goal_aware_vision_module/system.txt')
     human_prompt_str = load_prompt('goal_aware_vision_module/human.txt')
     self.human_prompt = PromptTemplate.from_template(human_prompt_str)
-    self.yaml_parser = YamlOutputParser(pydantic_object=PetViewDescription)
+    yaml_parser = YamlOutputParser(pydantic_object=PetViewDescription)
     self.object_permanence_service = ObjectPermanenceService(vectordb_adapter_service)
+    vision_llm = ChatOpenAI(temperature=0, model="gpt-4o", max_tokens=1024)
+    self.chain = vision_llm | yaml_parser
   
   
   def get_description_vectordb(
@@ -54,6 +58,11 @@ class VisionModuleWithGoals(BaseSubconsciousInputModule):
     :param vectordb_adapter:
     :return: (view_description, passageways, objects, pet_view_id)
     """
+    if check_env_flag('DISABLE_VISION_VECTORDB'):
+      context.analytics_service.new_text(f"found DISABLE_VISION_VECTORDB=true, skipping check to see if gptpet has "
+                                         f"seen this image before")
+      return None, None, None, None
+    
     similar_view = vectordb_adapter.get_similar_pet_views_with_goal(base64_image,
                                                                      context.goal_mixin.get_current_goal().goal_id)
     if similar_view is None:
@@ -101,15 +110,15 @@ class VisionModuleWithGoals(BaseSubconsciousInputModule):
     
     context.analytics_service.new_image(base64_image)
     
-    # call vision llm
-    # TODO:
-    response_str = visual_llm_adapter.call_visual_llm_with_system_prompt(
-      system_prompt=self.system_prompt,
-      human_prompt=self.human_prompt.format(current_goal=context.goal_mixin.get_current_goal().description),
-      encoded_image_prompt=base64_image
-    )
-    print("called LLM and found text_description = ", response_str)
-    parsed_response: PetViewDescription = self.yaml_parser.parse(response_str)
+    msgs = [
+      SystemMessage(content=self.system_prompt),
+      HumanMessage(
+        content=[
+          {"type": "text", "text": self.human_prompt.format(current_goal=context.goal_mixin.get_current_goal().description)},
+          {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{base64_image}"}},
+        ])
+    ]
+    parsed_response: PetViewDescription = self.chain.invoke(msgs)
     
     # setup passageways
     passageway_descriptions_pydantic = parsed_response.passageway_descriptions
