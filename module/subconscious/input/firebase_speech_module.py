@@ -1,15 +1,10 @@
+from constants.audio import AUDIO_MODULE_SCHEMA, AUDIO_MODULE_DESCRIPTION, AUDIO_MODULE_NAME, AUDIO_CONSCIOUS_KEY
 from gptpet_context import GPTPetContext
 from model.subconscious import ConsciousInput
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from firebase_admin import credentials, db, initialize_app
 
 from utils.env_utils import get_env_var
-
-AUDIO_MODULE_SCHEMA = {
-  "heard_text": "text of audio gptpet heard from its microphone"
-}
-AUDIO_MODULE_DESCRIPTION = "Capture of text GPTPet heard from its microphone as text"
-AUDIO_MODULE_NAME = "audio_module"
 
 
 class FirebaseAudioModule(BaseSubconsciousInputModule):
@@ -38,7 +33,7 @@ class FirebaseAudioModule(BaseSubconsciousInputModule):
       context.analytics_service.new_text(f'found new command to send to gptpet: "{command}"')
     
     return ConsciousInput(
-      value=dict(heard_text=command),
+      value={AUDIO_CONSCIOUS_KEY: command},
       schema=AUDIO_MODULE_SCHEMA,
       description=AUDIO_MODULE_DESCRIPTION,
       name=AUDIO_MODULE_NAME

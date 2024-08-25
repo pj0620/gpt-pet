@@ -1,5 +1,6 @@
 from langchain_core.prompts import ChatPromptTemplate
 
+from constants.audio import AUDIO_CONSCIOUS_KEY
 from model.conscious import NewTaskResponse, TaskDefinition
 from model.subconscious import ConsciousInput
 from module.subconscious.input.stdin_speech_module import AUDIO_MODULE_NAME
@@ -40,7 +41,7 @@ def simple_subconscious_observation_summarizer(conscious_inputs: list[ConsciousI
       objects_count = len(objects_descriptions)
       objects_descriptions_str = ".".join([o["description"] for o in objects_descriptions])
     elif conscious_input.name == AUDIO_MODULE_NAME:
-      heard_audio = conscious_input.value['heard_text']
+      heard_text = conscious_input.value[AUDIO_CONSCIOUS_KEY]
     
   summary = current_view_description
   
@@ -48,6 +49,8 @@ def simple_subconscious_observation_summarizer(conscious_inputs: list[ConsciousI
     summary += f"I see {passageways_count} passageways in front of me. {passageway_descriptions_str}."
   if objects_descriptions_str is not None:
     summary += f"Additionally I see {objects_count} objects. {objects_descriptions_str}"
+  if heard_text is not None:
+    summary += f"Additionally I heard {heard_text}."
   
   return summary
   
