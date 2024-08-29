@@ -5,6 +5,7 @@ from model.conscious import NewTaskResponse, TaskDefinition
 from model.subconscious import ConsciousInput
 from module.subconscious.input.stdin_speech_module import AUDIO_MODULE_NAME
 from module.subconscious.input.vision_module import VISION_MODULE_NAME
+from utils.prompt_utils import preprocess_sentence
 
 
 def task_response_mapper(conscious_inputs_str: str, new_task_resp: NewTaskResponse) -> TaskDefinition:
@@ -36,21 +37,21 @@ def simple_subconscious_observation_summarizer(conscious_inputs: list[ConsciousI
         current_view_description = conscious_input.value["description"]
       passageway_descriptions = conscious_input.value["passageway_descriptions"]
       passageways_count = len(passageway_descriptions)
-      passageway_descriptions_str = ".".join([p["description"] for p in passageway_descriptions])
+      passageway_descriptions_str = " ".join([preprocess_sentence(p["description"]) for p in passageway_descriptions])
       objects_descriptions = conscious_input.value["objects_descriptions"]
       objects_count = len(objects_descriptions)
-      objects_descriptions_str = ".".join([o["description"] for o in objects_descriptions])
+      objects_descriptions_str = " ".join([preprocess_sentence(o["description"]) for o in objects_descriptions])
     elif conscious_input.name == AUDIO_MODULE_NAME:
       heard_text = conscious_input.value[AUDIO_CONSCIOUS_KEY]
     
   summary = current_view_description
   
-  if passageway_descriptions_str is not None:
-    summary += f"I see {passageways_count} passageways in front of me. {passageway_descriptions_str}."
-  if objects_descriptions_str is not None:
-    summary += f"Additionally I see {objects_count} objects. {objects_descriptions_str}"
-  if heard_text is not None:
-    summary += f"Additionally I heard {heard_text}."
+  if passageways_count > 0 and passageway_descriptions_str is not None:
+    summary += f"I see {passageways_count} passageway{'s' if passageways_count > 0 else ''} in front of me. {passageway_descriptions_str}"
+  if objects_count > 0 and objects_descriptions_str is not None:
+    summary += f"I see {objects_count} object{'s' if objects_count > 0 else ''}. {objects_descriptions_str}"
+  if heard_text is not None and (heard_text != ''):
+    summary += f"I heard a person say {heard_text}."
   
   return summary
   

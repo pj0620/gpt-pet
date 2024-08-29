@@ -1,0 +1,9 @@
+subconscious_info:
+{subconscious_info}
+current_goal: {current_goal}
+looking_direction: {looking_direction}
+time: {time}
+list_of_relevant_memories:
+{relevant_memory}
+list_of_previous_tasks_newest_to_oldest:
+{previous_tasks}

@@ -69,6 +69,13 @@ def load_text(*fpaths, by_lines=False):
       return fp.readlines()
     else:
       return fp.read()
+    
+    
+def preprocess_sentence(sentence: str):
+  cur = sentence.strip()
+  if cur[-1] != '.':
+    cur += '.'
+  return cur
 
 
 def load_control_primitives_context(primitive_names):

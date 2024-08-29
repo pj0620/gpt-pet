@@ -3,6 +3,7 @@ import numpy as np
 from constants.kinect import FREENECT_LED_RED
 from gptpet import GPTPet
 from module.conscious.goal_aware_chain_conscious_module import GoalAwareChainConsciousModule
+from module.conscious.goal_aware_gen_agent_conscious_module import GoalAwareGenAgentChainConsciousModule
 from module.sensory.proximity_module import ProximityModule
 from module.subconscious.input.base_subconscious_input_module import BaseSubconsciousInputModule
 from module.subconscious.input.firebase_speech_module import FirebaseAudioModule
@@ -44,7 +45,10 @@ if not check_env_flag('SIM_SKIP_PROXIMITY_SENSOR'):
   subconscious_input_modules.append(ProximitySensorModule())
 
 context.analytics_service.new_text("initializing conscious module")
-conscious_module = GoalAwareChainConsciousModule()
+conscious_module = GoalAwareGenAgentChainConsciousModule(
+  vector_db_adapter_service=context.vectordb_adapter,
+  analytics_service=context.analytics_service
+)
 
 context.analytics_service.new_text("initializing executor module")
 executor_module = SingleInputAgentExecutorModule(context)

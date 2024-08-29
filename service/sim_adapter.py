@@ -26,7 +26,10 @@ class SimAdapter:
       # tiny kitchen
       # scene="FloorPlan13",
       
-      scene="FloorPlan14",
+      # tiny kitchen + living room
+      # scene="FloorPlan14",
+      
+      scene="FloorPlan2",
       gridSize=0.01,
       rotateStepDegrees=90,
       # camera properties

@@ -1,3 +1,3 @@
-control_api.tilt_up() # this is used to make gptpet tilt up with its camera
-control_api.tilt_straight() # this is used to make gptpet tilt straight forward with its camera
+control_api.tilt_up() # this is used to make gptpet tilt up with its camera. This is the only way to tilt gptpet, rotate should not be used
+control_api.tilt_straight() # this is used to make gptpet tilt straight forward with its camera. This is the only way to tilt gptpet, rotate should not be used
 control_api.tilt_down() # etc ...
