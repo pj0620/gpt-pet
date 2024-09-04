@@ -106,17 +106,15 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     context.analytics_service.new_text(f"found previously existing skill, {skill}")
     
     # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
-    # check skill validator chain
-    if new_task.task != skill.task:
-      valid = self.validation_chain.invoke(dict(
-        skill=skill.code,
-        task=new_task.task
-      ))
-      if not valid:
-        context.analytics_service.new_text(
-          f"validation chain found previously existing skill `{skill}` does NOT complete "
-          f"the task `{new_task.task}` rejecting")
-        return None, False
+    valid = self.validation_chain.invoke(dict(
+      skill=skill.code,
+      task=new_task.task
+    ))
+    if not valid:
+      context.analytics_service.new_text(
+        f"validation chain found previously existing skill `{skill}` does NOT complete "
+        f"the task `{new_task.task}` rejecting")
+      return None, False
     
     print(f'executing code from skill manager')
     try:
