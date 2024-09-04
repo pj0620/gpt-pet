@@ -35,7 +35,7 @@ class GenerativeAgentConsciousModule(BaseConsciousModule):
       k=5
     )
     self.gen_memory = GenerativeAgentMemory(
-      llm=ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.5),
+      llm=ChatOpenAI(model="gpt-4o-mini", temperature=0.5),
       memory_retriever=retriever,
       verbose=True,
     )
