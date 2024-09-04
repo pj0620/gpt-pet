@@ -54,7 +54,7 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       verbose=True
     )
     
-    parser_llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+    parser_llm = ChatOpenAI(model="gpt-4o-mini", temperature=0)
     yaml_parser = YamlOutputParser(pydantic_object=NewTaskResponseGoalIncluded)
     self.output_parser = OutputFixingParser.from_llm(parser=yaml_parser, llm=parser_llm)
     
@@ -66,7 +66,7 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       k=5
     )
     self.gen_memory = GenerativeAgentMemory(
-      llm=ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.5),
+      llm=ChatOpenAI(model="gpt-4o-mini", temperature=0.5),
       memory_retriever=retriever,
       reflection_threshold=0.25,
       verbose=True,
@@ -79,7 +79,7 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
     self.summarizer_chain = (
         {"observation": RunnablePassthrough()}
         | summarizer_prompt
-        | ChatOpenAI(model="gpt-3.5-turbo", temperature=0)
+        | ChatOpenAI(model="gpt-4o-mini", temperature=0)
         | StrOutputParser()
     )
   
