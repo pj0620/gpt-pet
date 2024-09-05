@@ -17,6 +17,7 @@ The following must be true of the generated programs
 6. Don't manually write code to go down a passageway. Leverage goto_passageway method from control_api when possible.
 7. If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
 8. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
+9. Code should be less than 500 characters
 
 Reminder to use environment_tool before giving final answer.
 
