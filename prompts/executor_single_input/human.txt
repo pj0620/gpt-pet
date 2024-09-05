@@ -1,6 +1,8 @@
 Leveraging environment_tool, create a python program that can be run on a robot that will execute the following task.
 
-task: {input}
+In some cases, code was found to execute this task previously, but it was rejected or ran and failed. This info is included below via the previously_attempted_code, and reason_code_invalid keys.
+
+{input}
 
 Here are some useful programs you can use as a model when creating your code.
 
@@ -14,6 +16,7 @@ The following must be true of the generated programs
 5. Code should not contain a main method or if __name__ == "__main__" block
 6. Don't manually write code to go down a passageway. Leverage goto_passageway method from control_api when possible.
 7. If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
+8. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
 
 Reminder to use environment_tool before giving final answer.
 

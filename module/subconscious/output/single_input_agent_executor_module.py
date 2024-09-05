@@ -2,7 +2,7 @@ from json import tool
 from typing import Tuple
 
 from langchain import hub
-from langchain.output_parsers import BooleanOutputParser
+from langchain.output_parsers import BooleanOutputParser, YamlOutputParser
 from langchain_core.agents import AgentAction
 from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
@@ -14,12 +14,14 @@ from langchain.agents import create_openai_functions_agent, AgentExecutor, initi
 from agent.executor_agent import create_executor_chat_agent
 from gptpet_context import GPTPetContext
 from model.conscious import TaskResult, TaskDefinition
+from model.executor import SkillValidationResponse
 from model.skill_library import SkillCreateModel
 from module.subconscious.output.base_executor_module import BaseExecutorModule
 from service.vectordb_adapter_service import VectorDBAdapterService
 from tools.environment.environment_tool import EnvironmentTool
-from utils.prompt_utils import load_prompt, load_control_primitives_context
+from utils.prompt_utils import load_prompt, load_control_primitives_context, get_yaml
 
+NO_MATCHING_SKILL_MSG = "no matching skill"
 
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
@@ -69,7 +71,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     validation_prompt = validation_prompt.partial(
       programs=self.get_programs()
     )
-    bool_output_parser = BooleanOutputParser()
+    bool_output_parser = YamlOutputParser(pydantic_object=SkillValidationResponse)
     
     self.validation_chain = validation_prompt | llm | bool_output_parser
   
@@ -90,48 +92,49 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
       context: GPTPetContext,
       vectordb_adapter: VectorDBAdapterService,
       new_task: TaskDefinition
-  ) -> Tuple[str | None, bool]:
+  ) -> Tuple[str | None, bool, str]:
     """
     :param context:
     :param new_task:
     :param vectordb_adapter: VectorDBAdapter
-    :return: the skill, and if skill was executed successfully using the skil in the skill library?
+    :return: the skill, if skill was executed successfully using the skil in the skill library, reasoning that the skill
+     does or does not complete the task
     """
     skills_from_skill_manager = vectordb_adapter.get_similar_skill(new_task, 0.9)
     print('skills_from_skill_manager: ', skills_from_skill_manager)
     if len(skills_from_skill_manager) == 0:
-      return None, False
+      return None, False, NO_MATCHING_SKILL_MSG
     
     skill = skills_from_skill_manager[0]
     context.analytics_service.new_text(f"found previously existing skill, {skill}")
     
     # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
-    valid = self.validation_chain.invoke(dict(
+    validation_response: SkillValidationResponse = self.validation_chain.invoke(dict(
       skill=skill.code,
       task=new_task.task
     ))
-    if not valid:
+    if not validation_response.solves_task:
       context.analytics_service.new_text(
         f"validation chain found previously existing skill `{skill}` does NOT complete "
-        f"the task `{new_task.task}` rejecting")
-      return None, False
+        f"the task `{new_task.task}` rejecting. reasoning: {validation_response.reasoning}")
+      return None, False, validation_response.reasoning
     
     print(f'executing code from skill manager')
     try:
       self.environment_tool.real_execute(code=skill.code)
-      return skill.code, True
+      return skill.code, True, validation_response.reasoning
     except Exception as e:
       print('got exception while executing skill manager code, deleting from skill library', e)
       context.analytics_service.new_text(
         f"got exception while executing skill manager code, deleting from skill library")
       vectordb_adapter.delete_skill(skill)
-      return skill.code, False
+      return skill.code, False, f"attempted to execute and got the following error: {e}"
   
   def execute(self, context: GPTPetContext, new_task: TaskDefinition) -> TaskResult:
     self.environment_tool.update_passageways(context.passageways)
     self.environment_tool.update_objects(context.objects_in_view)
     
-    code, completed_from_skill = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
+    code, completed_from_skill, skill_reasoning = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
     if completed_from_skill:
       context.analytics_service.new_text("task was completed successfuly using skill from skill library")
       return TaskResult(
@@ -139,9 +142,16 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
         executor_output=code
       )
     
+    conscious_input = dict(task=new_task.task)
+    if skill_reasoning != NO_MATCHING_SKILL_MSG:
+      conscious_input = {
+        **conscious_input,
+        "previously_attempted_code": code,
+        "reason_code_invalid": skill_reasoning
+      }
     context.analytics_service.new_text(f"no previous skill found matching new task, writing code: {new_task}")
     result = self.agent_executor.invoke(dict(
-      input=new_task.task,
+      input=get_yaml(conscious_input),
       chat_history=[],
     ))
     # hack to check if environment tool successfully executed
