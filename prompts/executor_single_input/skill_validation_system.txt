@@ -8,6 +8,7 @@ The skill code will utilize control_api which is a api layer that is used by the
 
 Things to keep in minds
 1. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
+2. Instructions to turn right or turn left without specifying degrees should result in a turn of 30 degrees in that direction. No more no less
 
 Skill Code: ... proposed code from memory to execute the task
 Task: ... task to execute
