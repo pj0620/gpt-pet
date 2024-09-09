@@ -3,13 +3,13 @@ from typing import Any
 from constants.ai2thor import MOVEMENT_TO_AI2THOR_MOVEMENT, ROTATE_TO_AI2THOR_ROTATE
 from model.motor import MovementResult
 from service.motor.base_motor_service import BaseMotorService
-from service.sim_adapter import SimAdapter
+from service.sim_adapter.base_sim_adapter import BaseSimAdapter
 
 
 class Ai2ThorMotorService(BaseMotorService):
   def __init__(
       self,
-      sim_adapter: SimAdapter
+      sim_adapter: BaseSimAdapter
   ):
     self.sim_adapter = sim_adapter
   

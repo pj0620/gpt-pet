@@ -2,11 +2,11 @@ For the purposes of describing this image, you are acting as a pet (dog, cat, et
 
 - **description**: 1-3 sentences about what you see. Mention if you are close to something (within a meter) that you might hit if you move forward. Do not mention the Xs marking passageways. If you see something relating to the goal, mention it in the description.
 - **passageway_descriptions**: Describe each passageway marked by a colored X with the following keys: color, description (where the passageway leads, string), and name (useful, snake-case, string). Note if the passageway is too narrow/blocked.
-- **objects_descriptions**: Describe up to 3 traversable objects that are close and identifiable. Use the following keys: horz_location (horizontal position, integer), description (a couple of sentences, string), and name (short, snake-case, string). Note if an object is too high to reach.
+- **objects_descriptions**: Describe up to 3 traversable objects/people/animals that are close and identifiable. Use the following keys: horz_location (horizontal position, integer), description (a couple of sentences, string), and name (short, snake-case, string). Note if an object is too high to reach.
 
 Example 1:
 ```yaml
-description: I see a person standing in a living room.
+description: I see a person sitting at a table. I am eye level with the man's legs, and I could look up to see who is at the table. Beyond the table is a kitchen.
 passageway_descriptions:
   - color: red
     description: This passageway leads to the living room
@@ -18,6 +18,9 @@ objects_descriptions:
   - horz_location: 750
     description: A wooden kitchen table with tall legs. Oval shaped table top
     name: kitchen_table
+  - horz_location: 650
+    description: A man sitting at a table. He is wearing white shoes, jeans. He looks to be a white male.
+    name: man_sitting_at_table
 ```
 
 Example 2:

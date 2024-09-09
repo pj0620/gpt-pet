@@ -2,13 +2,13 @@ from typing import Any
 
 from gptpet_context import GPTPetContext
 from module.sensory.base_sensory_module import BaseSensoryModule
-from service.sim_adapter import SimAdapter
+from service.sim_adapter.base_sim_adapter import BaseSimAdapter
 
 
 class Ai2ThorCameraModule(BaseSensoryModule):
   def __init__(
       self,
-      sim_adapter: SimAdapter
+      sim_adapter: BaseSimAdapter
   ):
     self.sim_adapter = sim_adapter
   

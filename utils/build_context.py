@@ -7,8 +7,8 @@ from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.kinect.sim.noop_kinect_service import NoopKinectService
 from service.motor.sim.ai2thor_motor_service import Ai2ThorMotorService
-from service.motor.sim.stuck_motor_service import StuckMotorService
-from service.sim_adapter import SimAdapter
+from service.sim_adapter.multi_agent_sim_adapter import MultiAgentSimAdapter
+from service.sim_adapter.single_agent_sim_adapter import SingleAgentSimAdapter
 from service.vectordb_adapter_service import VectorDBAdapterService
 from service.visual_llm_adapter_service import VisualLLMAdapterService
 from utils.env_utils import get_env
@@ -29,7 +29,7 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
   
   gptpet_env = get_env()
   if gptpet_env == 'local':
-    sim_adapter = SimAdapter()
+    sim_adapter = SingleAgentSimAdapter()
     context.motor_adapter = Ai2ThorMotorService(sim_adapter)
     camera_module = Ai2ThorCameraModule(sim_adapter)
     depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)

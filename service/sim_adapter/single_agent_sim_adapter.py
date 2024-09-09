@@ -1,23 +1,20 @@
 import os
 
-import cv2
-import numpy as np
 from ai2thor.controller import Controller
 
-from constants.ai2thor import AI2THOR_CROUCH, AI2THOR_NOOP, AI2THOR_LOOK_DOWN, AI2THOR_MOVE_AHEAD
+from constants.ai2thor import AI2THOR_MOVE_AHEAD
 from constants.motor import MOVE_BACK, MOVE_LEFT, MOVE_RIGHT, MOVE_AHEAD
 from model.collision import CollisionError
-from utils.math_utils import get_rotation_vector, dict_to_array
+from service.sim_adapter.base_sim_adapter import BaseSimAdapter
 
 WINDOW_NAME = 'Pet View'
 PROXIMITY_SENSOR_MAX_STEPS = 10
 PROXIMITY_SENSOR_RESOLUTION = 0.4
 
-# cv2.namedWindow(WINDOW_NAME, cv2.WINDOW_NORMAL)
 
-class SimAdapter:
-  def __init__(self):
-    self.controller = Controller(
+class SingleAgentSimAdapter(BaseSimAdapter):
+  def __init__(self, scene="FloorPlan2"):
+    self._controller = Controller(
       agentMode="locobot",
       
       # OG
@@ -29,7 +26,7 @@ class SimAdapter:
       # tiny kitchen + living room
       # scene="FloorPlan14",
       
-      scene="FloorPlan2",
+      scene=scene,
       gridSize=0.01,
       rotateStepDegrees=90,
       # camera properties
@@ -41,37 +38,38 @@ class SimAdapter:
       
       renderDepthImage=True
     )
-    self.last_event = None
+    self._last_event = None
     # self.controller.step(AI2THOR_CROUCH)
     # self.controller.step(AI2THOR_LOOK_DOWN, degrees=30)
-    self.noop()
+    self._noop()
     
-    self.skip_proximity_sensors = os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true'
-    self.enable_ai2thor_debug_logging = os.environ.get('ENABLE_AI2THOR_DEBUG_LOGGING') == 'true'
+    self._skip_proximity_sensors = os.environ.get('SIM_SKIP_PROXIMITY_SENSOR') == 'true'
+    self._enable_ai2thor_debug_logging = os.environ.get('ENABLE_AI2THOR_DEBUG_LOGGING') == 'true'
     
-    self.proximity_measurements = None
-    self.update_proximity_sensors()
+    self._proximity_measurements = None
+    self._update_proximity_sensors()
   
-  def noop(self):
+  def _noop(self):
     # self.last_event = self.controller.step(AI2THOR_NOOP)
-    self.last_event = self.controller.step(AI2THOR_MOVE_AHEAD, moveMagnitude=0)
+    self._last_event = self._controller.step(AI2THOR_MOVE_AHEAD, moveMagnitude=0)
   
   def do_step(self,
               action,
               update_proximity_sensors=True,
               **kwargs
-  ):
-    if self.enable_ai2thor_debug_logging: print(f'calling do_step with {action=}, {update_proximity_sensors=}, {kwargs=}')
-    self.last_event = self.controller.step(action=action, **kwargs)
-    if self.enable_ai2thor_debug_logging: print(f'{self.last_event=}')
+              ):
+    if self._enable_ai2thor_debug_logging: print(
+      f'calling do_step with {action=}, {update_proximity_sensors=}, {kwargs=}')
+    self._last_event = self._controller.step(action=action, **kwargs)
+    if self._enable_ai2thor_debug_logging: print(f'{self._last_event=}')
     # self.update_camera()
     if update_proximity_sensors:
-      if not self.last_event.metadata['lastActionSuccess']:
+      if not self._last_event.metadata['lastActionSuccess']:
         raise CollisionError(f"hit something while executing {action} with following args {kwargs}")
       else:
         print(f"successfully executed {action} with following args {kwargs}")
-      self.update_proximity_sensors()
-    
+      self._update_proximity_sensors()
+  
   # def get_collision_direction(self):
   #   if self.last_event.metadata["lastActionSuccess"]:
   #     return None
@@ -87,32 +85,32 @@ class SimAdapter:
   #   return 'ahead'
   
   def get_view(self):
-    self.noop()
-    last_frame = self.last_event.frame
+    self._noop()
+    last_frame = self._last_event.frame
     return last_frame
   
   def get_depth_view(self):
-    self.noop()
-    last_frame = self.last_event.depth_frame
+    self._noop()
+    last_frame = self._last_event.depth_frame
     return last_frame
   
   def last_event_successful(self):
-    if self.last_event is None:
+    if self._last_event is None:
       return False
-    return self.last_event.metadata['lastActionSuccess']
+    return self._last_event.metadata['lastActionSuccess']
   
-  def update_proximity_sensors(self):
+  def _update_proximity_sensors(self):
     actions = [MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK]
     directions = ['right', 'ahead', 'left', 'back']
     
-    start_position = dict(self.last_event.metadata["agent"]["position"])
+    start_position = dict(self._last_event.metadata["agent"]["position"])
     distances = {
       direction: float('inf')
       for direction in directions
     }
-    if not self.skip_proximity_sensors:
+    if not self._skip_proximity_sensors:
       for action, direction in zip(actions, directions):
-        self.noop()
+        self._noop()
         final_steps = 0
         
         jump_size = PROXIMITY_SENSOR_MAX_STEPS
@@ -132,6 +130,5 @@ class SimAdapter:
           position=start_position,
           update_proximity_sensors=False
         )
-      
-    self.proximity_measurements = distances
-      
+    
+    self._proximity_measurements = distances
