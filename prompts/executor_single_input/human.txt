@@ -19,6 +19,7 @@ The following must be true of the generated programs
 8. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
 9. Code should be less than 500 characters
 10. Given tasks such as 'Turn right' or 'Turn left' without specifying the degrees to turn. The resulting code should turn exactly 30 degrees in that direction. No more no less
+11. Code should be short, quick to execute, and only do the task specified.
 
 Reminder to use environment_tool before giving final answer.
 
