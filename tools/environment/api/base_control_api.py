@@ -13,10 +13,10 @@ class BaseControlAPI(ABC):
     self.last_steps = []
     self.passageways: list[Passageway] = []
     self.objects: list[Object] = []
-    
+  
   def update_passageways(self, new_passageways: list[Passageway]):
     self.passageways = new_passageways
-    
+  
   def update_objects(self, new_objects: list[Object]):
     self.objects = new_objects
   
@@ -26,7 +26,7 @@ class BaseControlAPI(ABC):
   
   def clear_last_actions(self):
     self.last_steps = []
-    
+  
   def rollback_last_successful(self):
     print("failed, rolling back last actions")
     try:
@@ -47,7 +47,6 @@ class BaseControlAPI(ABC):
           self.rotate(**params)
     except Exception as e:
       print("[ROLLBACK] got exception during rollback action, ", e)
-    
   
   @abstractmethod
   def move_right(
@@ -145,7 +144,7 @@ class BaseControlAPI(ABC):
     """
     :param passageway_name: color of passageway to move into
     """
-    
+  
   def get_passageway(self, passageway_name: str) -> Passageway:
     """
     :param passageway_name: name of passageway to get
@@ -157,7 +156,7 @@ class BaseControlAPI(ABC):
                       f"are {[p.name for p in self.passageways]}")
     elif len(matching_passageways) > 1:
       warnings.warn(f"found multiple passageways with the same color {passageway_name} choosing first")
-  
+    
     return matching_passageways[0]
   
   @abstractmethod
@@ -177,5 +176,3 @@ class BaseControlAPI(ABC):
   @abstractmethod
   def tilt_down(self) -> None:
     pass
-    
-  

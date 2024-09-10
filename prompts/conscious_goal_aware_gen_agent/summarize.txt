@@ -1,3 +1,5 @@
-shorten the following into a short 1-2 sentence concise summary. Only respond with the summary and nothing else.
+A robot pet named gptpet has just done the following. You are acting a Observer, you are given this description of the actions done and create a useful observation.
+
+shorten the following into a short 1-2 sentence observation. Only respond with the observation and nothing else.
 
 {observation}

@@ -1,4 +1,4 @@
-from abc import ABC
+from abc import ABC, abstractmethod
 from typing import Any
 
 from gptpet_context import GPTPetContext
@@ -7,6 +7,7 @@ from module.base_module import BaseModule
 
 
 class BaseSubconsciousInputModule(ABC):
+  @abstractmethod
   def build_conscious_input(self, context: GPTPetContext) -> ConsciousInput:
     """
     Build input needed for Conscious Modules
