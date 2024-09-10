@@ -149,7 +149,8 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
         "previously_attempted_code": code,
         "reason_code_invalid": skill_reasoning
       }
-    context.analytics_service.new_text(f"no previous skill found matching new task, writing code: {new_task}")
+    context.analytics_service.new_text(f"no previous skill found matching new task, invoking executor agent with following")
+    context.analytics_service.new_text(get_yaml(conscious_input))
     result = self.agent_executor.invoke(dict(
       input=get_yaml(conscious_input),
       chat_history=[],
