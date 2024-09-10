@@ -8,6 +8,7 @@ import freenect
 
 NOOP_TILT_DEGREES = -100
 NOOP_LED_MODE = -1
+DEPTH_FRAME_COUNT = 5
 
 
 class AsyncPhysicalKinectService(BaseKinectService):
@@ -16,7 +17,7 @@ class AsyncPhysicalKinectService(BaseKinectService):
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
     
-    self._last_depth = None
+    self._last_depth_frames = []
     self._last_rgb = None
     
     # stores current angle
@@ -46,7 +47,9 @@ class AsyncPhysicalKinectService(BaseKinectService):
       self._update_led = NOOP_LED_MODE
   
   def _depth_handler(self, dev, data, timestamp):
-    self._last_depth = data
+    self._last_depth_frames.append(data)
+    if len(self._last_depth_frames) > DEPTH_FRAME_COUNT:
+      self._last_depth_frames.pop(0)
   
   def _rgb_handler(self, dev, data, timestamp):
     self._last_rgb = data
@@ -84,4 +87,4 @@ class AsyncPhysicalKinectService(BaseKinectService):
     return self._last_rgb
   
   def get_depth(self) -> np.array:
-    return self._last_depth
+    return sum(self._last_depth_frames) / DEPTH_FRAME_COUNT
