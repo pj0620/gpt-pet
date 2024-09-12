@@ -268,8 +268,8 @@ class PhysicalMotorService(BaseMotorService):
       raise StuckError(error_msg)
   
   def _calc_average_dist(self):
-    print("calculating average depth from depth sensor")
-    
     depth = self.kinect_service.get_depth()
     depth = depth.astype('float64')
-    return depth.sum() / np.count_nonzero(depth)
+    avg_depth = depth.sum() / np.count_nonzero(depth)
+    self.analytics_service.new_text(f"average depth from depth sensor = {avg_depth}")
+    return avg_depth
