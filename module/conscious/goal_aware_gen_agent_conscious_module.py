@@ -18,6 +18,7 @@ from module.conscious.base_conscious_module import BaseConsciousModule
 from service.analytics_service import AnalyticsService
 from service.vectordb_adapter_service import VectorDBAdapterService
 from utils.conscious import task_response_mapper, simple_subconscious_observation_summarizer
+from utils.env_utils import check_env_flag
 from utils.prompt_utils import load_prompt, get_yaml
 
 
@@ -29,11 +30,15 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
   ):
     self.analytics_service = analytics_service
     llm = ChatOpenAI(model="gpt-4o", temperature=0.1)
+    self.gen_agent_memory_enabled = check_env_flag('ENABLE_GEN_AGENT_MEMORY')
+    prompt_suffix = "" if self.gen_agent_memory_enabled else "_no_gen_memory"
     self.prompt_human = PromptTemplate.from_template(
-      load_prompt('conscious_goal_aware_gen_agent/human.txt')
+      load_prompt(
+        f'conscious_goal_aware_gen_agent/human{prompt_suffix}.txt'
+      )
     )
     self.prompt_system = PromptTemplate.from_template(
-      load_prompt('conscious_goal_aware_gen_agent/system.txt')
+      load_prompt(f'conscious_goal_aware_gen_agent/system{prompt_suffix}.txt')
     )
     self.tasks_history: list[dict] = []
     prompt = ChatPromptTemplate.from_messages(
@@ -109,14 +114,17 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
     relevant_memories_docs = self.gen_memory.fetch_memories(self.last_subconscious_summary, datetime.now())
     relevant_memories_strs = [rm.page_content for rm in relevant_memories_docs]
     
-    human_input = self.prompt_human.format(
+    human_msg_args = dict(
       subconscious_info=get_yaml(conscious_inputs_value_str, True),
       time=str(datetime.now()),
       previous_tasks=get_yaml(self.tasks_history, True),
       current_goal=context.goal_mixin.get_current_goal().description,
-      looking_direction=context.kinect_service.get_current_looking_direction(),
-      relevant_memory=get_yaml(relevant_memories_strs, True),
+      looking_direction=context.kinect_service.get_current_looking_direction()
     )
+    if self.gen_agent_memory_enabled:
+      human_msg_args["relevant_memory"] = get_yaml(relevant_memories_strs, True)
+    
+    human_input = self.prompt_human.format(**human_msg_args)
     system_input = self.prompt_system.format(
       subconscious_schema=get_yaml(conscious_inputs_schema_str, True)
     )
@@ -149,7 +157,7 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       self.tasks_history.pop(0)
     
     # gen agent
-    if self.last_subconscious_summary is None:
+    if (self.last_subconscious_summary is None) or (not self.gen_agent_memory_enabled):
       return
     """ update task results for success or fail
     """
