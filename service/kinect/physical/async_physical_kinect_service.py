@@ -8,7 +8,7 @@ import freenect
 
 NOOP_TILT_DEGREES = -100
 NOOP_LED_MODE = -1
-DEPTH_FRAME_COUNT = 5
+DEPTH_FRAME_COUNT = 3
 
 
 class AsyncPhysicalKinectService(BaseKinectService):
