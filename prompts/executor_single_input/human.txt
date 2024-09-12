@@ -14,7 +14,7 @@ The following must be true of the generated programs
 3. Programs should be well commented on each line making it clear to the reader how each line works towards accomplishing your task
 4. Code should never contain a while loop
 5. Code should not contain a main method or if __name__ == "__main__" block
-6. Don't manually write code to go down a passageway. Just call the goto_passageway method from control_api, and nothing else.
+6. Don't manually write code to go down a passageway. Just call the goto_passageway method from control_api, and nothing else.  Any calls to rotate, move, etc before calling goto_passageway will move the robot putting the passageway out of view.
 7. If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
 8. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
 9. Code should be less than 500 characters
