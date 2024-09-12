@@ -23,6 +23,7 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context, get
 
 NO_MATCHING_SKILL_MSG = "no matching skill"
 
+
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
   def __init__(self, context: GPTPetContext):
@@ -134,7 +135,8 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     self.environment_tool.update_passageways(context.passageways)
     self.environment_tool.update_objects(context.objects_in_view)
     
-    code, completed_from_skill, skill_reasoning = self.execute_from_skill_manager(context, context.vectordb_adapter, new_task)
+    code, completed_from_skill, skill_reasoning = self.execute_from_skill_manager(context, context.vectordb_adapter,
+                                                                                  new_task)
     if completed_from_skill:
       context.analytics_service.new_text("task was completed successfuly using skill from skill library")
       return TaskResult(
@@ -149,7 +151,8 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
         "previously_attempted_code": code,
         "reason_code_invalid": skill_reasoning
       }
-    context.analytics_service.new_text(f"no previous skill found matching new task, invoking executor agent with following")
+    context.analytics_service.new_text(
+      f"no previous skill found matching new task, invoking executor agent with following")
     context.analytics_service.new_text(get_yaml(conscious_input))
     result = self.agent_executor.invoke(dict(
       input=get_yaml(conscious_input),
@@ -163,7 +166,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     last_step_input, last_env_tool_resp = last_step
     if not isinstance(last_step_input, AgentAction) or not isinstance(last_env_tool_resp, str):
       raise ValueError("The last step does not contain a valid AgentAction and response string.")
-  
+    
     success = 'success!' in last_env_tool_resp
     executor_output = result['output'] if success else last_env_tool_resp
     task_result = TaskResult(
