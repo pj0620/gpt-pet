@@ -1,17 +1,13 @@
-from json import tool
+import random
 from typing import Tuple
 
-from langchain import hub
-from langchain.output_parsers import BooleanOutputParser, YamlOutputParser
+from langchain.output_parsers import YamlOutputParser
 from langchain_core.agents import AgentAction
-from langchain_core.messages import SystemMessage
 from langchain_core.prompts import ChatPromptTemplate, PromptTemplate, SystemMessagePromptTemplate, MessagesPlaceholder, \
   HumanMessagePromptTemplate
 from langchain_openai import ChatOpenAI
-from langchain.agents import create_openai_functions_agent, AgentExecutor, initialize_agent, AgentType, \
-  create_json_chat_agent, create_structured_chat_agent
+from langchain.agents import AgentExecutor, create_json_chat_agent
 
-from agent.executor_agent import create_executor_chat_agent
 from gptpet_context import GPTPetContext
 from model.conscious import TaskResult, TaskDefinition
 from model.executor import SkillValidationResponse
@@ -23,6 +19,8 @@ from utils.prompt_utils import load_prompt, load_control_primitives_context, get
 
 NO_MATCHING_SKILL_MSG = "no matching skill"
 
+SKILL_VALIDATION_PROBABILITY = 0.2
+NON_VALIDATED_SKILL_REASONING = 'found in skill library'
 
 class SingleInputAgentExecutorModule(BaseExecutorModule):
   
@@ -109,21 +107,24 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     skill = skills_from_skill_manager[0]
     context.analytics_service.new_text(f"found previously existing skill, {skill}")
     
-    # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
-    validation_response: SkillValidationResponse = self.validation_chain.invoke(dict(
-      skill=skill.code,
-      task=new_task.task
-    ))
-    if not validation_response.solves_task:
-      context.analytics_service.new_text(
-        f"validation chain found previously existing skill `{skill}` does NOT complete "
-        f"the task `{new_task.task}` rejecting. reasoning: {validation_response.reasoning}")
-      return None, False, validation_response.reasoning
+    validation_response: SkillValidationResponse | None = None
+    if random.random() < SKILL_VALIDATION_PROBABILITY:
+      print('validating skill')
+      # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
+      validation_response = self.validation_chain.invoke(dict(
+        skill=skill.code,
+        task=new_task.task
+      ))
+      if not validation_response.solves_task:
+        context.analytics_service.new_text(
+          f"validation chain found previously existing skill `{skill}` does NOT complete "
+          f"the task `{new_task.task}` rejecting. reasoning: {validation_response.reasoning}")
+        return None, False, validation_response.reasoning
     
     print(f'executing code from skill manager')
     try:
       self.environment_tool.real_execute(code=skill.code)
-      return skill.code, True, validation_response.reasoning
+      return skill.code, True, validation_response.reasoning if validation_response else NON_VALIDATED_SKILL_REASONING
     except Exception as e:
       print('got exception while executing skill manager code, deleting from skill library', e)
       context.analytics_service.new_text(
