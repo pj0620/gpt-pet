@@ -109,7 +109,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     
     validation_response: SkillValidationResponse | None = None
     if random.random() < SKILL_VALIDATION_PROBABILITY:
-      print('validating skill')
+      context.analytics_service.new_text('validating skill')
       # TODO: grab k skills, and make it choose from the list of k or -1 if not meet the task
       validation_response = self.validation_chain.invoke(dict(
         skill=skill.code,
@@ -121,14 +121,12 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
           f"the task `{new_task.task}` rejecting. reasoning: {validation_response.reasoning}")
         return None, False, validation_response.reasoning
     
-    print(f'executing code from skill manager')
+    context.analytics_service.new_text(f'executing code from skill manager')
     try:
       self.environment_tool.real_execute(code=skill.code)
       return skill.code, True, validation_response.reasoning if validation_response else NON_VALIDATED_SKILL_REASONING
     except Exception as e:
       print('got exception while executing skill manager code, deleting from skill library', e)
-      context.analytics_service.new_text(
-        f"got exception while executing skill manager code, deleting from skill library")
       vectordb_adapter.delete_skill(skill)
       return skill.code, False, f"attempted to execute and got the following error: {e}"
   
@@ -139,7 +137,7 @@ class SingleInputAgentExecutorModule(BaseExecutorModule):
     code, completed_from_skill, skill_reasoning = self.execute_from_skill_manager(context, context.vectordb_adapter,
                                                                                   new_task)
     if completed_from_skill:
-      context.analytics_service.new_text("task was completed successfuly using skill from skill library")
+      context.analytics_service.new_text("task was completed successfully using skill from skill library")
       return TaskResult(
         success=True,
         executor_output=code
