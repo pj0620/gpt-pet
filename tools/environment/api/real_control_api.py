@@ -25,7 +25,7 @@ class RealControlAPI(BaseControlAPI):
     self.context.kinect_service.do_tilt(30)
   
   def tilt_straight(self) -> None:
-    self.context.kinect_service.do_tilt(0)
+    self.context.kinect_service.do_tilt(-15)
   
   def tilt_down(self) -> None:
     self.context.kinect_service.do_tilt(-30)
