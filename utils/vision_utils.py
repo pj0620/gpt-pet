@@ -89,7 +89,7 @@ def filter_close_values(values, min_distance):
 @dataclass
 class LabelPassagewaysConfig:
   # used to control what part of the depth image should be average to compute a passageway
-  top_clip_percent: float = 0.5
+  top_clip_percent: float = 0.6
   bottom_clip_percent: float = 0.95
   
   # average distance to be considered a path forward
