@@ -21,20 +21,16 @@ PASSAGEWAY_STOP_TIME = 1
 class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorService
   proximity_sensor_adapter: BaseDeviceIOAdapter
-  kinect_service: BaseKinectService
-  analytics_service: AnalyticsService
   
   def __init__(self,
                proximity_sensor_adapter: BaseDeviceIOAdapter,
                motor_adapter: BaseMotorService,
-               kinect_service: BaseKinectService,
-               analytics_service: AnalyticsService,
                context: GPTPetContext):
     super().__init__()
     self.proximity_sensor_adapter = proximity_sensor_adapter
     self.motor_adapter = motor_adapter
-    self.kinect_service = kinect_service
-    self.analytics_service = analytics_service
+    self.kinect_service = context.kinect_service
+    self.analytics_service = context.analytics_service
     self.context = context
   
   def tilt_up(self) -> None:
