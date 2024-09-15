@@ -4,3 +4,7 @@ class CollisionError(Exception):
 
 class StuckError(Exception):
   pass
+
+
+class InvalidPassagewayError(Exception):
+  pass
