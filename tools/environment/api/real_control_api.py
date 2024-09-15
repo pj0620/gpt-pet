@@ -2,23 +2,39 @@ import time
 
 from constants.motor import MOVE_RIGHT, MOVE_AHEAD, MOVE_LEFT, MOVE_BACK, ROTATE_RIGHT, ROTATE_LEFT
 from gptpet_context import GPTPetContext
+from model.collision import CollisionError, InvalidPassagewayError
+from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
+from service.kinect.base_kinect_service import BaseKinectService
 from service.motor.base_motor_service import BaseMotorService
 from tools.environment.api.base_control_api import BaseControlAPI
 import warnings
+
+from utils.vision_utils import depth_arr_avg
+
+PASSAGEWAY_STEP_DEGREES = 5
+PASSAGEWAY_MAX_STEP_COUNT = 6
+PASSAGEWAY_AVG_DEPTH_THRESHOLD = 0.5
+PASSAGEWAY_STOP_TIME = 1
 
 
 class RealControlAPI(BaseControlAPI):
   motor_adapter: BaseMotorService
   proximity_sensor_adapter: BaseDeviceIOAdapter
+  kinect_service: BaseKinectService
+  analytics_service: AnalyticsService
   
   def __init__(self,
                proximity_sensor_adapter: BaseDeviceIOAdapter,
                motor_adapter: BaseMotorService,
+               kinect_service: BaseKinectService,
+               analytics_service: AnalyticsService,
                context: GPTPetContext):
     super().__init__()
     self.proximity_sensor_adapter = proximity_sensor_adapter
     self.motor_adapter = motor_adapter
+    self.kinect_service = kinect_service
+    self.analytics_service = analytics_service
     self.context = context
   
   def tilt_up(self) -> None:
@@ -97,6 +113,26 @@ class RealControlAPI(BaseControlAPI):
     passageway = self.get_passageway(passageway_name)
     degrees_to_turn = passageway.turn_degrees
     self.rotate(degrees_to_turn)
+    turn_step_deg = PASSAGEWAY_STEP_DEGREES if degrees_to_turn > 0 else -PASSAGEWAY_STEP_DEGREES
+    validated_depth = False
+    for passageway_step in range(PASSAGEWAY_MAX_STEP_COUNT + 1):
+      total_degrees_turned = degrees_to_turn + passageway_step * turn_step_deg
+      avg_depth = depth_arr_avg(self.kinect_service.get_depth())
+      self.analytics_service.new_text(f"checking depth sensor after turning {total_degrees_turned} degrees resulted "
+                                      f"in avg_depth = {avg_depth}")
+      
+      if avg_depth <= PASSAGEWAY_AVG_DEPTH_THRESHOLD:
+        validated_depth = True
+        break
+      
+      self.analytics_service.new_text(f"{avg_depth} > {PASSAGEWAY_AVG_DEPTH_THRESHOLD}, rotating {turn_step_deg}")
+      self.rotate(turn_step_deg)
+      time.sleep(PASSAGEWAY_STOP_TIME)
+      
+    if not validated_depth:
+      raise InvalidPassagewayError(f"passageway `{passageway_name}` is not traversable. Cannot move through "
+                                   f"this passageway")
+    
     time.sleep(0.5)
     dist = min(self.read_ahead_sensor() * 0.9, self.read_ahead_sensor() - 0.2)
     return self.move_ahead(dist)
