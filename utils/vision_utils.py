@@ -90,7 +90,7 @@ def filter_close_values(values, min_distance):
 class LabelPassagewaysConfig:
   # used to control what part of the depth image should be average to compute a passageway
   top_clip_percent: float = 0.5
-  bottom_clip_percent: float = 0.9
+  bottom_clip_percent: float = 0.95
   
   # average distance to be considered a path forward
   passage_distance_threshold: float = 0.5
@@ -129,9 +129,16 @@ def label_passageways(
   
   # compute average distances using depth camera view
   depth_image_arr_clipped[depth_image_arr_clipped == 2.047] = 0
-  non_zero_count = np.count_nonzero(depth_image_arr_clipped, axis=0)
+  
+  # removing filtering non-zero points logic
+  # non_zero_count = np.count_nonzero(depth_image_arr_clipped, axis=0)
+  # col_sums = np.sum(depth_image_arr_clipped, axis=0)
+  # row_avgs = np.where(non_zero_count != 0, col_sums / non_zero_count, 0)
+  
+  clipped_height = (bottom_percent - top_percent) * image_height
   col_sums = np.sum(depth_image_arr_clipped, axis=0)
-  row_avgs = np.where(non_zero_count != 0, col_sums / non_zero_count, 0)
+  row_avgs = col_sums / clipped_height
+  
   row_avgs_blurred = gaussian_filter(row_avgs, sigma=config.sigma)
   
   # find sections where robot can walk
@@ -265,6 +272,20 @@ def np_img_to_base64(np_array: np.array):
 
 
 def depth_arr_avg(depth_raw_arr: np.array):
+  config = LabelPassagewaysConfig()
+  
+  # clip depth averaging to only scan bottom of the image
+  image_height = depth_raw_arr.shape[0]
+  image_width = depth_raw_arr.shape[1]
+  top_percent = config.top_clip_percent
+  bottom_percent = config.bottom_clip_percent
+  depth_image_arr_clipped = (depth_raw_arr
+                             [int(image_height * top_percent):int(image_height * bottom_percent), :]
+                             .copy())
+  
+  # compute average distances using depth camera view
+  depth_image_arr_clipped[depth_image_arr_clipped == 2.047] = 0
+  
   blurred_depth_arr = gaussian_filter(depth_raw_arr, sigma=75)
   
   non_zero_count = np.count_nonzero(blurred_depth_arr, axis=0).astype(float)[25:-25]
