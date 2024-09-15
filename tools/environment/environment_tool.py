@@ -35,7 +35,10 @@ class EnvironmentTool(BaseTool):
                proximity_sensor_adapter: BaseDeviceIOAdapter,
                motor_adapter: BaseMotorService,
                context: GPTPetContext):
-    real_control_api = RealControlAPI(proximity_sensor_adapter, motor_adapter, context)
+    real_control_api = RealControlAPI(
+      proximity_sensor_adapter=proximity_sensor_adapter,
+      motor_adapter=motor_adapter,
+      context=context)
     super(EnvironmentTool, self).__init__(
       mock_control_api=MockControlAPI(),
       real_control_api=real_control_api,
