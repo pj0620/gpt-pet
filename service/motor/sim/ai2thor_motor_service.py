@@ -19,6 +19,8 @@ class Ai2ThorMotorService(BaseMotorService):
       move_magnitude: float = 1
   ) -> MovementResult:
     assert action in MOVEMENT_TO_AI2THOR_MOVEMENT.keys(), f'invalid movement action {action}'
+    
+    move_magnitude = min(move_magnitude, 1.)
 
     self.sim_adapter.do_step(
       action=MOVEMENT_TO_AI2THOR_MOVEMENT[action],

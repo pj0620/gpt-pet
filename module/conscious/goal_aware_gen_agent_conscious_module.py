@@ -119,7 +119,7 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       time=str(datetime.now()),
       previous_tasks=get_yaml(self.tasks_history, True),
       current_goal=context.goal_mixin.get_current_goal().description,
-      looking_direction=context.kinect_service.get_current_looking_direction()
+      # looking_direction=context.kinect_service.get_current_looking_direction()
     )
     if self.gen_agent_memory_enabled:
       human_msg_args["relevant_memory"] = get_yaml(relevant_memories_strs, True)

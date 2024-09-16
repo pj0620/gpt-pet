@@ -286,14 +286,14 @@ def depth_arr_avg(depth_raw_arr: np.array):
   # compute average distances using depth camera view
   depth_image_arr_clipped[depth_image_arr_clipped == 2.047] = 0
   
-  blurred_depth_arr = gaussian_filter(depth_raw_arr, sigma=75)
-  
-  non_zero_count = np.count_nonzero(blurred_depth_arr, axis=0).astype(float)[25:-25]
-  
-  # Sum of elements in each column
-  col_sums = np.sum(blurred_depth_arr, axis=0).astype(float)[25:-25]
+  # blurred_depth_arr = gaussian_filter(depth_raw_arr, sigma=75)
+  # non_zero_count = np.count_nonzero(blurred_depth_arr, axis=0).astype(float)[25:-25]
+  # col_sums = np.sum(blurred_depth_arr, axis=0).astype(float)[25:-25]
+  # row_avgs = np.where(non_zero_count != 0, col_sums / non_zero_count, 0)
   
   # Calculate averages, avoiding division by zero
-  row_avgs = np.where(non_zero_count != 0, col_sums / non_zero_count, 0)
-
+  clipped_height = (bottom_percent - top_percent) * image_height
+  col_sums = np.sum(depth_image_arr_clipped, axis=0)[25:-25]
+  row_avgs = col_sums / clipped_height
+  
   return min(row_avgs)
