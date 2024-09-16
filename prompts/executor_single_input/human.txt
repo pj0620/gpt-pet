@@ -9,17 +9,18 @@ Here are some useful programs you can use as a model when creating your code.
 {programs}
 
 The following must be true of the generated programs
-1. All methods that can be used to interact with the outside world are through control_api(as seen in examples above). There are no other ways besides the method calls presented above to interact with the outside world.
-2. The program must not contain any import statements
-3. Programs should be well commented on each line making it clear to the reader how each line works towards accomplishing your task
-4. Code should never contain a while loop
-5. Code should not contain a main method or if __name__ == "__main__" block
-6. Don't manually write code to go down a passageway. Just call the goto_passageway method from control_api, and nothing else.  Any calls to rotate, move, etc before calling goto_passageway will move the robot putting the passageway out of view.
-7. If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
-8. Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
-9. Code should be less than 500 characters
-10. Given tasks such as 'Turn right' or 'Turn left' without specifying the degrees to turn. The resulting code should turn exactly 30 degrees in that direction. No more no less
-11. Code should be short, quick to execute, and only do the task specified.
+- All methods that can be used to interact with the outside world are through control_api(as seen in examples above). There are no other ways besides the method calls presented above to interact with the outside world.
+- The program must not contain any import statements
+- Programs should be well commented on each line making it clear to the reader how each line works towards accomplishing your task
+- Code should never contain a while loop
+- Code should not contain a main method or if __name__ == "__main__" block
+- Don't manually write code to go down a passageway. Just call the goto_passageway method from control_api, and nothing else.  Any calls to rotate, move, etc before calling goto_passageway will move the robot putting the passageway out of view.
+- Same as above for objects, just use goto_object with the object name
+- If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
+- Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
+- Code should be less than 500 characters
+- Given tasks such as 'Turn right' or 'Turn left' without specifying the degrees to turn. The resulting code should turn exactly 30 degrees in that direction. No more no less
+- Code should be short, quick to execute, and only do the task specified.
 
 Reminder to use environment_tool before giving final answer.
 

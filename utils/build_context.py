@@ -6,6 +6,7 @@ from module.sensory.sim.ai2thor_depth_camera_module import Ai2ThorDepthCameraMod
 from service.analytics_service import AnalyticsService
 from service.device_io.sim.ai2thor_device_io_adapter import Ai2thorDeviceIOAdapter
 from service.kinect.sim.noop_kinect_service import NoopKinectService
+from service.kinect.sim.sim_kinect_service import SimKinectService
 from service.motor.sim.ai2thor_motor_service import Ai2ThorMotorService
 from service.sim_adapter.multi_agent_sim_adapter import MultiAgentSimAdapter
 from service.sim_adapter.single_agent_sim_adapter import SingleAgentSimAdapter
@@ -33,7 +34,7 @@ def build_context() -> tuple[GPTPetContext, list[BaseSensoryModule]]:
     context.motor_adapter = Ai2ThorMotorService(sim_adapter)
     camera_module = Ai2ThorCameraModule(sim_adapter)
     depth_camera_module = Ai2ThorDepthCameraModule(sim_adapter)
-    context.kinect_service = NoopKinectService()
+    context.kinect_service = SimKinectService(sim_adapter=sim_adapter)
     context.device_io_adapter = Ai2thorDeviceIOAdapter(sim_adapter)
   elif gptpet_env == 'physical':
     # keep imports here to avoid GPIO libraries causing issues

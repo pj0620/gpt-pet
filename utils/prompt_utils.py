@@ -9,7 +9,13 @@ from PIL import Image
 
 def load_prompt(prompt: str) -> str:
   with open('prompts/' + prompt) as f:
-    return f.read()
+    lines = []
+    for line in f.readlines():
+      if line.strip().startswith("#"):
+        continue
+      lines.append(line)
+    joined_lines = "".join(lines)
+    return joined_lines
 
 
 def encode_image(image_path):
@@ -69,8 +75,8 @@ def load_text(*fpaths, by_lines=False):
       return fp.readlines()
     else:
       return fp.read()
-    
-    
+
+
 def preprocess_sentence(sentence: str):
   cur = sentence.strip()
   if cur[-1] != '.':
