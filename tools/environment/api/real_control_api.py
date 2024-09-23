@@ -125,6 +125,10 @@ class RealControlAPI(BaseControlAPI):
     
     time.sleep(0.5)
     dist = min(self.read_ahead_sensor() * 0.9, self.read_ahead_sensor() - 0.2)
+    
+    if dist < 0.1:
+      raise InvalidPassagewayError(f"passageway `{passageway_name}` is too close cannot move through it.")
+    
     return self.move_ahead(dist)
   
   def turn_to_find_opening(self, initial_degrees: float, turn_step_deg: float) -> Tuple[bool, float]:
@@ -139,7 +143,7 @@ class RealControlAPI(BaseControlAPI):
         validated_depth = True
         break
       
-      self.analytics_service.new_text(f"{avg_depth} > {PASSAGEWAY_AVG_DEPTH_THRESHOLD}, rotating {turn_step_deg}")
+      self.analytics_service.new_text(f"{avg_depth} < {PASSAGEWAY_AVG_DEPTH_THRESHOLD}, rotating {turn_step_deg}")
       self.rotate(turn_step_deg)
       time.sleep(PASSAGEWAY_STOP_TIME)
     

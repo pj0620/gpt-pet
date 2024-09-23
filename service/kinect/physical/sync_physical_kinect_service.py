@@ -13,7 +13,6 @@ class SyncPhysicalKinectService(BaseKinectService):
   
   def set_led_mode(self, led_mode: int) -> None:
     """Set the tilt angle of the Kinect sensor."""
-    # The angle should be in the range of -30 to 30 degrees
     if led_mode not in FREENECT_LED_MODES:
       raise Exception(f"invalid led mode: {led_mode}")
     

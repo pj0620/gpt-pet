@@ -106,14 +106,6 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       for inp in context.conscious_inputs
     }
     
-    # Gen Agent
-    self.last_subconscious_summary = self.subconscious_input_summarizer(
-      context.conscious_inputs
-    )
-    context.analytics_service.new_text(f"conscious_input_summary: {self.last_subconscious_summary}")
-    relevant_memories_docs = self.gen_memory.fetch_memories(self.last_subconscious_summary, datetime.now())
-    relevant_memories_strs = [rm.page_content for rm in relevant_memories_docs]
-    
     human_msg_args = dict(
       subconscious_info=get_yaml(conscious_inputs_value_str, True),
       time=str(datetime.now()),
@@ -122,6 +114,12 @@ class GoalAwareGenAgentChainConsciousModule(BaseConsciousModule):
       # looking_direction=context.kinect_service.get_current_looking_direction()
     )
     if self.gen_agent_memory_enabled:
+      self.last_subconscious_summary = self.subconscious_input_summarizer(
+        context.conscious_inputs
+      )
+      context.analytics_service.new_text(f"conscious_input_summary: {self.last_subconscious_summary}")
+      relevant_memories_docs = self.gen_memory.fetch_memories(self.last_subconscious_summary, datetime.now())
+      relevant_memories_strs = [rm.page_content for rm in relevant_memories_docs]
       human_msg_args["relevant_memory"] = get_yaml(relevant_memories_strs, True)
     
     human_input = self.prompt_human.format(**human_msg_args)

@@ -13,7 +13,7 @@ PROXIMITY_SENSOR_RESOLUTION = 0.4
 
 
 class SingleAgentSimAdapter(BaseSimAdapter):
-  def __init__(self, scene="FloorPlan2"):
+  def __init__(self, scene="FloorPlan4"):
     self._controller = Controller(
       agentMode="locobot",
       
