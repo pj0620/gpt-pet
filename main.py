@@ -20,7 +20,7 @@ np.set_printoptions(precision=3, suppress=True)
 context, sensory_modules = build_context()
 
 context.kinect_service.set_led_mode(FREENECT_LED_RED)
-context.kinect_service.do_tilt(-15)
+context.kinect_service.do_tilt(0)
 
 context.analytics_service.new_text("initializing proximity module")
 sensory_modules.append(ProximityModule(context.device_io_adapter))
