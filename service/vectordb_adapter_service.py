@@ -347,7 +347,7 @@ class VectorDBAdapterService:
     
   def get_task(self, pet_view_id: str) -> SavedTask | None:
     self.analytics_service.new_text(f"searching for saved task for pet_view_id = {pet_view_id}")
-    try: #b015678e-d28e-45c9-b891-ea6cda1638b9
+    try:
       result = (
         self.vectordb_client.query
         .get(class_name=TASK_CLASS_NAME, properties=["task", "reasoning", "pet_view_id"])

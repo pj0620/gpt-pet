@@ -16,6 +16,7 @@ from service.analytics_service import AnalyticsService
 from service.device_io.base_device_io_adapter import BaseDeviceIOAdapter
 from service.kinect.base_kinect_service import BaseKinectService
 from service.motor.base_motor_service import BaseMotorService
+from utils.env_utils import check_env_flag
 
 GPIO.setmode(GPIO.BOARD)
 with open('constants/gpio/gpio.json', 'r') as file:
@@ -257,6 +258,9 @@ class PhysicalMotorService(BaseMotorService):
       GPIO.output(p, GPIO.LOW)
     
     GPIO.cleanup()
+    
+    if check_env_flag('SLEEP_AFTER_EVERY_ACTION'):
+      sleep(1)
     
     print("calculating after average depth")
     after_avg_depth = self._calc_average_dist()
