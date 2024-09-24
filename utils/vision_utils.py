@@ -298,4 +298,4 @@ def depth_arr_avg(depth_raw_arr: np.array):
   
   print('row_avgs: ', row_avgs)
   
-  return min(row_avgs)
+  return np.percentile(row_avgs, 10)
