@@ -7,8 +7,8 @@ import numpy as np
 
 from constants.gpio.gpio_constants import FORWARD, FACES, SIDES, BACK, DIRECTIONS, BACKWARD, FRONT, LEFT, RIGHT, \
   MOTOR_CONTROLLERS
-from constants.motor import LINEAR_ACTIONS, ROTATE_ACTIONS, MIN_WALL_DIST, DEPTH_SENSOR_STUCK_THRESHOLD, \
-  DEPTH_SENSOR_TIME_THRESHOLD
+from constants.motor import (LINEAR_ACTIONS, ROTATE_ACTIONS, MIN_WALL_DIST, DEPTH_SENSOR_TIME_THRESHOLD,
+                             DEPTH_SENSOR_STUCK_THRESHOLD_MM)
 from constants.physical_motor import *
 from model.collision import CollisionError, StuckError
 from model.motor import MovementResult
@@ -265,10 +265,17 @@ class PhysicalMotorService(BaseMotorService):
     print("calculating after average depth")
     after_avg_depth = self._calc_average_dist()
     
-    perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
-    if duration > DEPTH_SENSOR_TIME_THRESHOLD and perc_change_depth < DEPTH_SENSOR_STUCK_THRESHOLD:
+    # perc_change_depth = abs((after_avg_depth - before_avg_depth) / before_avg_depth)
+    # if duration > DEPTH_SENSOR_TIME_THRESHOLD and perc_change_depth < DEPTH_SENSOR_STUCK_THRESHOLD:
+    #   error_msg = f"Stuck error: depth sensor measurements indicate that you are stuck."
+    #   self.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+    #   raise StuckError(error_msg)
+    
+    change_depth = abs(after_avg_depth - before_avg_depth)
+    if duration > DEPTH_SENSOR_TIME_THRESHOLD and change_depth < DEPTH_SENSOR_STUCK_THRESHOLD_MM:
       error_msg = f"Stuck error: depth sensor measurements indicate that you are stuck."
-      self.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth}")
+      self.analytics_service.new_text(error_msg + f"; before: {before_avg_depth}, after: {after_avg_depth} less than "
+                                                  f"threshold of {DEPTH_SENSOR_STUCK_THRESHOLD_MM}")
       raise StuckError(error_msg)
   
   def _calc_average_dist(self):
