@@ -296,6 +296,7 @@ def depth_arr_avg(depth_raw_arr: np.array):
   col_sums = np.sum(depth_image_arr_clipped, axis=0)[25:-44]
   row_avgs = col_sums / clipped_height
   
-  print('row_avgs: ', row_avgs)
+  if np.all(row_avgs == 0):
+    return 0
   
   return np.percentile(row_avgs, 10)
