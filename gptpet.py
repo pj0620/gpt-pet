@@ -67,6 +67,12 @@ class GPTPet:
       
       self.conscious_module.report_task_result(new_task, context.task_result)
       
+      # delete last view if failed, maybe gptpet mislabeled
+      # TODO: assuming goal-based view
+      if not context.task_result.success:
+        if context.last_pet_view.pet_view_id is not None:
+          context.vectordb_adapter.delete_pet_view_with_goal(context.last_pet_view.pet_view_id)
+      
       context.analytics_service.new_text(
         f'task_result: {context.task_result}'
       )
