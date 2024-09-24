@@ -296,4 +296,6 @@ def depth_arr_avg(depth_raw_arr: np.array):
   col_sums = np.sum(depth_image_arr_clipped, axis=0)[25:-25]
   row_avgs = col_sums / clipped_height
   
+  print('row_avgs: ', row_avgs)
+  
   return min(row_avgs)
