@@ -293,7 +293,7 @@ def depth_arr_avg(depth_raw_arr: np.array):
   
   # Calculate averages, avoiding division by zero
   clipped_height = (bottom_percent - top_percent) * image_height
-  col_sums = np.sum(depth_image_arr_clipped, axis=0)[25:-25]
+  col_sums = np.sum(depth_image_arr_clipped, axis=0)[25:-44]
   row_avgs = col_sums / clipped_height
   
   print('row_avgs: ', row_avgs)
