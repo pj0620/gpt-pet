@@ -124,7 +124,7 @@ class RealControlAPI(BaseControlAPI):
                                      f"this passageway")
     
     time.sleep(0.5)
-    dist = min(self.read_ahead_sensor() * 0.9, self.read_ahead_sensor() - 0.2)
+    dist = self.read_ahead_sensor() * 0.9
     
     if dist < 0.1:
       raise InvalidPassagewayError(f"passageway `{passageway_name}` is too close cannot move through it.")
