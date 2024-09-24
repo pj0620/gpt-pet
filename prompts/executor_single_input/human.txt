@@ -15,7 +15,7 @@ The following must be true of the generated programs
 - Code should never contain a while loop
 - Code should not contain a main method or if __name__ == "__main__" block
 - Don't manually write code to go down a passageway. Just call the goto_passageway method from control_api, and nothing else.  Any calls to rotate, move, etc before calling goto_passageway will move the robot putting the passageway out of view.
-- Same as above for objects, just use goto_object with the object name
+- Same as above for objects("go to X"), just use goto_object with the object name
 - If there is a condition blocking you from completing the task; getting stuck, etc... let user know.
 - Tilting the robots camera can only be achieved by using control_api.tilt_...(), control_api.rotate() does NOT tilt the camera it turns the robot left/right.
 - Code should be less than 500 characters
