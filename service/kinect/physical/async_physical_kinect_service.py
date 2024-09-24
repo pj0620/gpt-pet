@@ -17,7 +17,7 @@ class AsyncPhysicalKinectService(BaseKinectService):
     self._update_led = NOOP_LED_MODE
     self._update_deg_tilt = NOOP_TILT_DEGREES
     
-    self._last_depth_frames = []
+    self._last_depth_frames: list[np.array] = []
     self._last_rgb = None
     
     # stores current angle
@@ -88,4 +88,6 @@ class AsyncPhysicalKinectService(BaseKinectService):
   def get_depth(self) -> np.array:
     print('self._last_depth_frames: ', self._last_depth_frames)
     print('res: ', sum(self._last_depth_frames) / DEPTH_FRAME_COUNT)
+    print('min: ', self._last_depth_frames[0].min())
+    print('max: ', self._last_depth_frames[0].max())
     return sum(self._last_depth_frames) / DEPTH_FRAME_COUNT
