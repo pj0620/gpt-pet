@@ -266,6 +266,20 @@ class VectorDBAdapterService:
     print(f'successfully created new create_pet_view_with_goal with id: {new_pet_view_id}, and associated with goal {new_pet_view.goal_id}')
     return new_pet_view_id
   
+  def delete_pet_view_with_goal(self, pet_view_with_goal: str) -> str | None:
+    try:
+      deleted_pet_view_id = self.vectordb_client.data_object.delete(
+        class_name=PET_VIEW_WITH_GOAL_CLASS_NAME,
+        uuid=pet_view_with_goal
+      )
+    except ConnectionError as e:
+      self.analytics_service.new_text("error: failed to delete petview with goal id from connection error")
+      print(e)
+      return None
+    
+    print(f'successfully deleted new pet_view_with_goal with id: {deleted_pet_view_id}')
+    return deleted_pet_view_id
+  
   def get_similar_skill(self, task_definition: TaskDefinition, skill_threshold: float) -> list[FoundSkill]:
     try:
       raw_response = self.weaviate_skill_lc.similarity_search_with_score(
