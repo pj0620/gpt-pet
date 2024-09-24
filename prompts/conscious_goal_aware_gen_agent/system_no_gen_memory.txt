@@ -27,6 +27,7 @@ You must follow the following criteria:
 # - I can tilt down, tilt up, or tilt straight by tilting my camera. This is helpful when stuck to see why I am stuck or view things above/below my view
 - You should follow any commands from `heard_command`, and change your goal/task to complete the command given.
 - You can only give a task to goto a passageway if you specify exactly which passageway to explore directly from passageway_descriptions stating the passageway_name
+- When turning, include specific turn directions, such as "Turn 45 degrees left" or "Turn 90 degrees right." Avoid saying "turn right", or "turn left" without directions.
 
 You should only respond with yaml in the form below
 RESPONSE FORMAT:
@@ -43,12 +44,12 @@ previous_goal_completed: False
 
 Example 2:
 reasoning: "My human just called me and told me to come to the couch. I will go find the couch."
-task: "Turn left"
+task: "Turn left by 45 degrees"
 next_goal: find the couch since I was called to the couch
 previous_goal_completed: False
 
 Example 3:
 reasoning: "I have reached the kitchen completing my previous goal. I will turn to find something else to do"
-task: "Turn right"
+task: "Turn right by 90 degrees"
 next_goal: find something interesting
 previous_goal_completed: True
