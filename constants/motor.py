@@ -38,4 +38,4 @@ DEPTH_SENSOR_TIME_THRESHOLD = 0.1
 # depth sensor stuck threshold in mm.
 #   change in avg depth < DEPTH_SENSOR_STUCK_THRESHOLD -> Stuck detected
 #   change in avg depth >= DEPTH_SENSOR_STUCK_THRESHOLD -> NO Stuck detected
-DEPTH_SENSOR_STUCK_THRESHOLD_MM = 50 # %
+DEPTH_SENSOR_STUCK_THRESHOLD_MM = 20 # %

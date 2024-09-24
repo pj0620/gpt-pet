@@ -86,8 +86,4 @@ class AsyncPhysicalKinectService(BaseKinectService):
     return self._last_rgb
   
   def get_depth(self) -> np.array:
-    print('self._last_depth_frames: ', self._last_depth_frames)
-    print('res: ', sum(self._last_depth_frames) / DEPTH_FRAME_COUNT)
-    print('min: ', self._last_depth_frames[0].min())
-    print('max: ', self._last_depth_frames[0].max())
     return sum(self._last_depth_frames) / DEPTH_FRAME_COUNT
