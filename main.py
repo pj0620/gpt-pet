@@ -46,10 +46,15 @@ if not check_env_flag('SIM_SKIP_PROXIMITY_SENSOR'):
   subconscious_input_modules.append(ProximitySensorModule())
 
 context.analytics_service.new_text("initializing conscious module")
-conscious_module = CachedConsciousModule(GoalAwareGenAgentChainConsciousModule(
+# conscious_module = CachedConsciousModule(GoalAwareGenAgentChainConsciousModule(
+#   vector_db_adapter_service=context.vectordb_adapter,
+#   analytics_service=context.analytics_service
+# ))
+
+conscious_module = GoalAwareGenAgentChainConsciousModule(
   vector_db_adapter_service=context.vectordb_adapter,
   analytics_service=context.analytics_service
-))
+)
 
 context.analytics_service.new_text("initializing executor module")
 executor_module = SingleInputAgentExecutorModule(context)
