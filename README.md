@@ -22,10 +22,9 @@ Link to GPTPet's [3d model](https://cad.onshape.com/documents/8d74c2e4639a24043b
 3. Once Docker is started, run `docker-compose up` in the gpt-pet directory. This should install for a long time.
 4. install requirements from requirements.txt
      `python -m pip install -r requirements.txt`
-6. create a new file named '.env'
-7. add the following to .env `OPENAI_API_KEY=<INSERT YOUR OPENAI KEY>`
-8. run main.py through pycharm's launcher with the following settings. The important thing is to point it to your .env file.
-9. watch the Pet start walking!
+5. update OPENAI_API_KEY in .env
+6. run main.py
+7. watch the Pet start walking!
 
 ## As one script
 ```
@@ -34,7 +33,6 @@ cd gpt-pet
 # !!!MAKE SURE DOCKER IS RUNNING!!!
 docker-compose up &
 python -m pip install -r requirements.txt
-echo "OPENAI_API_KEY=<INSERT YOUR OPENAI KEY>" > .env
-source .env
+# update OPENAI_API_KEY in .env
 python main.py
 ```
