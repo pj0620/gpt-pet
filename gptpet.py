@@ -78,5 +78,4 @@ class GPTPet:
       )
       
       # necessary to make sure robot is still for image
-      # sleep(0.5)
-      sleep(5)
+      sleep(0.5)
